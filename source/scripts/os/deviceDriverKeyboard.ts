@@ -77,8 +77,6 @@ module TSOS {
                     _Console.historyIndex--;
                 }else{
 
-                    _Console.historyIndex++;
-
                     if (_Console.historyIndex >= _Console.consoleHistory.length) {
                         _Console.historyIndex = 0;
                     }
@@ -86,6 +84,7 @@ module TSOS {
                     if (_Console.consoleHistory[_Console.historyIndex]) {
                         this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
                     }
+                    _Console.historyIndex++;
                 }
 
             } else if(keyCode == 9){    //Tab key

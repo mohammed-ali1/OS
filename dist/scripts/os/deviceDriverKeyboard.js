@@ -74,7 +74,6 @@ var TSOS;
                     }
                     _Console.historyIndex--;
                 } else {
-                    _Console.historyIndex++;
 
                     if (_Console.historyIndex >= _Console.consoleHistory.length) {
                         _Console.historyIndex = 0;
@@ -83,6 +82,7 @@ var TSOS;
                     if (_Console.consoleHistory[_Console.historyIndex]) {
                         this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
                     }
+                    _Console.historyIndex++;
                 }
             } else if (keyCode == 9) {
                 var buffer = _Console.buffer;
