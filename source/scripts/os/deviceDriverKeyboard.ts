@@ -67,8 +67,6 @@ module TSOS {
 
                 if(keyCode == 38) { //UP Arrow Key
 
-                    _Console.historyIndex--;
-
                     if (_Console.historyIndex < 0) {
                         _Console.historyIndex = _Console.consoleHistory.length - 1;
                     }
@@ -76,6 +74,7 @@ module TSOS {
                     if (_Console.consoleHistory[_Console.historyIndex]) {
                         this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
                     }
+                    _Console.historyIndex--;
                 }else{
 
                     _Console.historyIndex++;

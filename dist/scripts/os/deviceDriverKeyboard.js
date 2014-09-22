@@ -65,8 +65,6 @@ var TSOS;
                 _Console.deleteCurrentBuffer();
 
                 if (keyCode == 38) {
-                    _Console.historyIndex--;
-
                     if (_Console.historyIndex < 0) {
                         _Console.historyIndex = _Console.consoleHistory.length - 1;
                     }
@@ -74,6 +72,7 @@ var TSOS;
                     if (_Console.consoleHistory[_Console.historyIndex]) {
                         this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
                     }
+                    _Console.historyIndex--;
                 } else {
                     _Console.historyIndex++;
 
