@@ -71,9 +71,7 @@ var TSOS;
                         _Console.historyIndex = _Console.consoleHistory.length - 1;
                     }
 
-                    if (_Console.consoleHistory[_Console.historyIndex]) {
-                        this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
-                    }
+                    this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
                 } else {
                     _Console.historyIndex++;
 
@@ -81,21 +79,22 @@ var TSOS;
                         _Console.historyIndex = 0;
                     }
 
-                    if (_Console.consoleHistory[_Console.historyIndex]) {
-                        this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
-                    }
+                    this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
                 }
             } else if (keyCode == 9) {
-                var buffer = _Console.buffer;
+                _Console.deleteCurrentLine();
+                var buffer = _Console.buffer.substring(0, 3);
 
-                var input = buffer.charAt(0);
-
-                for (var i = 0; i < _OsShell.commandList.length; i++) {
-                    if (input == _OsShell.commandList[i].charAt(i)) {
-                        _StdOut.deleteCurrentLine();
-                        _StdOut.putText("Match: " + _OsShell.commandList[i].command);
-                        return;
+                if (buffer.length >= 2) {
+                    for (var i = 0; i < _OsShell.commandList.length; i++) {
+                        if (buffer == _OsShell.commandList[i].command.substring(0, 3)) {
+                            _Console.deleteCurrentLine();
+                            _StdOut.putText(_OsShell.commandList[i].command);
+                            return;
+                        }
                     }
+                } else {
+                    _StdOut.putText("Length needs to be at least 2!");
                 }
             } else {
                 _OsShell.shellBSOD();
