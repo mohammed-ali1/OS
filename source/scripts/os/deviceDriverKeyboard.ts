@@ -74,7 +74,7 @@ module TSOS {
 
                     this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
 
-                }else{
+                }else{  //Down Arrow Key
 
                     _Console.historyIndex++;
 
@@ -95,12 +95,13 @@ module TSOS {
 
                         if (buffer == _OsShell.commandList[i].command.substring(0, 3)) {
 
+                            _StdOut.deleteCurrentLine();
+                            _StdOut.putText(_OsShell.commandList[i].command);
+                            _StdOut.handleInput();
+                            return;
                         }
                     }
                 }
-            }
-            else{
-                _OsShell.shellBSOD();
             }
         }
 

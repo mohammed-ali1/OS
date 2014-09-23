@@ -101,10 +101,6 @@ module TSOS {
          */
         public renderDate(){
 
-//            setInterval(function(){
-//                document.getElementById("time").innerHTML = new Date().toLocaleTimeString();
-//            },1000);
-
                 // CLOCK WHICH IS NOT WORKING :(
 //            document.getElementById("status").innerHTML = "Type status to change me!";
 //

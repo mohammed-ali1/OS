@@ -88,11 +88,13 @@ var TSOS;
                 if (buffer.length >= 2) {
                     for (var i = 0; i < _OsShell.commandList.length; i++) {
                         if (buffer == _OsShell.commandList[i].command.substring(0, 3)) {
+                            _StdOut.deleteCurrentLine();
+                            _StdOut.putText(_OsShell.commandList[i].command);
+                            _StdOut.handleInput();
+                            return;
                         }
                     }
                 }
-            } else {
-                _OsShell.shellBSOD();
             }
         };
 

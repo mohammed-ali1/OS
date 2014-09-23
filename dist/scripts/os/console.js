@@ -100,9 +100,6 @@ var TSOS;
         * of the page.
         */
         Console.prototype.renderDate = function () {
-            //            setInterval(function(){
-            //                document.getElementById("time").innerHTML = new Date().toLocaleTimeString();
-            //            },1000);
             // CLOCK WHICH IS NOT WORKING :(
             //            document.getElementById("status").innerHTML = "Type status to change me!";
             //

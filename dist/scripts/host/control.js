@@ -92,7 +92,7 @@ var TSOS;
             /*
             DISPLAY THE CLOCK @ THE TOP AND STATUS!
             */
-            _Console.renderDate();
+            document.getElementById("status").innerHTML = "Type Status to change me!";
         };
 
         Control.hostBtnHaltOS_click = function (btn) {
