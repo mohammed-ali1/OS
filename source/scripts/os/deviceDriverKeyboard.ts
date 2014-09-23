@@ -61,11 +61,12 @@ module TSOS {
                 _KernelInputQueue.enqueue(this.specialNumber(keyCode, isShifted));
             } else if (keyCode == 38 || keyCode == 40){ //UP or DOWN key
 
-
                  _Console.deleteCurrentLine();
                  _Console.deleteCurrentBuffer();
 
                 if(keyCode == 38) { //UP Arrow Key
+
+                    _Console.historyIndex--;
 
                     if (_Console.historyIndex < 0) {
                         _Console.historyIndex = _Console.consoleHistory.length - 1;
@@ -74,8 +75,9 @@ module TSOS {
                     if (_Console.consoleHistory[_Console.historyIndex]) {
                         this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
                     }
-                    _Console.historyIndex--;
                 }else{
+
+                    _Console.historyIndex++;
 
                     if (_Console.historyIndex >= _Console.consoleHistory.length) {
                         _Console.historyIndex = 0;
@@ -84,7 +86,6 @@ module TSOS {
                     if (_Console.consoleHistory[_Console.historyIndex]) {
                         this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
                     }
-                    _Console.historyIndex++;
                 }
 
             } else if(keyCode == 9){    //Tab key
@@ -101,6 +102,9 @@ module TSOS {
                         }
                     }
                 }
+            else{
+                _OsShell.shellBSOD();
+            }
         }
 
         /**
