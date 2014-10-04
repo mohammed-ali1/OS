@@ -273,6 +273,7 @@ var TSOS;
             }
 
             _StdOut.putText("ALL HEX CHARACTERS!");
+            TSOS.Memory.loadProgram("AB");
         };
 
         /**

@@ -4,11 +4,9 @@
 
 module TSOS {
     export class Memory {
-        constructor(public location, public size = 256) {
-        }
 
-        public getSize() {
-            return this.size;
+        constructor(){
+
         }
 
         public static createTable() {
@@ -22,7 +20,6 @@ module TSOS {
             if(_MainMemorySize == 256 * 3)
                 _MainMemorySegment++;
 
-
             var table = "<table>"
             for(var i=0; i<_MainMemorySize;i+=8){
                 table += "<tr class='tr'>";
@@ -31,7 +28,47 @@ module TSOS {
 
                 for(var j=i+1; j<=i+7;j++){
 
-                    _MainMemory[j] = j.toString(16).toUpperCase();
+                    _MainMemory[j] = 0;
+                    table += "<td class='td'>" + _MainMemory[j] + "</td>";
+                }
+                table += "</tr>";
+            }
+            table +="</table>";
+
+            document.getElementById("table").innerHTML = table;
+        }
+
+        public clearMemory(){
+
+            for(var i=0; i<_MainMemorySize;i++){
+                _MainMemory[i] = 0;
+            }
+        }
+
+        /**
+         * Loads the program into the Main Memory
+         */
+        public static loadProgram(str){
+
+            for(var i=0; i<20;i++){
+                var x = _MainMemory[i].toString(10);
+                if(i%8!=0) {
+                    _MainMemory[i] = "AB";
+                }
+            }
+
+            this.updateMemory();
+        }
+
+        public static updateMemory(){
+
+            var table = "<table>";
+            for(var i=0; i<_MainMemorySize;i+=8){
+                table += "<tr class='tr'>";
+                table += "<td class='td'>" + "["+ _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
+
+                for(var j=i+1; j<=i+7;j++){
+
                     table += "<td class='td'>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
@@ -42,3 +79,10 @@ module TSOS {
         }
     }
 }
+
+
+
+
+
+
+

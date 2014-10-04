@@ -4,15 +4,8 @@
 var TSOS;
 (function (TSOS) {
     var Memory = (function () {
-        function Memory(location, size) {
-            if (typeof size === "undefined") { size = 256; }
-            this.location = location;
-            this.size = size;
+        function Memory() {
         }
-        Memory.prototype.getSize = function () {
-            return this.size;
-        };
-
         Memory.createTable = function () {
             _MainMemory = new Array();
 
@@ -30,7 +23,43 @@ var TSOS;
                 table += "<td class='td'>" + "[" + _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
 
                 for (var j = i + 1; j <= i + 7; j++) {
-                    _MainMemory[j] = j.toString(16).toUpperCase();
+                    _MainMemory[j] = 0;
+                    table += "<td class='td'>" + _MainMemory[j] + "</td>";
+                }
+                table += "</tr>";
+            }
+            table += "</table>";
+
+            document.getElementById("table").innerHTML = table;
+        };
+
+        Memory.prototype.clearMemory = function () {
+            for (var i = 0; i < _MainMemorySize; i++) {
+                _MainMemory[i] = 0;
+            }
+        };
+
+        /**
+        * Loads the program into the Main Memory
+        */
+        Memory.loadProgram = function (str) {
+            for (var i = 0; i < 20; i++) {
+                var x = _MainMemory[i].toString(10);
+                if (i % 8 != 0) {
+                    _MainMemory[i] = "AB";
+                }
+            }
+
+            this.updateMemory();
+        };
+
+        Memory.updateMemory = function () {
+            var table = "<table>";
+            for (var i = 0; i < _MainMemorySize; i += 8) {
+                table += "<tr class='tr'>";
+                table += "<td class='td'>" + "[" + _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
+
+                for (var j = i + 1; j <= i + 7; j++) {
                     table += "<td class='td'>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
