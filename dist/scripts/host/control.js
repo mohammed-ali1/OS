@@ -61,6 +61,7 @@ var TSOS;
             // Update the log console.
             var taLog = document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
+            taLog.style.color = "#" + Math.floor(Math.random() * 16777215).toString(16);
             // Optionally update a log database or some streaming service.
         };
 
@@ -92,7 +93,16 @@ var TSOS;
             /*
             DISPLAY THE CLOCK @ THE TOP AND STATUS!
             */
-            document.getElementById("status").innerHTML = "Type Status to change me!";
+            document.getElementById("status").innerHTML = "Status: Running...";
+            TSOS.Memory.createTable();
+            //            var tr = document.createElement("tr");
+            //            tr.setAttribute("id","tr"+0);
+            //            var td = document.createElement("td");
+            //            td.appendchild(document.createTextNode("TABLE TEST"));
+            //            tr.appendchild(td);
+            //            var tbody = document.createElement("tbody");
+            //            tbody.appendChild(tr);
+            //            document.getElementById("table").appendChild(tbody);
         };
 
         Control.hostBtnHaltOS_click = function (btn) {

@@ -1,5 +1,25 @@
 /* TSOS.css */
 
+/* Heading */
+#top{
+    margin-bottom: 1%;
+    width: 100%;
+    height: 70px;
+    background-color: lightgray;
+    border-radius: 10px;
+}
+
+#status{
+    float: left;
+    color: firebrick;
+    font-size: 24px;
+}
+#clock{
+    float: right;
+    font-size: 25px;
+    color:firebrick;
+}
+
 body {
     /*background: #909193 url(../images/linen.png) repeat;*/
     background-color: darkgray;
@@ -9,12 +29,17 @@ body {
     font-style: normal;
 }
 
+#divMain{
+    width:70%;
+    float: left;
+    height: auto;
+}
+
 h1 {
     color: black;
     font-size: 24pt;
     font-weight: normal;
     font-style: normal;
-    border-bottom: 1px solid black;
 }
 
 h2 {
@@ -22,6 +47,7 @@ h2 {
     font-size: 20pt;
     font-weight: normal;
     font-style: normal;
+    color: firebrick;
 }
 
 h3 {
@@ -29,6 +55,7 @@ h3 {
     font-size: 16pt;
     font-weight: normal;
     font-style: normal;
+    color: firebrick;
 }
 
 #display {
@@ -48,12 +75,17 @@ h3 {
     text-align: center;
 }
 
+#divButtonBar{
+    padding-top: 10px;
+}
+
 #btnStartOS{
     background-color: lawngreen;
     font-size: 20px;
     border-radius: 5px;
     -webkit-border-radius: 10px;
     width: 150px;
+
 }
 
 #btnHaltOS{
@@ -72,6 +104,69 @@ h3 {
     width: 150px;
 }
 
-#display, #taHostLog, #taProgramInput{
+ #taHostLog, #taProgramInput{
     border-radius: 5px;
+    border: transparent;
+    background-color: darkgray;
+}
+
+ #taProgramInput{
+     background-color: #ffffff;
+     width:360px;
+}
+
+#taHostLog{
+    color:firebrick;
+    resize:none;
+    width:350px;
+    height:250px;
+    overflow: scroll;
+    font-family: Helvetica, Verdana, Arial, sans-serif;
+    font-size: 9pt;
+    font-weight: bold;
+    font-style: normal;
+    padding-left: 5px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    margin-left: 5px;
+}
+
+#divLog{
+    margin-top: -3%;
+}
+
+
+/*.divMemory{*/
+    /*border: 1px   solid #000000;*/
+    /*width: 28%;*/
+    /*margin-top:2%;*/
+    /*overflow: scroll;*/
+    /*height: 254px;*/
+    /*float: left;*/
+    /*margin-left: 1%;*/
+    /*background-color:transparent;*/
+    /*margin-top:5px;*/
+/*}*/
+
+#tableID{
+    margin-top:1%;
+    width:350px;
+    float: left;
+    height:300px;
+    overflow: scroll;
+    background-color: transparent;
+    font-size: 18px;
+}
+
+tr:nth-child(odd) {
+    background-color: #FFFFAA;
+}
+tr:nth-child(even) {
+    background-color: #C8C800;
+}
+td:hover{
+    background-color: #FF9331;
+}
+.td{
+    padding: 5px;
 }

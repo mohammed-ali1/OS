@@ -25,27 +25,35 @@
     <script type="text/javascript" src="dist/scripts/os/shellCommand.js"></script>
     <script type="text/javascript" src="dist/scripts/os/userCommand.js"></script>
     <script type="text/javascript" src="dist/scripts/os/kernel.js"></script>
+    <script type="text/javascript" src="dist/scripts/os/Memory.js"></script>
 
     <!-- Other Routines -->
     <script type="text/javascript" src="dist/scripts/utils.js"></script>
     <!-- Uncomment this line below to enable Glados testing -->
     <!-- <script type="text/javascript" src="http://www.labouseur.com/courses/os/projects/glados.js"></script> -->
-
-    <center><h1 id="status" style="color: firebrick">Status: off</h1></center>
-
-    <center><h1 id="clock"></h1></center>
-
-   <script>
-       setInterval(function(){
-           document.getElementById("clock").innerHTML = new Date().toLocaleString();
-       },100);
-   </script>
-
 </head>
 
 <body onload="onDocumentLoad();">
 
-<div id="divMain" style="width:100%;">
+<div id="top">
+
+    <p id="status">
+        Status: off
+    </p>
+
+    <p id="clock">
+
+        <script>
+            setInterval(function(){
+                document.getElementById("clock").innerHTML = "[" + new Date().toLocaleDateString() +
+                        "] [" +    new Date().toLocaleTimeString() + "]";
+            },100);
+        </script>
+        <br> <br> <br> <br>
+    </p>
+</div>
+
+<div id="divMain">
 
     <div id="divButtonBar" style="margin:4px;">
         <input type="button"
@@ -83,31 +91,69 @@
         </canvas>
     </div>
 
-    <div id="divLog" style="margin-left:520px;">
-        <label>
-            Host Log
-            <br>
+    <div id="divLog" style="margin-left:2%;margin-top:-4%; ">
+            <center><h3 style="color: firebrick;">Host Log</h3></center>
             <textarea name="taHostLog"
                       id  ="taHostLog"
                       rows="26"
                       cols="48"
                     ></textarea>
-        </label>
     </div>
 
-    <div id="divUserProgramInput" style="margin-left:520px;">
-        <label>
-            User Program Input
-            <br>
+    <div id="divUserProgramInput" style="margin-left:2%; margin-top:6%;">
+
+            <center><h3 style="color: firebrick;margin-top:-1">User Program Input</h3></center>
             <textarea name="taProgramInput"
                       id  ="taProgramInput"
                       rows="8"
                       cols="48"
                     ></textarea>
-        </label>
     </div>
-
 </div>
+    <p style="margin-top:40px;">
+    <center>
+        <h3>Main Memory</h3>
+    </center>
+    </p>
+
+    <!--<div class="divMemory">-->
+        <!--<script type="text/javascript">-->
+
+    <!--// NEED TO FIGURE OUT HOW TO DO THIS INSIDE THE TABLE-->
+    <!--// FOR NOW STICKING WITH RENDERING INSIDE THIS SCRIPT-->
+
+            <!--//Convert to Base 16 and ADD to the Memory Array-->
+            <!--//CREATE THE MEMORY-->
+            <!--for(var i=0; i<_MemorySize;i+=8){-->
+                <!--_Memory[i] = i.toString(16).toUpperCase();-->
+                <!--for(var j=i+1; j<=i+7;j++){-->
+                    <!--_Memory[j] = j.toString(16).toUpperCase();-->
+                <!--}-->
+            <!--}-->
+
+            <!--//Figure out the segment-->
+            <!--if(_Memory.length==256)-->
+            <!--_Segment ++;-->
+            <!--if(_Memory.length==256*2)-->
+                <!--_Segment++;-->
+            <!--if(_Memory.length==256*3)-->
+                <!--_Segment++;-->
+
+                <!--//Finally Render Memory onto the web-->
+             <!--for(var i=0; i< _Memory.length;i+=8) {-->
+                 <!--document.writeln("{" + _Segment + "X" + _Memory[i] + "}");-->
+
+                 <!--for (var j = i + 1; j <= i + 7; j++) {-->
+                     <!--document.writeln(_Memory[j]);-->
+                 <!--}-->
+                 <!--document.writeln("<br>");-->
+             <!--}-->
+        <!--</script>-->
+    <!--</div>-->
+
+    <div id="tableID">
+        <table id="table"></table>
+    </div>
 
 <p class="footerText" style="clear:both;">
     <br>

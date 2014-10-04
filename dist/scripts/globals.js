@@ -62,6 +62,14 @@ var _hardwareClockID = null;
 var _GLaDOS = null;
 var Glados = null;
 
+// MEMORY INFO
+var _Segment = -1;
+var _Memory = new Array();
+var _MemorySize = 256;
+var _MainMemory = null;
+var _MainMemorySize = 256;
+var _MainMemorySegment = -1;
+
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();
 };

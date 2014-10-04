@@ -283,7 +283,7 @@ module TSOS {
          */
         public shellLoad(){
 
-            var x = document.getElementById("taProgramInput").value;
+            var x =  document.getElementById("taProgramInput").value;
 
             if(x.length == 0){
                 _StdOut.putText("There's NOTHING to load!");
