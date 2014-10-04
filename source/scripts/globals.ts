@@ -67,9 +67,6 @@ var _GLaDOS: any = null;
 var Glados: any = null;
 
 // MEMORY INFO
-var _Segment: number = -1;
-var _Memory = new Array();
-var _MemorySize : number = 256;
 var _MainMemory: any[] = null;
 var _MainMemorySize: number = 256;
 var _MainMemorySegment: number = -1;

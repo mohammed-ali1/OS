@@ -283,7 +283,8 @@ module TSOS {
          */
         public shellLoad(){
 
-            var x =  document.getElementById("taProgramInput").value;
+            var f =  document.getElementById("taProgramInput").value;
+            var x = f.replace(/\s/g,'');
 
             if(x.length == 0){
                 _StdOut.putText("There's NOTHING to load!");
@@ -301,9 +302,8 @@ module TSOS {
                     return;
                 }
             }
-
-            _StdOut.putText("ALL HEX CHARACTERS!");
-            TSOS.Memory.loadProgram("AB");
+            _StdOut.putText("Loaded Successfully!");
+            TSOS.Memory.loadProgram(x.toString());
         }
 
         /**

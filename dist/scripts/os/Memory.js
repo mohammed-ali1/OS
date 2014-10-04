@@ -5,8 +5,12 @@ var TSOS;
 (function (TSOS) {
     var Memory = (function () {
         function Memory() {
+            this.createTable();
         }
-        Memory.createTable = function () {
+        /**
+        * Creates the Memory inside the Table
+        */
+        Memory.prototype.createTable = function () {
             _MainMemory = new Array();
 
             if (_MainMemorySize == 256)
@@ -17,6 +21,7 @@ var TSOS;
                 _MainMemorySegment++;
 
             var table = "<table>";
+
             for (var i = 0; i < _MainMemorySize; i += 8) {
                 table += "<tr class='tr'>";
                 _MainMemory[i] = i.toString(16).toUpperCase();
@@ -43,18 +48,29 @@ var TSOS;
         * Loads the program into the Main Memory
         */
         Memory.loadProgram = function (str) {
-            for (var i = 0; i < 20; i++) {
-                var x = _MainMemory[i].toString(10);
-                if (i % 8 != 0) {
-                    _MainMemory[i] = "AB";
+            var x = str.toString();
+            x = x.trim();
+            var a = 0, b = 2;
+
+            for (var i = 0; i < str.length; i += 8) {
+                for (var j = i + 1; j <= i + 7; j++) {
+                    _MainMemory[j] = x.substring(a, b);
+                    a = b;
+                    b = b + 2;
+
+                    if (_MainMemory[j] == "") {
+                        _MainMemory[j] = 0;
+                    }
                 }
             }
-
-            this.updateMemory();
         };
 
+        /**
+        * Updates the Memory (called by the setInterval function every 100 ms)
+        */
         Memory.updateMemory = function () {
             var table = "<table>";
+
             for (var i = 0; i < _MainMemorySize; i += 8) {
                 table += "<tr class='tr'>";
                 table += "<td class='td'>" + "[" + _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
@@ -65,7 +81,6 @@ var TSOS;
                 table += "</tr>";
             }
             table += "</table>";
-
             document.getElementById("table").innerHTML = table;
         };
         return Memory;

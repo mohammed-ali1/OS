@@ -6,10 +6,13 @@ module TSOS {
     export class Memory {
 
         constructor(){
-
+            this.createTable();
         }
 
-        public static createTable() {
+        /**
+         * Creates the Memory inside the Table
+         */
+        public createTable() {
 
             _MainMemory = new Array();
 
@@ -21,6 +24,7 @@ module TSOS {
                 _MainMemorySegment++;
 
             var table = "<table>"
+
             for(var i=0; i<_MainMemorySize;i+=8){
                 table += "<tr class='tr'>";
                 _MainMemory[i] = i.toString(16).toUpperCase();
@@ -50,39 +54,44 @@ module TSOS {
          */
         public static loadProgram(str){
 
-            for(var i=0; i<20;i++){
-                var x = _MainMemory[i].toString(10);
-                if(i%8!=0) {
-                    _MainMemory[i] = "AB";
+            var x = str.toString();
+                x = x.trim();
+            var a = 0, b = 2;
+            //Need to load carefully Here!
+
+            for(var i=0; i<str.length;i+=8){
+
+                for(var j= i+1; j<=i+7;j++){
+                    _MainMemory[j] = x.substring(a,b);
+                    a = b;
+                    b = b+2;
+
+                    if(_MainMemory[j] == ""){
+                        _MainMemory[j] = 0;
+                    }
                 }
             }
-
-            this.updateMemory();
         }
 
+        /**
+         * Updates the Memory (called by the setInterval function every 100 ms)
+         */
         public static updateMemory(){
 
             var table = "<table>";
+
             for(var i=0; i<_MainMemorySize;i+=8){
+
                 table += "<tr class='tr'>";
                 table += "<td class='td'>" + "["+ _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
 
                 for(var j=i+1; j<=i+7;j++){
-
                     table += "<td class='td'>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
             }
             table +="</table>";
-
             document.getElementById("table").innerHTML = table;
         }
     }
 }
-
-
-
-
-
-
-

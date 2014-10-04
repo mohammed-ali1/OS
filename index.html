@@ -92,7 +92,7 @@
     </div>
 
     <div id="divLog" style="margin-left:2%;margin-top:-4%; ">
-            <center><h3 style="color: firebrick;">Host Log</h3></center>
+            <center><h3 style="color: firebrick;">Logger</h3></center>
             <textarea name="taHostLog"
                       id  ="taHostLog"
                       rows="26"
@@ -110,49 +110,21 @@
                     ></textarea>
     </div>
 </div>
-    <p style="margin-top:40px;">
-    <center>
-        <h3>Main Memory</h3>
-    </center>
+
+    <p>
+        <center>
+            <h3 style="margin-left: 1%;">Main Memory</h3>
+        </center>
     </p>
-
-    <!--<div class="divMemory">-->
-        <!--<script type="text/javascript">-->
-
-    <!--// NEED TO FIGURE OUT HOW TO DO THIS INSIDE THE TABLE-->
-    <!--// FOR NOW STICKING WITH RENDERING INSIDE THIS SCRIPT-->
-
-            <!--//Convert to Base 16 and ADD to the Memory Array-->
-            <!--//CREATE THE MEMORY-->
-            <!--for(var i=0; i<_MemorySize;i+=8){-->
-                <!--_Memory[i] = i.toString(16).toUpperCase();-->
-                <!--for(var j=i+1; j<=i+7;j++){-->
-                    <!--_Memory[j] = j.toString(16).toUpperCase();-->
-                <!--}-->
-            <!--}-->
-
-            <!--//Figure out the segment-->
-            <!--if(_Memory.length==256)-->
-            <!--_Segment ++;-->
-            <!--if(_Memory.length==256*2)-->
-                <!--_Segment++;-->
-            <!--if(_Memory.length==256*3)-->
-                <!--_Segment++;-->
-
-                <!--//Finally Render Memory onto the web-->
-             <!--for(var i=0; i< _Memory.length;i+=8) {-->
-                 <!--document.writeln("{" + _Segment + "X" + _Memory[i] + "}");-->
-
-                 <!--for (var j = i + 1; j <= i + 7; j++) {-->
-                     <!--document.writeln(_Memory[j]);-->
-                 <!--}-->
-                 <!--document.writeln("<br>");-->
-             <!--}-->
-        <!--</script>-->
-    <!--</div>-->
 
     <div id="tableID">
         <table id="table"></table>
+        <script>
+            setInterval(function(){
+                TSOS.Memory.updateMemory();
+
+            },100);
+        </script>
     </div>
 
 <p class="footerText" style="clear:both;">

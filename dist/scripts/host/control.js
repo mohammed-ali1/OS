@@ -94,7 +94,7 @@ var TSOS;
             DISPLAY THE CLOCK @ THE TOP AND STATUS!
             */
             document.getElementById("status").innerHTML = "Status: Running...";
-            TSOS.Memory.createTable();
+            new TSOS.Memory();
             //            var tr = document.createElement("tr");
             //            tr.setAttribute("id","tr"+0);
             //            var td = document.createElement("td");

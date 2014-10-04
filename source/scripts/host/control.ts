@@ -100,7 +100,7 @@ module TSOS {
              */
 
             document.getElementById("status").innerHTML = "Status: Running...";
-            Memory.createTable();
+            new Memory();
 
 //            var tr = document.createElement("tr");
 //            tr.setAttribute("id","tr"+0);

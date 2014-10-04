@@ -13,6 +13,7 @@
     color: firebrick;
     font-size: 24px;
 }
+
 #clock{
     float: right;
     font-size: 25px;
@@ -21,7 +22,7 @@
 
 body {
     /*background: #909193 url(../images/linen.png) repeat;*/
-    background-color: darkgray;
+    background-color: rgba(122, 122, 122, 0.40);
     font-family: Helvetica, Verdana, Arial, sans-serif;
     font-size: 12pt;
     font-weight: normal;
@@ -61,6 +62,7 @@ h3 {
     background-color:#DFDBC3;
     /*border: 2px solid red;*/
     cursor: default;
+    border-radius: 5px;
 }
 
 .normal_button {
@@ -104,14 +106,15 @@ h3 {
 }
 
  #taHostLog, #taProgramInput{
-    border-radius: 5px;
     border: transparent;
-    background-color: darkgray;
+    background-color: transparent;
 }
 
  #taProgramInput{
-     background-color: #ffffff;
+     background-color: whitesmoke;
      width:360px;
+     resize: none;
+     border-radius: 10px;
 }
 
 #taHostLog{
@@ -134,32 +137,19 @@ h3 {
     margin-top: -3%;
 }
 
-
-/*.divMemory{*/
-    /*border: 1px   solid #000000;*/
-    /*width: 28%;*/
-    /*margin-top:2%;*/
-    /*overflow: scroll;*/
-    /*height: 254px;*/
-    /*float: left;*/
-    /*margin-left: 1%;*/
-    /*background-color:transparent;*/
-    /*margin-top:5px;*/
-/*}*/
-
 #tableID{
-    margin-top:1%;
-    width:auto;
+    width:350px;
     resize: none;
     float: left;
-    height:300px;
+    height:296px;
     overflow: scroll;
     background-color: transparent;
-    font-size: 18px;
+    font-size:14px;
 }
 
 tr:nth-child(odd) {
     background-color: #FFFFAA;
+
 }
 tr:nth-child(even) {
     background-color: #C8C800;
@@ -169,4 +159,10 @@ td:hover{
 }
 .td{
     padding: 8px;
+}
+
+.th{
+    background-color: peachpuff;
+    border-radius: 10px;
+    margin-left:5%;
 }
