@@ -147,6 +147,7 @@ h3 {
     overflow: scroll;
     background-color: transparent;
     font-size:14px;
+    webkit-scrollbar: hidden;
 }
 
 #tableID tr:nth-child(odd) {
@@ -172,6 +173,7 @@ h3 {
     margin-top: -1%;
     border-radius: 10px;
     overflow: hidden;
+    webkit-scrollbar: hidden;
 }
 
 #pcbTable th{
