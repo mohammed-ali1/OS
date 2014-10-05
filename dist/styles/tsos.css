@@ -27,6 +27,7 @@ body {
     font-size: 12pt;
     font-weight: normal;
     font-style: normal;
+    width:1250px;
 }
 
 #divMain{
@@ -170,6 +171,7 @@ h3 {
     border: 5px solid firebrick;
     margin-top: -1%;
     border-radius: 10px;
+    overflow: hidden;
 }
 
 #pcbTable th{

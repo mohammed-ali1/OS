@@ -36,6 +36,7 @@ var TSOS;
             table += "</table>";
 
             document.getElementById("table").innerHTML = table;
+            document.getElementById("pc").innerHTML = "PC";
         };
 
         /**

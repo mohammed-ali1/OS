@@ -36,7 +36,7 @@ module TSOS {
             this.Zflag = 0;
             this.isExecuting = false;
         }
-
+        
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
