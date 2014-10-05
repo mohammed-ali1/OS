@@ -56,10 +56,11 @@ h3 {
     font-weight: normal;
     font-style: normal;
     color: firebrick;
+    text-align: center;
 }
 
 #display {
-    background-color:#DFDBC3;
+    background-color: cornflowerblue;
     /*border: 2px solid red;*/
     cursor: default;
     border-radius: 5px;
@@ -134,35 +135,52 @@ h3 {
 }
 
 #divLog{
-    margin-top: -3%;
+    margin-top: 4%;
 }
 
 #tableID{
     width:350px;
     resize: none;
     float: left;
-    height:296px;
+    height:306px;
     overflow: scroll;
     background-color: transparent;
     font-size:14px;
 }
 
-tr:nth-child(odd) {
+#tableID tr:nth-child(odd) {
     background-color: #FFFFAA;
 
 }
-tr:nth-child(even) {
+#tableID tr:nth-child(even) {
     background-color: #C8C800;
 }
-td:hover{
+#tableID td:hover{
     background-color: #FF9331;
 }
-.td{
-    padding: 8px;
+#tableID td{
+    padding: 10px;
 }
 
-.th{
-    background-color: peachpuff;
+#pcb{
+    margin-top: 390px;
+}
+
+#pcbTable{
+    border: 5px solid firebrick;
+    margin-top: -1%;
     border-radius: 10px;
-    margin-left:5%;
+}
+
+#pcbTable th{
+    padding: 5px;
+    text-align: center;
+    color: firebrick;
+    background-color: peachpuff;
+    border: 5px solid ghostwhite;
+    border-radius: 10px;
+}
+
+#pcbTable td{
+    padding: 5px;
 }

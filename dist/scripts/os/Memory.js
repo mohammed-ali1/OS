@@ -23,13 +23,13 @@ var TSOS;
             var table = "<table>";
 
             for (var i = 0; i < _MainMemorySize; i += 8) {
-                table += "<tr class='tr'>";
+                table += "<tr>";
                 _MainMemory[i] = i.toString(16).toUpperCase();
-                table += "<td class='td'>" + "[" + _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
+                table += "<td>" + "[" + _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
 
                 for (var j = i + 1; j <= i + 7; j++) {
                     _MainMemory[j] = 0;
-                    table += "<td class='td'>" + _MainMemory[j] + "</td>";
+                    table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
             }
@@ -38,6 +38,9 @@ var TSOS;
             document.getElementById("table").innerHTML = table;
         };
 
+        /**
+        * Clears the Main Memory.
+        */
         Memory.prototype.clearMemory = function () {
             for (var i = 0; i < _MainMemorySize; i++) {
                 _MainMemory[i] = 0;
@@ -63,6 +66,9 @@ var TSOS;
                     }
                 }
             }
+
+            //Update the Memory
+            this.updateMemory();
         };
 
         /**
@@ -72,11 +78,11 @@ var TSOS;
             var table = "<table>";
 
             for (var i = 0; i < _MainMemorySize; i += 8) {
-                table += "<tr class='tr'>";
-                table += "<td class='td'>" + "[" + _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
+                table += "<tr>";
+                table += "<td>" + "[" + _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
 
                 for (var j = i + 1; j <= i + 7; j++) {
-                    table += "<td class='td'>" + _MainMemory[j] + "</td>";
+                    table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
             }

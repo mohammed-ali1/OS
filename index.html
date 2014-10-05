@@ -26,6 +26,7 @@
     <script type="text/javascript" src="dist/scripts/os/userCommand.js"></script>
     <script type="text/javascript" src="dist/scripts/os/kernel.js"></script>
     <script type="text/javascript" src="dist/scripts/os/Memory.js"></script>
+    <script type="text/javascript" src="dist/scripts/os/Pcb.js"></script>
 
     <!-- Other Routines -->
     <script type="text/javascript" src="dist/scripts/utils.js"></script>
@@ -92,7 +93,7 @@
     </div>
 
     <div id="divLog" style="margin-left:2%;margin-top:-4%; ">
-            <center><h3 style="color: firebrick;">Logger</h3></center>
+            <center><h3 style="color: firebrick;">Host Logger</h3></center>
             <textarea name="taHostLog"
                       id  ="taHostLog"
                       rows="26"
@@ -102,29 +103,49 @@
 
     <div id="divUserProgramInput" style="margin-left:2%; margin-top:6%;">
 
-            <center><h3 style="color: firebrick;margin-top:-1">User Program Input</h3></center>
+            <center><h3 style="color: firebrick;margin-top:9%;">User Program</h3></center>
             <textarea name="taProgramInput"
                       id  ="taProgramInput"
                       rows="8"
                       cols="48"
+                      style="margin-top: -2%;"
                     ></textarea>
     </div>
+
 </div>
 
-    <p>
-        <center>
-            <h3 style="margin-left: 1%;">Main Memory</h3>
-        </center>
-    </p>
+<p>
+<center>
+    <h3 style="margin-top:3%;">Main Memory</h3>
+</center>
+</p>
 
     <div id="tableID">
         <table id="table"></table>
-        <script>
-            setInterval(function(){
-                TSOS.Memory.updateMemory();
+    </div>
 
-            },100);
-        </script>
+    <div id="pcb">
+        <p>
+            <h3>CPU Info</h3>
+        </p>
+        <table id="pcbTable">
+
+            <tr>
+                <th>PC</th>
+                <th>ACC</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Z</th>
+            </tr>
+
+            <tr>
+                <td>PC data</td>
+                <td>ACC data</td>
+                <td>X data</td>
+                <td>Y data</td>
+                <td>Z data</td>
+            </tr>
+        </table>
     </div>
 
 <p class="footerText" style="clear:both;">

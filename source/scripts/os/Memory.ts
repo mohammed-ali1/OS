@@ -23,25 +23,28 @@ module TSOS {
             if(_MainMemorySize == 256 * 3)
                 _MainMemorySegment++;
 
-            var table = "<table>"
+            var table = "<table>";
 
             for(var i=0; i<_MainMemorySize;i+=8){
-                table += "<tr class='tr'>";
+                table += "<tr>";
                 _MainMemory[i] = i.toString(16).toUpperCase();
-                table += "<td class='td'>" + "["+ _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
+                table += "<td>" + "["+ _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
 
                 for(var j=i+1; j<=i+7;j++){
-
                     _MainMemory[j] = 0;
-                    table += "<td class='td'>" + _MainMemory[j] + "</td>";
+                    table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
             }
             table +="</table>";
 
             document.getElementById("table").innerHTML = table;
+
         }
 
+        /**
+         * Clears the Main Memory.
+         */
         public clearMemory(){
 
             for(var i=0; i<_MainMemorySize;i++){
@@ -62,6 +65,7 @@ module TSOS {
             for(var i=0; i<str.length;i+=8){
 
                 for(var j= i+1; j<=i+7;j++){
+
                     _MainMemory[j] = x.substring(a,b);
                     a = b;
                     b = b+2;
@@ -71,6 +75,9 @@ module TSOS {
                     }
                 }
             }
+
+            //Update the Memory
+            this.updateMemory();
         }
 
         /**
@@ -82,11 +89,11 @@ module TSOS {
 
             for(var i=0; i<_MainMemorySize;i+=8){
 
-                table += "<tr class='tr'>";
-                table += "<td class='td'>" + "["+ _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
+                table += "<tr>";
+                table += "<td>" + "["+ _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
 
                 for(var j=i+1; j<=i+7;j++){
-                    table += "<td class='td'>" + _MainMemory[j] + "</td>";
+                    table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
             }
