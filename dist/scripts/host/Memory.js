@@ -36,7 +36,6 @@ var TSOS;
             table += "</table>";
 
             document.getElementById("table").innerHTML = table;
-            document.getElementById("pc").innerHTML = "PC";
         };
 
         /**
@@ -75,7 +74,7 @@ var TSOS;
         };
 
         /**
-        * Updates the Memory (called by the setInterval function every 100 ms)
+        * Updates the Memory.
         */
         Memory.updateMemory = function () {
             var table = "<table>";

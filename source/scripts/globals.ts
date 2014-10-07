@@ -21,7 +21,6 @@ var TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interr
                             // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ: number = 1;
 
-
 //
 // Global Variables
 //
@@ -74,3 +73,7 @@ var _MainMemorySegment: number = -1;
 var onDocumentLoad = function() {
 	TSOS.Control.hostInit();
 };
+
+ // OP CODES
+ var _OpCodes: Object []= ["A9","AD", "8D", "6D", "A2", "AE", "A0", "AC", "EA",  "00",  "EC", "D0", "EE","FF"];
+ var _Parameter: number [] = [1,2,2,2,1,2,1,2,0,0,2,1,2,0];

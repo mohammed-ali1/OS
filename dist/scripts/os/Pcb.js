@@ -12,8 +12,6 @@ var TSOS;
             this.base = base;
             this.limit = limit;
         }
-        Pcb.createPCBTable = function () {
-        };
         return Pcb;
     })();
     TSOS.Pcb = Pcb;

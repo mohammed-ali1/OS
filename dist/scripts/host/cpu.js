@@ -28,7 +28,7 @@ var TSOS;
             this.isExecuting = isExecuting;
         }
         Cpu.prototype.init = function () {
-            this.PC = 0;
+            this.PC = 1;
             this.Acc = 0;
             this.Xreg = 0;
             this.Yreg = 0;
@@ -38,8 +38,132 @@ var TSOS;
 
         Cpu.prototype.cycle = function () {
             _Kernel.krnTrace('CPU cycle');
+
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+            this.displayCPU();
+            TSOS.Memory.updateMemory();
+        };
+
+        Cpu.prototype.displayCPU = function () {
+            document.getElementById("pc").innerHTML = _CPU.PC.toString();
+            document.getElementById("acc").innerHTML = _CPU.Acc.toString();
+            document.getElementById("x").innerHTML = _CPU.Xreg.toString();
+            document.getElementById("y").innerHTML = _CPU.Yreg.toString();
+            document.getElementById("z").innerHTML = _CPU.Zflag.toString();
+            document.getElementById("s").innerHTML = _CPU.isExecuting.toString();
+        };
+
+        Cpu.prototype.ManageOpCodes = function (str) {
+            str = str.toString();
+
+            if (str == "A9") {
+                this._A9_Instruction();
+            }
+            if (str == "AD") {
+                this._AD_Instruction();
+            }
+            if (str == "8D") {
+                this._8D_Instruction();
+            }
+            if (str == "6D") {
+                this._6D_Instruction();
+            }
+            if (str == "A2") {
+                this._A2_Instruction();
+            }
+            if (str == "AE") {
+                this._AE_Instruction();
+            }
+            if (str == "A0") {
+                this._A0_Instruction();
+            }
+            if (str == "AC") {
+                this._AC_Instruction();
+            }
+            if (str == "EA") {
+                this._EA_Instruction();
+            }
+            if (str == "00") {
+                this._00_Instruction();
+            }
+            if (str == "EC") {
+                this._EC_Instruction();
+            }
+            if (str == "D0") {
+                this._D0_Instruction();
+            }
+            if (str == "EE") {
+                this._EE_Instruction();
+            }
+            if (str == "FF") {
+                this._FF_Instruction();
+            }
+        };
+
+        /**
+        * Load the accumulator with a constant
+        */
+        Cpu.prototype._A9_Instruction = function () {
+            this.Acc = _MainMemory[this.PC + 1];
+        };
+
+        Cpu.prototype._AD_Instruction = function () {
+        };
+
+        /**
+        * Store the Accumulator in the memory.
+        * @private
+        */
+        Cpu.prototype._8D_Instruction = function () {
+            _MainMemory[(this.PC + 1).toString(16)] = this.PC + 1;
+        };
+
+        /**
+        * Add the contents of Address and store it in ACC.
+        * @private
+        */
+        Cpu.prototype._6D_Instruction = function () {
+            this.Acc += parseInt(_MainMemory[this.PC + 1].toString(16));
+        };
+
+        /**
+        * Load the X-Reg with Constant
+        * @private
+        */
+        Cpu.prototype._A2_Instruction = function () {
+            this.Xreg = _MainMemory[this.PC + 1];
+        };
+
+        /**
+        * Load the X-Reg from Memory
+        * @private
+        */
+        Cpu.prototype._AE_Instruction = function () {
+        };
+
+        Cpu.prototype._A0_Instruction = function () {
+        };
+
+        Cpu.prototype._AC_Instruction = function () {
+        };
+
+        Cpu.prototype._EA_Instruction = function () {
+        };
+
+        Cpu.prototype._00_Instruction = function () {
+        };
+
+        Cpu.prototype._EC_Instruction = function () {
+        };
+
+        Cpu.prototype._D0_Instruction = function () {
+        };
+
+        Cpu.prototype._EE_Instruction = function () {
+        };
+
+        Cpu.prototype._FF_Instruction = function () {
         };
         return Cpu;
     })();

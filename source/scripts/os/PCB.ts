@@ -12,9 +12,5 @@ module TSOS{
         }
 
 
-
-        public static createPCBTable(){
-
-        }
     }
 }

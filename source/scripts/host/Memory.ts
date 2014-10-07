@@ -39,18 +39,18 @@ module TSOS {
             table +="</table>";
 
             document.getElementById("table").innerHTML = table;
-            document.getElementById("pc").innerHTML = "PC";
-
         }
 
         /**
          * Clears the Main Memory.
          */
-        public clearMemory(){
+        public static clearMemory(){
 
             for(var i=0; i<_MainMemorySize;i++){
                 _MainMemory[i] = 0;
             }
+
+            this.updateMemory();
         }
 
         /**
@@ -59,7 +59,7 @@ module TSOS {
         public static loadProgram(str){
 
             var x = str.toString();
-                x = x.trim();
+            x = x.trim();
             var a = 0, b = 2;
             //Need to load carefully Here!
 
@@ -82,7 +82,7 @@ module TSOS {
         }
 
         /**
-         * Updates the Memory (called by the setInterval function every 100 ms)
+         * Updates the Memory.
          */
         public static updateMemory(){
 

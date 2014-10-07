@@ -61,7 +61,8 @@ h3 {
 }
 
 #display {
-    background-color: cornflowerblue;
+    /*background-color: cornflowerblue;*/
+    background-color: #E78A61;
     /*border: 2px solid red;*/
     cursor: default;
     border-radius: 5px;
@@ -88,7 +89,6 @@ h3 {
     border-radius: 5px;
     -webkit-border-radius: 10px;
     width: 150px;
-
 }
 
 #btnHaltOS{
@@ -107,16 +107,16 @@ h3 {
     width: 150px;
 }
 
- #taHostLog, #taProgramInput{
+#taHostLog, #taProgramInput{
     border: transparent;
     background-color: transparent;
 }
 
- #taProgramInput{
-     background-color: whitesmoke;
-     width:360px;
-     resize: none;
-     border-radius: 10px;
+#taProgramInput{
+    background-color: whitesmoke;
+    width:360px;
+    resize: none;
+    border-radius: 10px;
 }
 
 #taHostLog{
@@ -135,10 +135,6 @@ h3 {
     margin-left: 5px;
 }
 
-#divLog{
-    margin-top: 4%;
-}
-
 #tableID{
     width:350px;
     resize: none;
@@ -149,33 +145,40 @@ h3 {
     font-size:14px;
 }
 
+/* Halloween Colors...WHY NOT?*/
 #tableID tr:nth-child(odd) {
-    background-color: #FFFFAA;
+    background-color: #FFD801;
 
 }
 #tableID tr:nth-child(even) {
-    background-color: #C8C800;
+    background-color:  #E66C2C;
 }
+#tableID tr:hover{
+    /*background-color: #F87217;*/
+}
+
 #tableID td:hover{
-    background-color: #FF9331;
+    background-color:  #ffffff;
 }
+
 #tableID td{
     padding: 10px;
 }
 
-#pcb{
-    margin-top: 390px;
-}
-
 #pcbTable{
-    border: 5px solid firebrick;
-    margin-top: -1%;
+    border: 3px solid firebrick;
     border-radius: 10px;
-    overflow: hidden;
+    width: 370px;
+    height: 105px;
+    /*margin-top: 2%;*/
+    margin-left:2%;
+    /*border-radius: 10px;*/
+    /*overflow: hidden;*/
+    /*height: 105px;*/
+    /*table-layout: fixed;*/
 }
 
 #pcbTable th{
-    padding: 5px;
     text-align: center;
     color: firebrick;
     background-color: peachpuff;
@@ -184,7 +187,13 @@ h3 {
 }
 
 #pcbTable td{
-    padding: 5px;
+    /*padding: 5px;*/
+    text-align: center;
+    border: 2px solid #000000;
+    border-radius: 5px;
+    color: firebrick;
+    background-color: peachpuff;
+
 }
 
 #-webkit-scrollbar{

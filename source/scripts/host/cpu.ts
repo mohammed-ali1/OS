@@ -29,7 +29,7 @@ module TSOS {
         }
 
         public init(): void {
-            this.PC = 0;
+            this.PC = 1;
             this.Acc = 0;
             this.Xreg = 0;
             this.Yreg = 0;
@@ -41,6 +41,161 @@ module TSOS {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+
+            this.displayCPU();
+            Memory.updateMemory();
         }
+
+
+        public displayCPU(){
+
+            document.getElementById("pc").innerHTML = _CPU.PC.toString();
+            document.getElementById("acc").innerHTML = _CPU.Acc.toString();
+            document.getElementById("x").innerHTML = _CPU.Xreg.toString();
+            document.getElementById("y").innerHTML = _CPU.Yreg.toString();
+            document.getElementById("z").innerHTML = _CPU.Zflag.toString();
+            document.getElementById("s").innerHTML = _CPU.isExecuting.toString();
+        }
+
+        public ManageOpCodes(str){
+
+            str = str.toString();
+
+            if(str == "A9"){
+                this._A9_Instruction();
+            }
+            if(str == "AD"){
+                this._AD_Instruction();
+            }
+            if(str == "8D"){
+                this._8D_Instruction();
+            }
+            if(str == "6D"){
+                this._6D_Instruction();
+            }
+            if(str == "A2"){
+                this._A2_Instruction();
+            }
+            if(str == "AE"){
+                this._AE_Instruction();
+            }
+            if(str == "A0"){
+                this._A0_Instruction();
+            }
+            if(str == "AC"){
+                this._AC_Instruction();
+            }
+            if(str == "EA"){
+                this._EA_Instruction();
+            }
+            if(str == "00"){
+                this._00_Instruction();
+            }
+            if(str == "EC"){
+                this._EC_Instruction();
+            }
+            if(str == "D0"){
+                this._D0_Instruction();
+            }
+            if(str == "EE"){
+                this._EE_Instruction();
+            }
+            if(str == "FF"){
+                this._FF_Instruction();
+            }
+        }
+
+
+        /**
+         * Load the accumulator with a constant
+         */
+        public _A9_Instruction(){
+            this.Acc = _MainMemory[this.PC+1];
+        }
+
+        public _AD_Instruction(){
+        }
+
+        /**
+         * Store the Accumulator in the memory.
+         * @private
+         */
+        public _8D_Instruction(){
+            _MainMemory[(this.PC+1).toString(16)] = this.PC+1;
+        }
+
+        /**
+         * Add the contents of Address and store it in ACC.
+         * @private
+         */
+        public _6D_Instruction(){
+            this.Acc += parseInt(_MainMemory[this.PC+1].toString(16));
+        }
+
+        /**
+         * Load the X-Reg with Constant
+         * @private
+         */
+        public _A2_Instruction(){
+            this.Xreg = _MainMemory[this.PC+1];
+        }
+
+        /**
+         * Load the X-Reg from Memory
+         * @private
+         */
+        public _AE_Instruction(){
+            
+        }
+
+        public _A0_Instruction(){
+
+        }
+
+        public _AC_Instruction(){
+
+        }
+
+        public _EA_Instruction(){
+
+        }
+
+        public _00_Instruction(){
+
+        }
+
+        public _EC_Instruction(){
+
+        }
+
+        public _D0_Instruction(){
+
+        }
+
+        public _EE_Instruction(){
+
+        }
+
+        public _FF_Instruction(){
+
+        }
+
+
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
