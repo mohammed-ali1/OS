@@ -59,45 +59,34 @@ var TSOS;
 
             if (str == "A9") {
                 this._A9_Instruction();
-            }
-            if (str == "AD") {
+            } else if (str == "AD") {
                 this._AD_Instruction();
-            }
-            if (str == "8D") {
+            } else if (str == "8D") {
                 this._8D_Instruction();
-            }
-            if (str == "6D") {
+            } else if (str == "6D") {
                 this._6D_Instruction();
-            }
-            if (str == "A2") {
+            } else if (str == "A2") {
                 this._A2_Instruction();
-            }
-            if (str == "AE") {
+            } else if (str == "AE") {
                 this._AE_Instruction();
-            }
-            if (str == "A0") {
+            } else if (str == "A0") {
                 this._A0_Instruction();
-            }
-            if (str == "AC") {
+            } else if (str == "AC") {
                 this._AC_Instruction();
-            }
-            if (str == "EA") {
+            } else if (str == "EA") {
                 this._EA_Instruction();
-            }
-            if (str == "00") {
+            } else if (str == "00") {
                 this._00_Instruction();
-            }
-            if (str == "EC") {
+            } else if (str == "EC") {
                 this._EC_Instruction();
-            }
-            if (str == "D0") {
+            } else if (str == "D0") {
                 this._D0_Instruction();
-            }
-            if (str == "EE") {
+            } else if (str == "EE") {
                 this._EE_Instruction();
-            }
-            if (str == "FF") {
+            } else if (str == "FF") {
                 this._FF_Instruction();
+            } else {
+                _StdOut.putText("Instruction Not VALID!");
             }
         };
 
@@ -109,6 +98,7 @@ var TSOS;
         };
 
         Cpu.prototype._AD_Instruction = function () {
+            this.Acc = _MainMemory[_MainMemory[this.PC + 1]];
         };
 
         /**
@@ -140,29 +130,68 @@ var TSOS;
         * @private
         */
         Cpu.prototype._AE_Instruction = function () {
+            this.Xreg = _MainMemory[_MainMemory[this.PC + 1]].toString(16);
         };
 
+        /**
+        * Load the Y-Reg with Constant
+        * @private
+        */
         Cpu.prototype._A0_Instruction = function () {
+            this.Yreg = _MainMemory[this.PC + 1];
         };
 
+        /**
+        * Load the Y_Reg from Memory
+        * @private
+        */
         Cpu.prototype._AC_Instruction = function () {
+            this.Yreg = _MainMemory[_MainMemory[this.PC + 1]].toString(16);
         };
 
+        /**
+        * No Operation
+        * @private
+        */
         Cpu.prototype._EA_Instruction = function () {
         };
 
+        /**
+        * Break
+        * @private
+        */
         Cpu.prototype._00_Instruction = function () {
         };
 
+        /**
+        * Compare a byte in Memory to the X-Reg
+        * Set Z-Flag to "0" if Equal
+        * @private
+        */
         Cpu.prototype._EC_Instruction = function () {
+            if (this.Zflag == _MainMemory[this.PC + 1]) {
+                this.Zflag = 0;
+            }
         };
 
+        /**
+        * Branch X bytes if Z-Flag Equals 0!
+        * @private
+        */
         Cpu.prototype._D0_Instruction = function () {
         };
 
+        /**
+        * Increment the value by a byte.
+        * @private
+        */
         Cpu.prototype._EE_Instruction = function () {
         };
 
+        /**
+        * System Call!
+        * @private
+        */
         Cpu.prototype._FF_Instruction = function () {
         };
         return Cpu;

@@ -61,8 +61,8 @@ var TSOS;
             // Update the log console.
             var taLog = document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
-            taLog.style.color = "#" + Math.floor(Math.random() * 16777215).toString(16);
 
+            //taLog.style.color = "#" + Math.floor(Math.random()*16777215).toString(16);
             // Optionally update a log database or some streaming service.
             _CPU.init();
         };
