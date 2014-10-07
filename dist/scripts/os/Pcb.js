@@ -4,14 +4,16 @@
 var TSOS;
 (function (TSOS) {
     var Pcb = (function () {
-        function Pcb(pid, base, limit) {
-            if (typeof pid === "undefined") { pid = -1; }
-            if (typeof base === "undefined") { base = -1; }
-            if (typeof limit === "undefined") { limit = -1; }
-            this.pid = pid;
-            this.base = base;
-            this.limit = limit;
+        function Pcb(pc, acc, x, y, z) {
+            this.pc = 0;
+            this.acc = "";
+            this.x = "";
+            this.y = "";
+            this.z = "";
         }
+        Pcb.prototype.updatePCB = function () {
+        };
+        Pcb.PID = 0;
         return Pcb;
     })();
     TSOS.Pcb = Pcb;

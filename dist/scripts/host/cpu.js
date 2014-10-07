@@ -41,8 +41,14 @@ var TSOS;
 
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-            this.displayCPU();
+            //Read Stuff from Memory
+            this.manageOpCodes(_MainMemory[this.PC]);
+
+            //Update the Memory if Any Changes!
             TSOS.Memory.updateMemory();
+
+            //Update the Current State of CPU!
+            this.displayCPU();
         };
 
         Cpu.prototype.displayCPU = function () {
@@ -54,7 +60,7 @@ var TSOS;
             document.getElementById("s").innerHTML = _CPU.isExecuting.toString();
         };
 
-        Cpu.prototype.ManageOpCodes = function (str) {
+        Cpu.prototype.manageOpCodes = function (str) {
             str = str.toString();
 
             if (str == "A9") {

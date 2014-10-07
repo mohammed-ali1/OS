@@ -42,8 +42,17 @@ module TSOS {
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
 
-            this.displayCPU();
+            //Read Stuff from Memory
+            this.manageOpCodes(_MainMemory[this.PC]);
+
+            //Update the Memory if Any Changes!
             Memory.updateMemory();
+
+            //Update the Current State of CPU!
+
+
+
+            this.displayCPU();
         }
 
 
@@ -57,7 +66,7 @@ module TSOS {
             document.getElementById("s").innerHTML = _CPU.isExecuting.toString();
         }
 
-        public ManageOpCodes(str){
+        public manageOpCodes(str){
 
             str = str.toString();
 
