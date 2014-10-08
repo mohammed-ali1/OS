@@ -71,10 +71,10 @@ var _MainMemorySize: number = 256;
 var _MainMemorySegment: number = -1;
 var _Memory : TSOS.Memory;
 
+var _Pcb:TSOS.Pcb;
+
+var _ResidentQueue: any[] =  null;
+
 var onDocumentLoad = function() {
 	TSOS.Control.hostInit();
 };
-
- // OP CODES
- var _OpCodes: Object []= ["A9","AD", "8D", "6D", "A2", "AE", "A0", "AC", "EA",  "00",  "EC", "D0", "EE","FF"];
- var _Parameter: number [] = [1,2,2,2,1,2,1,2,0,0,2,1,2,0];

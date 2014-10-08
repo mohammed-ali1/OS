@@ -4,16 +4,25 @@
 var TSOS;
 (function (TSOS) {
     var Pcb = (function () {
-        function Pcb(pc, acc, x, y, z) {
+        function Pcb(b, l) {
             this.pc = 0;
             this.acc = "";
             this.x = "";
             this.y = "";
             this.z = "";
+            this.base = 0;
+            this.limit = 0;
+            Pcb.PID++; //Increment PID all the time!
+            this.base = b;
+            this.limit = l;
         }
-        Pcb.prototype.updatePCB = function () {
+        Pcb.prototype.displayPDB = function () {
         };
-        Pcb.PID = 0;
+
+        Pcb.prototype.PID = function () {
+            return Pcb.PID;
+        };
+        Pcb.PID = -1;
         return Pcb;
     })();
     TSOS.Pcb = Pcb;

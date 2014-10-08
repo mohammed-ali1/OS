@@ -68,10 +68,10 @@ var _MainMemorySize = 256;
 var _MainMemorySegment = -1;
 var _Memory;
 
+var _Pcb;
+
+var _ResidentQueue = null;
+
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();
 };
-
-// OP CODES
-var _OpCodes = ["A9", "AD", "8D", "6D", "A2", "AE", "A0", "AC", "EA", "00", "EC", "D0", "EE", "FF"];
-var _Parameter = [1, 2, 2, 2, 1, 2, 1, 2, 0, 0, 2, 1, 2, 0];

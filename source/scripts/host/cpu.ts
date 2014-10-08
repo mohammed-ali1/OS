@@ -46,7 +46,7 @@ module TSOS {
             this.manageOpCodes(_MainMemory[this.PC]);
 
             //Update the Memory if Any Changes!
-            Memory.updateMemory();
+            _Memory.updateMemory();
 
             //Update the Current State of CPU!
 
@@ -121,11 +121,11 @@ module TSOS {
          * Load the accumulator with a constant
          */
         public _A9_Instruction(){
-            this.Acc = _MainMemory[this.PC+1];
+            this.Acc = parseInt(_MainMemory[this.PC+1]);
         }
 
         public _AD_Instruction(){
-            this.Acc = _MainMemory[_MainMemory[this.PC+1]];
+            this.Acc = parseInt(_MainMemory[_MainMemory[this.PC+1]]);
         }
 
         /**
@@ -141,7 +141,7 @@ module TSOS {
          * @private
          */
         public _6D_Instruction(){
-            this.Acc += parseInt(_MainMemory[this.PC+1].toString(16));
+            this.Acc += parseInt(_MainMemory[this.PC+1]);
         }
 
         /**
@@ -149,7 +149,7 @@ module TSOS {
          * @private
          */
         public _A2_Instruction(){
-            this.Xreg = _MainMemory[this.PC+1];
+            this.Xreg = parseInt(_MainMemory[this.PC+1]);
         }
 
         /**
@@ -157,7 +157,7 @@ module TSOS {
          * @private
          */
         public _AE_Instruction(){
-            this.Xreg = _MainMemory[_MainMemory[this.PC+1]].toString(16);
+            this.Xreg = parseInt(_MainMemory[_MainMemory[this.PC+1]]);
         }
 
         /**
@@ -165,7 +165,7 @@ module TSOS {
          * @private
          */
         public _A0_Instruction(){
-            this.Yreg = _MainMemory[this.PC+1];
+            this.Yreg = parseInt(_MainMemory[this.PC+1]);
         }
 
         /**
@@ -173,7 +173,7 @@ module TSOS {
          * @private
          */
         public _AC_Instruction(){
-            this.Yreg = _MainMemory[_MainMemory[this.PC+1]].toString(16);
+            this.Yreg = parseInt(_MainMemory[_MainMemory[this.PC+1]]);
         }
 
         /**

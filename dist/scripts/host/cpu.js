@@ -45,7 +45,7 @@ var TSOS;
             this.manageOpCodes(_MainMemory[this.PC]);
 
             //Update the Memory if Any Changes!
-            TSOS.Memory.updateMemory();
+            _Memory.updateMemory();
 
             //Update the Current State of CPU!
             this.displayCPU();
@@ -100,11 +100,11 @@ var TSOS;
         * Load the accumulator with a constant
         */
         Cpu.prototype._A9_Instruction = function () {
-            this.Acc = _MainMemory[this.PC + 1];
+            this.Acc = parseInt(_MainMemory[this.PC + 1]);
         };
 
         Cpu.prototype._AD_Instruction = function () {
-            this.Acc = _MainMemory[_MainMemory[this.PC + 1]];
+            this.Acc = parseInt(_MainMemory[_MainMemory[this.PC + 1]]);
         };
 
         /**
@@ -120,7 +120,7 @@ var TSOS;
         * @private
         */
         Cpu.prototype._6D_Instruction = function () {
-            this.Acc += parseInt(_MainMemory[this.PC + 1].toString(16));
+            this.Acc += parseInt(_MainMemory[this.PC + 1]);
         };
 
         /**
@@ -128,7 +128,7 @@ var TSOS;
         * @private
         */
         Cpu.prototype._A2_Instruction = function () {
-            this.Xreg = _MainMemory[this.PC + 1];
+            this.Xreg = parseInt(_MainMemory[this.PC + 1]);
         };
 
         /**
@@ -136,7 +136,7 @@ var TSOS;
         * @private
         */
         Cpu.prototype._AE_Instruction = function () {
-            this.Xreg = _MainMemory[_MainMemory[this.PC + 1]].toString(16);
+            this.Xreg = parseInt(_MainMemory[_MainMemory[this.PC + 1]]);
         };
 
         /**
@@ -144,7 +144,7 @@ var TSOS;
         * @private
         */
         Cpu.prototype._A0_Instruction = function () {
-            this.Yreg = _MainMemory[this.PC + 1];
+            this.Yreg = parseInt(_MainMemory[this.PC + 1]);
         };
 
         /**
@@ -152,7 +152,7 @@ var TSOS;
         * @private
         */
         Cpu.prototype._AC_Instruction = function () {
-            this.Yreg = _MainMemory[_MainMemory[this.PC + 1]].toString(16);
+            this.Yreg = parseInt(_MainMemory[_MainMemory[this.PC + 1]]);
         };
 
         /**

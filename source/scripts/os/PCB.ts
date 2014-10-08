@@ -6,19 +6,33 @@ module TSOS{
 
     export class Pcb{
 
-        public static PID = 0;
-        private pc = 0;
-        private acc = "";
-        private x = "";
-        private y = "";
-        private z = "";
+        private static PID = -1;
+        private pc:number = 0;
+        private acc:string = "";
+        private x:string = "";
+        private y:string = "";
+        private z:string = "";
+        private base: number=0;
+        private limit:number=0;
 
-        constructor(pc:number, acc:string, x:string, y:string, z:string){
+        constructor(b:number, l:number){
+
+            Pcb.PID++;  //Increment PID all the time!
+            this.base = b;
+            this.limit = l;
+
         }
 
-        public updatePCB(){
+        public displayPDB(){
 
         }
+
+
+        public PID(){
+            return Pcb.PID;
+        }
+
+
 
     }
 }

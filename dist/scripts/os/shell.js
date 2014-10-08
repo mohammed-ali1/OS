@@ -272,8 +272,16 @@ var TSOS;
                     return;
                 }
             }
-            _StdOut.putText("Loaded Successfully!");
+
             _Memory.loadProgram(x.toString());
+
+            //Create New PCB
+            _Pcb = new TSOS.Pcb(0, _Memory.size());
+            _ResidentQueue = new Array();
+            _ResidentQueue[_Pcb.PID()] = _Pcb;
+            _StdOut.putText("Loaded Successfully!");
+            _Console.advanceLine();
+            _StdOut.putText("PID: " + _Pcb.PID());
         };
 
         /**

@@ -24,6 +24,7 @@ var TSOS;
             for (var i = 0; i < _MainMemorySize; i += 8) {
                 table += "<tr>";
                 _MainMemory[i] = i.toString(16).toUpperCase();
+                _MainMemory[i] = i.toString(16).toUpperCase();
                 table += "<td>" + "[" + _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
 
                 for (var j = i + 1; j <= i + 7; j++) {
@@ -89,6 +90,10 @@ var TSOS;
             }
             table += "</table>";
             document.getElementById("table").innerHTML = table;
+        };
+
+        Memory.prototype.size = function () {
+            return _MainMemorySize;
         };
         return Memory;
     })();
