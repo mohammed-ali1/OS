@@ -5,7 +5,6 @@ var TSOS;
 (function (TSOS) {
     var Memory = (function () {
         function Memory() {
-            this.createTable();
         }
         /**
         * Creates the Memory inside the Table
@@ -41,7 +40,7 @@ var TSOS;
         /**
         * Clears the Main Memory.
         */
-        Memory.clearMemory = function () {
+        Memory.prototype.clearMemory = function () {
             for (var i = 0; i < _MainMemorySize; i++) {
                 _MainMemory[i] = 0;
             }
@@ -52,7 +51,7 @@ var TSOS;
         /**
         * Loads the program into the Main Memory
         */
-        Memory.loadProgram = function (str) {
+        Memory.prototype.loadProgram = function (str) {
             var x = str.toString();
             x = x.trim();
             var a = 0, b = 2;
@@ -76,7 +75,7 @@ var TSOS;
         /**
         * Updates the Memory.
         */
-        Memory.updateMemory = function () {
+        Memory.prototype.updateMemory = function () {
             var table = "<table>";
 
             for (var i = 0; i < _MainMemorySize; i += 8) {

@@ -6,7 +6,6 @@ module TSOS {
     export class Memory {
 
         constructor(){
-            this.createTable();
         }
 
         /**
@@ -44,7 +43,7 @@ module TSOS {
         /**
          * Clears the Main Memory.
          */
-        public static clearMemory(){
+        public clearMemory(){
 
             for(var i=0; i<_MainMemorySize;i++){
                 _MainMemory[i] = 0;
@@ -56,7 +55,7 @@ module TSOS {
         /**
          * Loads the program into the Main Memory
          */
-        public static loadProgram(str){
+        public loadProgram(str){
 
             var x = str.toString();
             x = x.trim();
@@ -84,7 +83,7 @@ module TSOS {
         /**
          * Updates the Memory.
          */
-        public static updateMemory(){
+        public updateMemory(){
 
             var table = "<table>";
 

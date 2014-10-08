@@ -94,7 +94,9 @@ var TSOS;
 
             //Display System Status...
             document.getElementById("status").innerHTML = "Status: Running...";
-            new TSOS.Memory();
+
+            _Memory = new TSOS.Memory();
+            _Memory.createTable();
         };
 
         Control.hostBtnHaltOS_click = function (btn) {

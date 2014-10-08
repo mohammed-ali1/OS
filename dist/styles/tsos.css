@@ -114,7 +114,7 @@ h3 {
 
 #taProgramInput{
     background-color: whitesmoke;
-    width:360px;
+    /*width:360px;*/
     resize: none;
     border-radius: 10px;
 }
@@ -165,37 +165,28 @@ h3 {
     padding: 10px;
 }
 
-#pcbTable{
-    border: 3px solid firebrick;
+#cpu, #pcb{
+    border: 4px solid firebrick;
+    width:350px;
+    /*height: 105px;*/
+    margin-top: -6%;
+    /*margin-left:2%;*/
     border-radius: 10px;
-    width: 370px;
-    height: 105px;
-    /*margin-top: 2%;*/
-    margin-left:2%;
-    /*border-radius: 10px;*/
     /*overflow: hidden;*/
     /*height: 105px;*/
-    /*table-layout: fixed;*/
+    table-layout: fixed;
 }
 
-#pcbTable th{
+#cpu th, #pcb th{
     text-align: center;
     color: firebrick;
-    background-color: peachpuff;
-    border: 5px solid ghostwhite;
-    border-radius: 10px;
+    background-color: #FFD801;
 }
 
-#pcbTable td{
+#cpu td, #pcb td{
     /*padding: 5px;*/
     text-align: center;
-    border: 2px solid #000000;
     border-radius: 5px;
     color: firebrick;
-    background-color: peachpuff;
-
-}
-
-#-webkit-scrollbar{
-    display: none;
+    background-color:  #E66C2C;
 }

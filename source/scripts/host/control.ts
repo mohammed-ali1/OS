@@ -99,7 +99,9 @@ module TSOS {
 
             //Display System Status...
             document.getElementById("status").innerHTML = "Status: Running...";
-            new Memory();
+
+            _Memory = new Memory();
+            _Memory.createTable();
         }
 
         public static hostBtnHaltOS_click(btn): void {

@@ -69,6 +69,7 @@ var Glados: any = null;
 var _MainMemory: any[] = null;
 var _MainMemorySize: number = 256;
 var _MainMemorySegment: number = -1;
+var _Memory : TSOS.Memory;
 
 var onDocumentLoad = function() {
 	TSOS.Control.hostInit();

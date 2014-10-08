@@ -303,7 +303,7 @@ module TSOS {
                 }
             }
             _StdOut.putText("Loaded Successfully!");
-            TSOS.Memory.loadProgram(x.toString());
+            _Memory.loadProgram(x.toString());
         }
 
         /**

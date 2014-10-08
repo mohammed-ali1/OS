@@ -100,7 +100,7 @@
         <textarea name="taHostLog"
                   id  ="taHostLog"
                   rows="26"
-                  cols="48"
+                  cols="20"
                 ></textarea>
 
     <div id="divUserProgramInput">
@@ -109,13 +109,13 @@
         <textarea name="taProgramInput"
                   id  ="taProgramInput"
                   rows="8"
-                  cols="48"
+                  cols="40"
                   style="margin-top: -2%;"
                 ></textarea>
     </div>
 </div>
 
-<div id="memoryTable" style="margin-left:2px; float:left;">
+<div id="memoryTable" style="margin-left:1%; height: auto;float:left;">
 
     <div style="margin:2%;">
         <p>
@@ -125,36 +125,70 @@
         </p>
     </div>
 
-    <div id="tableID" >
-     <table id="table"></table>
+    <div id="tableID">
+        <table id="table"></table>
     </div>
-</div>
-
-<div id="pcb" style="float: left; width: auto; margin-left: 2px; margin-top: 1.5%;">
 
     <div>
-        <h3>CPU Info</h3>
 
-        <table id="pcbTable">
 
-            <tr>
-                <th>PC</th>
-                <th>ACC</th>
-                <th>X</th>
-                <th>Y</th>
-                <th>Z</th>
-                <th>Status</th>
-            </tr>
+        <div >
+            <p style="float:left;">
+                <h4 style="color: firebrick; text-align: center;">CPU</h4>
+            </p>
 
-            <tr>
-                <td id="pc">0</td>
-                <td id="acc">0</td>
-                <td id="x">0</td>
-                <td id="y">0</td>
-                <td id="z">0</td>
-                <td id="s">0</td>
-            </tr>
-        </table>
+            <table id="cpu">
+                <tr>
+                    <th>PC</th>
+                    <th>ACC</th>
+                    <th>X</th>
+                    <th>Y</th>
+                    <th>Z</th>
+                </tr>
+
+                <tr>
+                    <td id="pc">0</td>
+                    <td id="acc">0</td>
+                    <td id="x">0</td>
+                    <td id="y">0</td>
+                    <td id="z">0</td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="margin-bottom: -10px;">
+            <p style="float:left">
+                <h4 style="color: firebrick; text-align: center;">PCB</h4>
+            </p>
+
+            <table id="pcb"">
+                <tr>
+                    <th>PID</th>
+                    <th>Base</th>
+                    <th>Limit</th>
+                    <th>Status</th>
+                </tr>
+
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                    <th>PC</th>
+                    <th>ACC</th>
+                    <th>X</th>
+                    <th>Y</th>
+                    <th>Z</th>
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+            </table>
+        </div>
     </div>
 </div>
 
