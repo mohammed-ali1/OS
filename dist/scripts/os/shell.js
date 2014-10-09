@@ -77,6 +77,10 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
 
+            // run
+            sc = new TSOS.ShellCommand(this.shellRun, "run", "<pid> - Executes the current pid from Memory.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -273,15 +277,20 @@ var TSOS;
                 }
             }
 
+            //Load into Memory
             _Memory.loadProgram(x.toString());
-
-            //Create New PCB
-            _Pcb = new TSOS.Pcb(0, _Memory.size());
-            _ResidentQueue = new Array();
-            _ResidentQueue[_Pcb.PID()] = _Pcb;
             _StdOut.putText("Loaded Successfully!");
             _Console.advanceLine();
-            _StdOut.putText("PID: " + _Pcb.PID());
+
+            //Create New PCB
+            _Pcb = new TSOS.Pcb(0, _Memory.size()); //Memory Size is 256...so base and limit works (for now)!
+
+            //Create New Resident Queue
+            _ResidentQueue = new Array();
+            _ResidentQueue[_Pcb.getPid()] = _Pcb;
+
+            _StdOut.putText("Process ID: " + _ResidentQueue[_Pcb.getPid()].getPid());
+            _Pcb.displayPCB();
         };
 
         /**
@@ -378,6 +387,10 @@ var TSOS;
             } else {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
+        };
+
+        Shell.prototype.shellRun = function (args) {
+            _ReadyQueue.enqueue(_ResidentQueue[args]);
         };
         return Shell;
     })();

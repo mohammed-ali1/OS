@@ -13,15 +13,17 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 var TSOS;
 (function (TSOS) {
     var Cpu = (function () {
-        function Cpu(PC, Acc, Xreg, Yreg, Zflag, isExecuting) {
+        function Cpu(PC, Acc, IR, Xreg, Yreg, Zflag, isExecuting) {
             if (typeof PC === "undefined") { PC = 0; }
             if (typeof Acc === "undefined") { Acc = 0; }
+            if (typeof IR === "undefined") { IR = ""; }
             if (typeof Xreg === "undefined") { Xreg = 0; }
             if (typeof Yreg === "undefined") { Yreg = 0; }
             if (typeof Zflag === "undefined") { Zflag = 0; }
             if (typeof isExecuting === "undefined") { isExecuting = false; }
             this.PC = PC;
             this.Acc = Acc;
+            this.IR = IR;
             this.Xreg = Xreg;
             this.Yreg = Yreg;
             this.Zflag = Zflag;
@@ -30,6 +32,7 @@ var TSOS;
         Cpu.prototype.init = function () {
             this.PC = 1;
             this.Acc = 0;
+            this.IR = "";
             this.Xreg = 0;
             this.Yreg = 0;
             this.Zflag = 0;
@@ -42,18 +45,25 @@ var TSOS;
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             //Read Stuff from Memory
-            this.manageOpCodes(_MainMemory[this.PC]);
+            this.manageOpCodes(_MainMemory[_CPU.PC].toString(16));
 
             //Update the Memory if Any Changes!
             _Memory.updateMemory();
 
-            //Update the Current State of CPU!
+            //Update the CPU Table
             this.displayCPU();
+
+            //Update PCB
+            this.updatePcb(_ResidentQueue[_Pcb.getPid() - 1]);
+
+            //Display the PCB
+            _ResidentQueue[_Pcb.getPid() - 1].displayPCB();
         };
 
         Cpu.prototype.displayCPU = function () {
             document.getElementById("pc").innerHTML = _CPU.PC.toString();
             document.getElementById("acc").innerHTML = _CPU.Acc.toString();
+            document.getElementById("ir").innerHTML = _CPU.IR.toString();
             document.getElementById("x").innerHTML = _CPU.Xreg.toString();
             document.getElementById("y").innerHTML = _CPU.Yreg.toString();
             document.getElementById("z").innerHTML = _CPU.Zflag.toString();
@@ -94,13 +104,15 @@ var TSOS;
             } else {
                 _StdOut.putText("Instruction Not VALID!");
             }
+            this.PC++;
         };
 
         /**
         * Load the accumulator with a constant
         */
         Cpu.prototype._A9_Instruction = function () {
-            this.Acc = parseInt(_MainMemory[this.PC + 1]);
+            this.IR = _MainMemory[this.PC];
+            this.Acc = parseInt(_MainMemory[++this.PC], 16);
         };
 
         Cpu.prototype._AD_Instruction = function () {
@@ -199,6 +211,15 @@ var TSOS;
         * @private
         */
         Cpu.prototype._FF_Instruction = function () {
+        };
+
+        Cpu.prototype.updatePcb = function (p) {
+            _Pcb.pc = this.PC;
+            _Pcb.acc = this.Acc;
+            _Pcb.ir = this.IR;
+            _Pcb.x = this.Xreg;
+            _Pcb.y = this.Yreg;
+            _Pcb.z = this.Zflag;
         };
         return Cpu;
     })();

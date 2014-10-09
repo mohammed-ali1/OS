@@ -6,20 +6,36 @@ var TSOS;
     var Pcb = (function () {
         function Pcb(b, l) {
             this.pc = 0;
-            this.acc = "";
-            this.x = "";
-            this.y = "";
-            this.z = "";
+            this.acc = 0;
+            this.ir = "";
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
             this.base = 0;
             this.limit = 0;
+            this.state = "NEW";
             Pcb.PID++; //Increment PID all the time!
             this.base = b;
             this.limit = l;
         }
-        Pcb.prototype.displayPDB = function () {
+        /**
+        * Displays the the status of the current PCB.
+        */
+        Pcb.prototype.displayPCB = function () {
+            document.getElementById("pcbPid").innerHTML = "" + this.getPid();
+            document.getElementById("pcbBase").innerHTML = "" + this.base;
+            document.getElementById("pcbLimit").innerHTML = "" + this.limit;
+            document.getElementById("pcbStatus").innerHTML = this.state.toString();
+
+            document.getElementById("pcbPc").innerHTML = "" + this.pc;
+            document.getElementById("pcbAcc").innerHTML = "" + this.acc;
+            document.getElementById("pcbIr").innerHTML = this.ir;
+            document.getElementById("pcbX").innerHTML = "" + this.x;
+            document.getElementById("pcbY").innerHTML = "" + this.y;
+            document.getElementById("pcbZ").innerHTML = "" + this.z;
         };
 
-        Pcb.prototype.PID = function () {
+        Pcb.prototype.getPid = function () {
             return Pcb.PID;
         };
         Pcb.PID = -1;

@@ -95,8 +95,12 @@ var TSOS;
             //Display System Status...
             document.getElementById("status").innerHTML = "Status: Running...";
 
+            //Initialize the Memory
             _Memory = new TSOS.Memory();
             _Memory.createTable();
+
+            //Initialize Ready Queue
+            _ReadyQueue = new TSOS.Queue();
         };
 
         Control.hostBtnHaltOS_click = function (btn) {

@@ -68,9 +68,12 @@ var _MainMemorySize = 256;
 var _MainMemorySegment = -1;
 var _Memory;
 
+//PCB
 var _Pcb;
 
+//Ready and Resident Queues
 var _ResidentQueue = null;
+var _ReadyQueue;
 
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();

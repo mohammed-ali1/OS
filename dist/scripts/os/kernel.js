@@ -29,6 +29,9 @@ var TSOS;
             _StdIn = _Console;
             _StdOut = _Console;
 
+            //Initialize Ready Queue for the Processes to be loaded
+            _ReadyQueue = new TSOS.Queue();
+
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
@@ -81,9 +84,24 @@ var TSOS;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) {
                 _CPU.cycle();
+                _Pcb.displayPCB();
+                _CPU.displayCPU();
+            } else if (_ReadyQueue.getSize() > 0) {
+                this.krnExe(_ReadyQueue.dequeue());
             } else {
                 this.krnTrace("Idle");
             }
+        };
+
+        /**
+        * Execute the PID from the Ready Queue!
+        * @param p, the PID to execute.
+        */
+        Kernel.prototype.krnExe = function (p) {
+            this.krnTrace("Processing PID: " + p.getPid());
+            _CPU.isExecuting = true;
+            _CPU.PC = p.base;
+            _CPU.displayCPU();
         };
 
         //

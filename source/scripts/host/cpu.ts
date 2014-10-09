@@ -21,6 +21,7 @@ module TSOS {
 
         constructor(public PC: number = 0,
                     public Acc: number = 0,
+                    public IR: string = "",
                     public Xreg: number = 0,
                     public Yreg: number = 0,
                     public Zflag: number = 0,
@@ -31,6 +32,7 @@ module TSOS {
         public init(): void {
             this.PC = 1;
             this.Acc = 0;
+            this.IR = "";
             this.Xreg = 0;
             this.Yreg = 0;
             this.Zflag = 0;
@@ -43,23 +45,26 @@ module TSOS {
             // Do the real work here. Be sure to set this.isExecuting appropriately.
 
             //Read Stuff from Memory
-            this.manageOpCodes(_MainMemory[this.PC]);
+            this.manageOpCodes(_MainMemory[_CPU.PC].toString(16));
 
             //Update the Memory if Any Changes!
             _Memory.updateMemory();
 
-            //Update the Current State of CPU!
-
-
-
+            //Update the CPU Table
             this.displayCPU();
-        }
 
+            //Update PCB
+            this.updatePcb(_ResidentQueue[_Pcb.getPid()-1]);
+
+            //Display the PCB
+           _ResidentQueue[_Pcb.getPid()-1].displayPCB();
+        }
 
         public displayCPU(){
 
             document.getElementById("pc").innerHTML = _CPU.PC.toString();
             document.getElementById("acc").innerHTML = _CPU.Acc.toString();
+            document.getElementById("ir").innerHTML = _CPU.IR.toString();
             document.getElementById("x").innerHTML = _CPU.Xreg.toString();
             document.getElementById("y").innerHTML = _CPU.Yreg.toString();
             document.getElementById("z").innerHTML = _CPU.Zflag.toString();
@@ -115,13 +120,16 @@ module TSOS {
             else{
                 _StdOut.putText("Instruction Not VALID!");
             }
+            this.PC++;
         }
 
         /**
          * Load the accumulator with a constant
          */
         public _A9_Instruction(){
-            this.Acc = parseInt(_MainMemory[this.PC+1]);
+
+            this.IR = _MainMemory[this.PC];
+            this.Acc = parseInt(_MainMemory[++this.PC],16);
         }
 
         public _AD_Instruction(){
@@ -226,21 +234,16 @@ module TSOS {
         public _FF_Instruction(){
 
         }
+
+
+        public updatePcb(p:Pcb){
+
+            _Pcb.pc = this.PC;
+            _Pcb.acc = this.Acc;
+            _Pcb.ir = this.IR;
+            _Pcb.x = this.Xreg;
+            _Pcb.y = this.Yreg;
+            _Pcb.z = this.Zflag;
+        }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
