@@ -66,7 +66,7 @@ var _GLaDOS: any = null;
 var Glados: any = null;
 
 // MEMORY INFO
-var _MainMemory: any[] = null;
+var _MainMemory: string[] = null;
 var _MainMemorySize: number = 256;
 var _MainMemorySegment: number = -1;
 var _Memory : TSOS.Memory;

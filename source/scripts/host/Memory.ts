@@ -31,7 +31,7 @@ module TSOS {
                 table += "<td>" + "["+ _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
 
                 for(var j=i+1; j<=i+7;j++){
-                    _MainMemory[j] = 0;
+                    _MainMemory[j] = "00";
                     table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
@@ -47,7 +47,7 @@ module TSOS {
         public clearMemory(){
 
             for(var i=0; i<_MainMemorySize;i++){
-                _MainMemory[i] = 0;
+                _MainMemory[i] = "00";
             }
 
             this.updateMemory();
@@ -72,7 +72,7 @@ module TSOS {
                     b = b+2;
 
                     if(_MainMemory[j] == ""){
-                        _MainMemory[j] = 0;
+                        _MainMemory[j] = "00";
                     }
                 }
             }

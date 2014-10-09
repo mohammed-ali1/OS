@@ -87,9 +87,7 @@ module TSOS {
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 _CPU.cycle();
-                _Pcb.displayPCB();
-                _CPU.displayCPU();
-            } else if(_ReadyQueue.getSize()>0){
+            } else if(_ReadyQueue.getSize() != 0){
                 this.krnExe(_ReadyQueue.dequeue());
             } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
@@ -101,12 +99,12 @@ module TSOS {
          * @param p, the PID to execute.
          */
         public krnExe(p:Pcb){
+
             this.krnTrace("Processing PID: " +  p.getPid());
             _CPU.isExecuting = true;
             _CPU.PC = p.base;
             _CPU.displayCPU();
         }
-
 
         //
         // Interrupt Handling

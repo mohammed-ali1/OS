@@ -44,8 +44,8 @@ var TSOS;
 
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-            //Read Stuff from Memory
-            this.manageOpCodes(_MainMemory[_CPU.PC].toString(16));
+            //Read Stuff from Memory @ Program Counter
+            this.manageOpCodes(_MainMemory[_CPU.PC]);
 
             //Update the Memory if Any Changes!
             _Memory.updateMemory();
@@ -54,10 +54,10 @@ var TSOS;
             this.displayCPU();
 
             //Update PCB
-            this.updatePcb(_ResidentQueue[_Pcb.getPid() - 1]);
+            this.updatePcb(_Pcb.getPid() - 1);
 
             //Display the PCB
-            _ResidentQueue[_Pcb.getPid() - 1].displayPCB();
+            (_Pcb.getPid() - 1).displayPCB();
         };
 
         Cpu.prototype.displayCPU = function () {
@@ -73,7 +73,7 @@ var TSOS;
         Cpu.prototype.manageOpCodes = function (str) {
             str = str.toString();
 
-            if (str == "A9") {
+            if (str.toUpperCase() == "A9") {
                 this._A9_Instruction();
             } else if (str == "AD") {
                 this._AD_Instruction();
@@ -109,14 +109,19 @@ var TSOS;
 
         /**
         * Load the accumulator with a constant
+        * Takes 1 parameter.
         */
         Cpu.prototype._A9_Instruction = function () {
             this.IR = _MainMemory[this.PC];
-            this.Acc = parseInt(_MainMemory[++this.PC], 16);
+            this.Acc = parseInt(_MainMemory[++this.PC], 10); //read in base 10
         };
 
+        /**
+        * Load the accumulator from the  Memory
+        * Takes 2 parameters.
+        */
         Cpu.prototype._AD_Instruction = function () {
-            this.Acc = parseInt(_MainMemory[_MainMemory[this.PC + 1]]);
+            this.Acc = parseInt(_MainMemory[++this.PC]);
         };
 
         /**

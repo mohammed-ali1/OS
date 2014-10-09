@@ -84,9 +84,7 @@ var TSOS;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) {
                 _CPU.cycle();
-                _Pcb.displayPCB();
-                _CPU.displayCPU();
-            } else if (_ReadyQueue.getSize() > 0) {
+            } else if (_ReadyQueue.getSize() != 0) {
                 this.krnExe(_ReadyQueue.dequeue());
             } else {
                 this.krnTrace("Idle");
