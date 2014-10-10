@@ -187,7 +187,8 @@ var TSOS;
         * @private
         */
         Cpu.prototype._00_Instruction = function () {
-            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(0, 0));
+            var int = new TSOS.Interrupt(-1, 0);
+            _KernelInterruptQueue.enqueue(int);
         };
 
         /**

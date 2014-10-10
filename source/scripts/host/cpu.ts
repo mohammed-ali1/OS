@@ -205,7 +205,8 @@ module TSOS {
          * @private
          */
         public _00_Instruction(){
-            _KernelInterruptQueue.enqueue(new Interrupt(0,0));
+            var int = new Interrupt(-1,0);  //Pass -1 to re-start CPU.
+            _KernelInterruptQueue.enqueue(int);
         }
 
         /**

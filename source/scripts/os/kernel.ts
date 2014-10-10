@@ -138,8 +138,9 @@ module TSOS {
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
-                case 0: //0 Denotes END!
+                case -1: //-1 Denotes END of a process!
                     _CPU.init();//Re-Start the CPU!
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
