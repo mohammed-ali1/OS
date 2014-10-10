@@ -14,7 +14,7 @@ var TSOS;
 (function (TSOS) {
     var Cpu = (function () {
         function Cpu(PC, Acc, IR, Xreg, Yreg, Zflag, isExecuting) {
-            if (typeof PC === "undefined") { PC = 0; }
+            if (typeof PC === "undefined") { PC = 1; }
             if (typeof Acc === "undefined") { Acc = 0; }
             if (typeof IR === "undefined") { IR = ""; }
             if (typeof Xreg === "undefined") { Xreg = 0; }
@@ -45,36 +45,35 @@ var TSOS;
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             //Read Stuff from Memory @ Program Counter
-            this.manageOpCodes(_MainMemory[_CPU.PC]);
+            _CPU.manageOpCodes(_MainMemory[_CPU.PC].toString());
 
             //Update the Memory if Any Changes!
-            _Memory.updateMemory();
-
+            //            _Memory.updateMemory();
+            //
             //Update the CPU Table
-            this.displayCPU();
+            _CPU.displayCPU();
 
             //Update PCB
-            this.updatePcb(_Pcb.getPid() - 1);
+            _CPU.updatePcb(_Pcb);
 
             //Display the PCB
-            (_Pcb.getPid() - 1).displayPCB();
+            _Pcb.displayPCB();
         };
 
         Cpu.prototype.displayCPU = function () {
-            document.getElementById("pc").innerHTML = _CPU.PC.toString();
-            document.getElementById("acc").innerHTML = _CPU.Acc.toString();
-            document.getElementById("ir").innerHTML = _CPU.IR.toString();
-            document.getElementById("x").innerHTML = _CPU.Xreg.toString();
-            document.getElementById("y").innerHTML = _CPU.Yreg.toString();
-            document.getElementById("z").innerHTML = _CPU.Zflag.toString();
-            document.getElementById("s").innerHTML = _CPU.isExecuting.toString();
+            document.getElementById("pc").innerHTML = this.PC.toString();
+            document.getElementById("acc").innerHTML = this.Acc.toString();
+            document.getElementById("ir").innerHTML = this.IR;
+            document.getElementById("x").innerHTML = this.Xreg.toString();
+            document.getElementById("y").innerHTML = this.Yreg.toString();
+            document.getElementById("z").innerHTML = this.Zflag.toString();
         };
 
         Cpu.prototype.manageOpCodes = function (str) {
             str = str.toString();
 
             if (str.toUpperCase() == "A9") {
-                this._A9_Instruction();
+                _CPU._A9_Instruction();
             } else if (str == "AD") {
                 this._AD_Instruction();
             } else if (str == "8D") {
@@ -104,7 +103,7 @@ var TSOS;
             } else {
                 _StdOut.putText("Instruction Not VALID!");
             }
-            this.PC++;
+            _CPU.PC++;
         };
 
         /**
@@ -112,8 +111,12 @@ var TSOS;
         * Takes 1 parameter.
         */
         Cpu.prototype._A9_Instruction = function () {
-            this.IR = _MainMemory[this.PC];
-            this.Acc = parseInt(_MainMemory[++this.PC], 10); //read in base 10
+            _CPU.IR = _MainMemory[_CPU.PC.toString()];
+            _CPU.PC++;
+            if (_CPU.PC % 8 == 0) {
+                _CPU.PC++;
+            }
+            _CPU.Acc = parseInt(_MainMemory[_CPU.PC].toString()); //read in base 10
         };
 
         /**
@@ -184,6 +187,7 @@ var TSOS;
         * @private
         */
         Cpu.prototype._00_Instruction = function () {
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(0, 0));
         };
 
         /**
@@ -219,12 +223,12 @@ var TSOS;
         };
 
         Cpu.prototype.updatePcb = function (p) {
-            _Pcb.pc = this.PC;
-            _Pcb.acc = this.Acc;
-            _Pcb.ir = this.IR;
-            _Pcb.x = this.Xreg;
-            _Pcb.y = this.Yreg;
-            _Pcb.z = this.Zflag;
+            p.pc = _CPU.PC;
+            p.acc = _CPU.Acc;
+            p.ir = _CPU.IR;
+            p.x = _CPU.Xreg;
+            p.y = _CPU.Yreg;
+            p.z = _CPU.Zflag;
         };
         return Cpu;
     })();

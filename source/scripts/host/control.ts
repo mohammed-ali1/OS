@@ -68,7 +68,7 @@ module TSOS {
             //taLog.style.color = "#" + Math.floor(Math.random()*16777215).toString(16);
             // Optionally update a log database or some streaming service.
 
-            _CPU.init();
+//            _CPU.init(); // THIS ONE GOT ME IN TROUBLE....CPU WAS GOING FOR ONLY 1 CYCLE!
         }
 
 
@@ -105,7 +105,7 @@ module TSOS {
             _Memory.createTable();
 
             //Initialize Ready Queue
-            _ReadyQueue = new Queue();
+//            _ReadyQueue = new Queue();
         }
 
         public static hostBtnHaltOS_click(btn): void {

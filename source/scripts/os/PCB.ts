@@ -43,7 +43,7 @@ module TSOS{
             document.getElementById("pcbZ").innerHTML = "" + this.z;
         }
 
-        public getPid(){
+        public getPid() : number{
             return Pcb.PID;
         }
     }

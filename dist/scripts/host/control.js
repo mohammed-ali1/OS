@@ -61,10 +61,9 @@ var TSOS;
             // Update the log console.
             var taLog = document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
-
             //taLog.style.color = "#" + Math.floor(Math.random()*16777215).toString(16);
             // Optionally update a log database or some streaming service.
-            _CPU.init();
+            //            _CPU.init(); // THIS ONE GOT ME IN TROUBLE....CPU WAS GOING FOR ONLY 1 CYCLE!
         };
 
         //
@@ -98,9 +97,8 @@ var TSOS;
             //Initialize the Memory
             _Memory = new TSOS.Memory();
             _Memory.createTable();
-
             //Initialize Ready Queue
-            _ReadyQueue = new TSOS.Queue();
+            //            _ReadyQueue = new Queue();
         };
 
         Control.hostBtnHaltOS_click = function (btn) {

@@ -320,7 +320,7 @@ module TSOS {
             //Create New Resident Queue
             _ResidentQueue = new Array<Pcb>();
             _ResidentQueue[_Pcb.getPid()] = _Pcb;
-            _StdOut.putText("Process ID: " + _ResidentQueue[_Pcb.getPid()].getPid());
+            _StdOut.putText("Process ID: " + _Pcb.getPid());
         }
 
         /**
@@ -421,7 +421,8 @@ module TSOS {
         }
 
         public shellRun(args){
-            _ReadyQueue.enqueue(_ResidentQueue[args]);
+            _ReadyQueue = new Queue();
+            _ReadyQueue.enqueue(_ResidentQueue[args[0]]);
         }
     }
 }

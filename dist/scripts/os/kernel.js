@@ -84,7 +84,7 @@ var TSOS;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) {
                 _CPU.cycle();
-            } else if (_ReadyQueue.getSize() != 0) {
+            } else if (_ReadyQueue.getSize() > 0) {
                 this.krnExe(_ReadyQueue.dequeue());
             } else {
                 this.krnTrace("Idle");
@@ -130,6 +130,8 @@ var TSOS;
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
+                case 0:
+                    _CPU.init(); //Re-Start the CPU!
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }

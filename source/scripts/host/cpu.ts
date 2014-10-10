@@ -19,7 +19,7 @@ module TSOS {
 
     export class Cpu {
 
-        constructor(public PC: number = 0,
+        constructor(public PC: number = 1,
                     public Acc: number = 0,
                     public IR: string = "",
                     public Xreg: number = 0,
@@ -45,30 +45,29 @@ module TSOS {
             // Do the real work here. Be sure to set this.isExecuting appropriately.
 
             //Read Stuff from Memory @ Program Counter
-            this.manageOpCodes(_MainMemory[_CPU.PC]);
+            _CPU.manageOpCodes(_MainMemory[_CPU.PC].toString());
 
             //Update the Memory if Any Changes!
-            _Memory.updateMemory();
-
+//            _Memory.updateMemory();
+//
             //Update the CPU Table
-            this.displayCPU();
+            _CPU.displayCPU();
 
             //Update PCB
-            this.updatePcb(_Pcb.getPid()-1);
+            _CPU.updatePcb(_Pcb);
 
             //Display the PCB
-            (_Pcb.getPid()-1).displayPCB();
+            _Pcb.displayPCB();
         }
 
         public displayCPU(){
 
-            document.getElementById("pc").innerHTML = _CPU.PC.toString();
-            document.getElementById("acc").innerHTML = _CPU.Acc.toString();
-            document.getElementById("ir").innerHTML = _CPU.IR.toString();
-            document.getElementById("x").innerHTML = _CPU.Xreg.toString();
-            document.getElementById("y").innerHTML = _CPU.Yreg.toString();
-            document.getElementById("z").innerHTML = _CPU.Zflag.toString();
-            document.getElementById("s").innerHTML = _CPU.isExecuting.toString();
+            document.getElementById("pc").innerHTML = this.PC.toString();
+            document.getElementById("acc").innerHTML = this.Acc.toString();
+            document.getElementById("ir").innerHTML = this.IR;
+            document.getElementById("x").innerHTML = this.Xreg.toString();
+            document.getElementById("y").innerHTML = this.Yreg.toString();
+            document.getElementById("z").innerHTML = this.Zflag.toString();
         }
 
         public manageOpCodes(str){
@@ -76,7 +75,7 @@ module TSOS {
             str = str.toString();
 
             if(str.toUpperCase() == "A9"){
-                this._A9_Instruction();
+                _CPU._A9_Instruction();
             }
             else if(str == "AD"){
                 this._AD_Instruction();
@@ -120,7 +119,7 @@ module TSOS {
             else{
                 _StdOut.putText("Instruction Not VALID!");
             }
-            this.PC++;
+            _CPU.PC++;
         }
 
         /**
@@ -129,8 +128,12 @@ module TSOS {
          */
         public _A9_Instruction(){
 
-            this.IR = _MainMemory[this.PC];
-            this.Acc = parseInt(_MainMemory[++this.PC],10); //read in base 10
+            _CPU.IR = _MainMemory[_CPU.PC.toString()];
+            _CPU.PC++;
+            if(_CPU.PC % 8 == 0){
+                _CPU.PC++;
+            }
+            _CPU.Acc = parseInt(_MainMemory[_CPU.PC].toString()); //read in base 10
         }
 
         /**
@@ -202,7 +205,7 @@ module TSOS {
          * @private
          */
         public _00_Instruction(){
-
+            _KernelInterruptQueue.enqueue(new Interrupt(0,0));
         }
 
         /**
@@ -242,12 +245,12 @@ module TSOS {
 
         public updatePcb(p:Pcb){
 
-            _Pcb.pc = this.PC;
-            _Pcb.acc = this.Acc;
-            _Pcb.ir = this.IR;
-            _Pcb.x = this.Xreg;
-            _Pcb.y = this.Yreg;
-            _Pcb.z = this.Zflag;
+            p.pc = _CPU.PC;
+            p.acc = _CPU.Acc;
+            p.ir = _CPU.IR;
+            p.x = _CPU.Xreg;
+            p.y = _CPU.Yreg;
+            p.z = _CPU.Zflag;
         }
     }
 }
