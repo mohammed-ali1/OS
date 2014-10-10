@@ -30,7 +30,7 @@ module TSOS {
                 _MainMemory[i] = i.toString(16).toUpperCase();
                 table += "<td>" + "["+ _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
 
-                for(var j=i+1; j<=i+7;j++){
+                for(var j=i+1; j<=i+8;j++){
                     _MainMemory[j] = "00";
                     table += "<td>" + _MainMemory[j] + "</td>";
                 }
@@ -65,7 +65,7 @@ module TSOS {
 
             for(var i=0; i<str.length;i+=8){
 
-                for(var j= i+1; j<=i+7;j++){
+                for(var j= i+1; j<=i+8;j++){
 
                     _MainMemory[j] = x.substring(a,b);
                     a = b;
@@ -93,7 +93,7 @@ module TSOS {
                 table += "<tr>";
                 table += "<td>" + "["+ _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
 
-                for(var j=i+1; j<=i+7;j++){
+                for(var j=i+1; j<=i+8;j++){
                     table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";

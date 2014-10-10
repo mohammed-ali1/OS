@@ -136,13 +136,14 @@ h3 {
 }
 
 #tableID{
-    width:350px;
+    width:360px;
     resize: none;
     float: left;
-    height:306px;
+    height:290px;
     overflow: scroll;
     background-color: transparent;
-    font-size:14px;
+    font-size:12px;
+    font-weight: normal;
 }
 
 /* Halloween Colors...WHY NOT?*/
@@ -185,6 +186,7 @@ h3 {
 
 #cpu td, #pcb td{
     /*padding: 5px;*/
+    width: inherit;
     text-align: center;
     border-radius: 5px;
     color: #ffffff;

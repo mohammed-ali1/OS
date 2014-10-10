@@ -131,6 +131,8 @@ var TSOS;
                     _StdIn.handleInput();
                     break;
                 case -1:
+                    _Pcb.setState(2); //Pass 2 to mark Process as Terminated!
+                    _Pcb.displayPCB(); //Display the PCB
                     _CPU.init(); //Re-Start the CPU!
                     break;
                 default:

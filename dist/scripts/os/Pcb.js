@@ -38,6 +38,22 @@ var TSOS;
         Pcb.prototype.getPid = function () {
             return Pcb.PID;
         };
+
+        Pcb.prototype.setState = function (s) {
+            switch (s) {
+                case 0:
+                    _Pcb.state = "NEW";
+                    break;
+                case 1:
+                    _Pcb.state = "Running";
+                    break;
+                case 2:
+                    _Pcb.state = "Terminated";
+                    break;
+                default:
+                    _Pcb.state = "???";
+            }
+        };
         Pcb.PID = -1;
         return Pcb;
     })();

@@ -108,12 +108,12 @@ var TSOS;
 
         /**
         * Load the accumulator with a constant
-        * Takes 1 parameter.
+        * Takes 1 parameter (Constant)
         */
         Cpu.prototype._A9_Instruction = function () {
             _CPU.IR = _MainMemory[_CPU.PC.toString()];
             _CPU.PC++;
-            if (_CPU.PC % 8 == 0) {
+            if ((_CPU.PC % 8).toString(16) == 0) {
                 _CPU.PC++;
             }
             _CPU.Acc = parseInt(_MainMemory[_CPU.PC].toString()); //read in base 10
@@ -124,6 +124,15 @@ var TSOS;
         * Takes 2 parameters.
         */
         Cpu.prototype._AD_Instruction = function () {
+            _CPU.IR = _MainMemory[_CPU.PC.toString()];
+            var int = 0;
+            if (_CPU.PC + 1 % 8 == 0) {
+                _CPU.PC += 3;
+                int = _CPU.PC;
+            }
+            if (_CPU.PC + 2 % 8 != 0) {
+            }
+
             this.Acc = parseInt(_MainMemory[++this.PC]);
         };
 
@@ -148,7 +157,12 @@ var TSOS;
         * @private
         */
         Cpu.prototype._A2_Instruction = function () {
-            this.Xreg = parseInt(_MainMemory[this.PC + 1]);
+            _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.PC++;
+            if (_CPU.PC % 8 == 0) {
+                _CPU.PC++;
+            }
+            _CPU.Xreg = parseInt(_MainMemory[this.PC].toString());
         };
 
         /**
@@ -164,7 +178,12 @@ var TSOS;
         * @private
         */
         Cpu.prototype._A0_Instruction = function () {
-            this.Yreg = parseInt(_MainMemory[this.PC + 1]);
+            _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.PC++;
+            if (_CPU.PC % 8 == 0) {
+                _CPU.PC++;
+            }
+            this.Yreg = parseInt(_MainMemory[this.PC].toString());
         };
 
         /**
@@ -180,6 +199,7 @@ var TSOS;
         * @private
         */
         Cpu.prototype._EA_Instruction = function () {
+            return;
         };
 
         /**
@@ -207,6 +227,17 @@ var TSOS;
         * @private
         */
         Cpu.prototype._D0_Instruction = function () {
+            if (_CPU.Zflag == 0) {
+                _CPU.PC++;
+                if (_CPU.PC % 8 == 0) {
+                    _CPU.PC++;
+                }
+                _CPU.PC += parseInt(_MainMemory[_CPU.PC].toString());
+
+                if (_CPU.PC > _Memory.size()) {
+                    _CPU.PC = _CPU.PC - _Memory.size();
+                }
+            }
         };
 
         /**

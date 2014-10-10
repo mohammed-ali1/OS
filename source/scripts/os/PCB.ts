@@ -13,8 +13,8 @@ module TSOS{
         public x:number = 0;
         public y:number = 0;
         public z:number = 0;
-        public base: number=0;
-        public limit:number=0;
+        public base: number = 0;
+        public limit:number = 0;
         public state:string = "NEW";
 
         constructor(b:number, l:number){
@@ -45,6 +45,24 @@ module TSOS{
 
         public getPid() : number{
             return Pcb.PID;
+        }
+
+        public setState(s:number){
+
+            switch (s){
+                case 0:
+                    _Pcb.state = "NEW";
+                    break;
+                case 1:
+                    _Pcb.state = "Running";
+                    break;
+                case 2:
+                    _Pcb.state = "Terminated";
+                    break;
+                default :
+                    _Pcb.state = "???";
+
+            }
         }
     }
 }

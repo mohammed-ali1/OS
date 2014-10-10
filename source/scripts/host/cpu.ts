@@ -124,13 +124,13 @@ module TSOS {
 
         /**
          * Load the accumulator with a constant
-         * Takes 1 parameter.
+         * Takes 1 parameter (Constant)
          */
         public _A9_Instruction(){
 
             _CPU.IR = _MainMemory[_CPU.PC.toString()];
             _CPU.PC++;
-            if(_CPU.PC % 8 == 0){
+            if((_CPU.PC % 8).toString(16) == 0){
                 _CPU.PC++;
             }
             _CPU.Acc = parseInt(_MainMemory[_CPU.PC].toString()); //read in base 10
@@ -141,6 +141,17 @@ module TSOS {
          * Takes 2 parameters.
          */
         public _AD_Instruction(){
+
+            _CPU.IR = _MainMemory[_CPU.PC.toString()];
+            var int = 0;
+            if(_CPU.PC + 1 % 8 == 0){
+                _CPU.PC += 3;
+                int = _CPU.PC;
+            }
+            if(_CPU.PC + 2 % 8 !=0){
+
+            }
+
             this.Acc = parseInt(_MainMemory[++this.PC]);
         }
 
@@ -149,6 +160,8 @@ module TSOS {
          * @private
          */
         public _8D_Instruction(){
+
+
             _MainMemory[(this.PC+1).toString(16)] = this.PC+1;
         }
 
@@ -165,7 +178,13 @@ module TSOS {
          * @private
          */
         public _A2_Instruction(){
-            this.Xreg = parseInt(_MainMemory[this.PC+1]);
+
+            _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.PC++;
+            if(_CPU.PC %8 == 0){
+                _CPU.PC++;
+            }
+            _CPU.Xreg = parseInt(_MainMemory[this.PC].toString());
         }
 
         /**
@@ -181,7 +200,13 @@ module TSOS {
          * @private
          */
         public _A0_Instruction(){
-            this.Yreg = parseInt(_MainMemory[this.PC+1]);
+
+            _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.PC++;
+            if(_CPU.PC %8 == 0){
+                _CPU.PC++;
+            }
+            this.Yreg = parseInt(_MainMemory[this.PC].toString());
         }
 
         /**
@@ -197,7 +222,7 @@ module TSOS {
          * @private
          */
         public _EA_Instruction(){
-
+            return;
         }
 
         /**
@@ -215,6 +240,7 @@ module TSOS {
          * @private
          */
         public _EC_Instruction(){
+
             if(this.Zflag == _MainMemory[this.PC+1]){
                 this.Zflag = 0;
             }
@@ -226,6 +252,18 @@ module TSOS {
          */
         public _D0_Instruction(){
 
+            if(_CPU.Zflag == 0){
+
+                _CPU.PC++;
+                if(_CPU.PC %8 == 0){
+                    _CPU.PC++;
+                }
+                _CPU.PC += parseInt(_MainMemory[_CPU.PC].toString());
+
+                if(_CPU.PC > _Memory.size()){
+                    _CPU.PC = _CPU.PC - _Memory.size();
+                }
+            }
         }
 
         /**
