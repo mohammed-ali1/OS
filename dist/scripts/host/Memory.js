@@ -11,6 +11,7 @@ var TSOS;
         */
         Memory.prototype.createTable = function () {
             _MainMemory = new Array();
+            _MainMemoryBase = new Array();
 
             if (_MainMemorySize == 256)
                 _MainMemorySegment++;
@@ -22,12 +23,10 @@ var TSOS;
             var table = "<table>";
 
             for (var i = 0; i < _MainMemorySize; i += 8) {
-                table += "<tr>";
-                _MainMemory[i] = i.toString(16).toUpperCase();
-                _MainMemory[i] = i.toString(16).toUpperCase();
-                table += "<td>" + "[" + _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
+                _MainMemoryBase[i] = i.toString(16).toUpperCase();
+                table += "<tr><td>" + "[" + _MainMemorySegment + "x" + _MainMemoryBase[i] + "]" + "</td>";
 
-                for (var j = i + 1; j <= i + 8; j++) {
+                for (var j = i; j <= i + 7; j++) {
                     _MainMemory[j] = "00";
                     table += "<td>" + _MainMemory[j] + "</td>";
                 }
@@ -53,20 +52,15 @@ var TSOS;
         * Loads the program into the Main Memory
         */
         Memory.prototype.loadProgram = function (str) {
-            var x = str.toString();
-            x = x.trim();
+            var x = str.replace(/^\s+|\s+$/g, '');
+            x = str.trim();
             var a = 0, b = 2;
 
-            for (var i = 0; i < str.length; i += 8) {
-                for (var j = i + 1; j <= i + 8; j++) {
-                    _MainMemory[j] = x.substring(a, b);
-                    a = b;
-                    b = b + 2;
-
-                    if (_MainMemory[j] == "") {
-                        _MainMemory[j] = "00";
-                    }
-                }
+            for (var i = _Pcb.base; i < x.length / 2; i++) {
+                var s = x.substring(a, b);
+                _MainMemory[i] = s;
+                a = b;
+                b += 2;
             }
 
             //Update the Memory
@@ -80,10 +74,9 @@ var TSOS;
             var table = "<table>";
 
             for (var i = 0; i < _MainMemorySize; i += 8) {
-                table += "<tr>";
-                table += "<td>" + "[" + _MainMemorySegment + "x" + _MainMemory[i] + "]" + "</td>";
+                table += "<tr><td>" + "[" + _MainMemorySegment + "x" + _MainMemoryBase[i] + "]" + "</td>";
 
-                for (var j = i + 1; j <= i + 8; j++) {
+                for (var j = i; j <= i + 7; j++) {
                     table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";

@@ -69,6 +69,7 @@ var Glados: any = null;
 var _MainMemory: string[] = null;
 var _MainMemorySize: number = 256;
 var _MainMemorySegment: number = -1;
+var _MainMemoryBase : string[] = null;
 var _Memory : TSOS.Memory;
 
 //PCB

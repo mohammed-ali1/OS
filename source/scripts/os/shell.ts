@@ -309,8 +309,7 @@ module TSOS {
                 }
             }
 
-            //Load into Memory
-            _Memory.loadProgram(x.toString());
+            //Print to Console
             _StdOut.putText("Loaded Successfully!");
             _Console.advanceLine();
 
@@ -321,6 +320,9 @@ module TSOS {
             _ResidentQueue = new Array<Pcb>();
             _ResidentQueue[_Pcb.getPid()] = _Pcb;
             _StdOut.putText("Process ID: " + _Pcb.getPid());
+
+            //Finally load into Memory
+            _Memory.loadProgram(x.toString());
         }
 
         /**

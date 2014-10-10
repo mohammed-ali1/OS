@@ -277,8 +277,7 @@ var TSOS;
                 }
             }
 
-            //Load into Memory
-            _Memory.loadProgram(x.toString());
+            //Print to Console
             _StdOut.putText("Loaded Successfully!");
             _Console.advanceLine();
 
@@ -289,6 +288,9 @@ var TSOS;
             _ResidentQueue = new Array();
             _ResidentQueue[_Pcb.getPid()] = _Pcb;
             _StdOut.putText("Process ID: " + _Pcb.getPid());
+
+            //Finally load into Memory
+            _Memory.loadProgram(x.toString());
         };
 
         /**
