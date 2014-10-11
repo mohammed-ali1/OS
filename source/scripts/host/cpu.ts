@@ -47,10 +47,10 @@ module TSOS {
             // Do the real work here. Be sure to set this.isExecuting appropriately.
 
             //Read Stuff from Memory @ Program Counter
-            _CPU.manageOpCodes(_MainMemory[_CPU.PC].toString());
+            _CPU.manageOpCodes(_MemoryManager.read(_CPU.PC));
 
             //Update the Memory if Any Changes!
-            _Memory.updateMemory();
+            _MemoryManager.update();
 //
             //Update the CPU Table
             _CPU.displayCPU();
@@ -81,46 +81,46 @@ module TSOS {
                 _CPU._A9_Instruction();
             }
             else if(str == "AD"){
-                this._AD_Instruction();
+                _CPU._AD_Instruction();
             }
             else if(str == "8D"){
                 _CPU._8D_Instruction();
             }
             else if(str == "6D"){
-                this._6D_Instruction();
+                _CPU._6D_Instruction();
             }
             else if(str == "A2"){
-                this._A2_Instruction();
+                _CPU._A2_Instruction();
             }
             else if(str == "AE"){
-                this._AE_Instruction();
+                _CPU._AE_Instruction();
             }
             else if(str == "A0"){
-                this._A0_Instruction();
+                _CPU._A0_Instruction();
             }
             else if(str == "AC"){
-                this._AC_Instruction();
+                _CPU._AC_Instruction();
             }
             else if(str == "EA"){
-                this._EA_Instruction();
+                _CPU._EA_Instruction();
             }
             else if(str == "00"){
                 _CPU._00_Instruction();
             }
             else if(str == "EC"){
-                this._EC_Instruction();
+                _CPU._EC_Instruction();
             }
             else if(str == "D0"){
-                this._D0_Instruction();
+                _CPU._D0_Instruction();
             }
             else if(str == "EE"){
-                this._EE_Instruction();
+                _CPU._EE_Instruction();
             }
             else if(str == "FF"){
                 _CPU._FF_Instruction();
             }
-            else if(str == "$$"){
-                this._00_Instruction();
+            else if(str == "0"){
+                _CPU._00_Instruction();
             }
             else{
                 _StdOut.putText("Instruction Not VALID!");
@@ -134,9 +134,9 @@ module TSOS {
          */
         public _A9_Instruction(){
 
-            _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            _CPU.Acc = parseInt(_MainMemory[_CPU.PC],10); //read in base 10
+            _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC),16); //read in base 10
             _CPU.INS = "CPU -> [LDA #$" + _CPU.Acc + "]";
         }
 
@@ -146,9 +146,9 @@ module TSOS {
          */
         public _AD_Instruction(){
 
-            _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            _CPU.Acc = parseInt(_MainMemory[_CPU.PC]);
+            _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC),16);
             _CPU++;
             _CPU.INS = "CPU -> [LDA $00" + _CPU.Acc + "]";
 
@@ -160,10 +160,10 @@ module TSOS {
          */
         public _8D_Instruction(){
 
-             _CPU.IR = _MainMemory[_CPU.PC].toString();
+             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            var temp = parseInt(_MainMemory[_CPU.PC],16);
-            _MainMemory[temp] = "" + _CPU.Acc;
+            var temp = parseInt(_MemoryManager.read(_CPU.PC),16);
+            _MemoryManager.store(temp,_CPU.Acc.toString());
             _CPU.PC++;
             _CPU.INS = "CPU -> [STA $00" + temp.toString(16) + "]";
         }
@@ -173,10 +173,10 @@ module TSOS {
          * @private
          */
         public _6D_Instruction(){
-            _CPU.IR = _MainMemory[_CPU.PC];
+            _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            var temp = parseInt(_MainMemory[_CPU.PC],16);
-            _CPU.Acc += parseInt(_MainMemory[temp],10);
+            var temp = parseInt(_MemoryManager.read(_CPU.PC),16);
+            _CPU.Acc += parseInt(_MemoryManager.read(temp),10);
             _CPU.PC++;
         }
 
@@ -186,9 +186,9 @@ module TSOS {
          */
         public _A2_Instruction(){
 
-            _CPU.IR = _MainMemory[_CPU.PC];
+            _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            _CPU.Xreg = parseInt(_MainMemory[_CPU.PC],10);
+            _CPU.Xreg = parseInt(_MemoryManager.read(_CPU.PC),10);
         }
 
         /**
@@ -205,9 +205,9 @@ module TSOS {
          */
         public _A0_Instruction(){
 
-            _CPU.IR = _MainMemory[_CPU.PC];
+            _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            _CPU.Yreg = parseInt(_MainMemory[_CPU.PC],10);
+            _CPU.Yreg = parseInt(_MemoryManager.read(_CPU.PC),10);
         }
 
         /**
@@ -216,10 +216,10 @@ module TSOS {
          */
         public _AC_Instruction(){
 
-            _CPU.IR = _MainMemory[_CPU.PC];
+            _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            var temp = parseInt(_MainMemory[_CPU.PC],16);
-            _CPU.Yreg = parseInt(_MainMemory[temp],10);
+            var temp = parseInt(_MemoryManager.read(_CPU.PC),16);
+            _CPU.Yreg = parseInt(_MemoryManager.read(temp),10);
             _CPU.PC++;
         }
 
@@ -247,9 +247,9 @@ module TSOS {
          */
         public _EC_Instruction(){
 
-            _CPU.IR = _MainMemory[_CPU.PC];
+            _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            var temp = parseInt(_MainMemory[_CPU.PC],10);
+            var temp = parseInt(_MemoryManager.read(_CPU.PC),10);
             if(_CPU.Zflag == temp){
                 _CPU.Zflag = 0;
             }
@@ -262,11 +262,11 @@ module TSOS {
          */
         public _D0_Instruction(){
 
-            _CPU.IR = _MainMemory[_CPU.PC];
+            _CPU.IR = _MemoryManager.read(_CPU.PC);
 
             if(_CPU.Zflag == 0){
                 _CPU.PC++;
-                var temp:number = parseInt(_MainMemory[_CPU.PC],10);
+                var temp:number = parseInt(_MemoryManager.read(_CPU.PC),10);
                 _CPU.PC = temp - _CPU.PC;
             }
         }
@@ -284,7 +284,7 @@ module TSOS {
          * @private
          */
         public _FF_Instruction(){
-            _CPU.IR = _MainMemory[_CPU.PC];
+            _CPU.IR = _MemoryManager.read(_CPU.PC);
             var temp = _CPU.Yreg;
             _StdOut.putText("Y-Reg: " + temp);
         }
@@ -297,6 +297,10 @@ module TSOS {
             p.x = _CPU.Xreg;
             p.y = _CPU.Yreg;
             p.z = _CPU.Zflag;
+            if(_CPU.isExecuting)
+                p.setState(1)
+            else
+                p.setState(2);
         }
     }
 }

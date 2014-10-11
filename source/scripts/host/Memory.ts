@@ -5,7 +5,10 @@
 module TSOS {
     export class Memory {
 
+        public segment:number = -1;
+
         constructor(){
+            this.createTable();
         }
 
         /**
@@ -17,21 +20,21 @@ module TSOS {
             _MainMemoryBase = new Array();
 
             if(_MainMemorySize == 256)
-                _MainMemorySegment++;
+                this.segment = 0;
             if(_MainMemorySize == 256 * 2)
-                _MainMemorySegment++;
+                this.segment = 1;
             if(_MainMemorySize == 256 * 3)
-                _MainMemorySegment++;
+                this.segment = 2;
 
             var table = "<table>";
 
             for(var i=0; i<_MainMemorySize;i+=8){
 
                 _MainMemoryBase[i] = i.toString(16).toUpperCase();
-                table += "<tr><td>" + "["+ _MainMemorySegment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                table += "<tr><td>" + "["+ this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
 
                 for(var j=i; j<=i+7;j++){
-                    _MainMemory[j] = "$$";
+                    _MainMemory[j] = "0";
                     table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
@@ -42,15 +45,16 @@ module TSOS {
         }
 
         /**
-         * Clears the Main Memory.
+         * Reads the Memory at the given index
+         * @param index
+         * @returns {string}
          */
-        public clearMemory(){
+        public read(index:number){
+            return _MainMemory[index];
+        }
 
-            for(var i=0; i<_MainMemorySize;i++){
-                _MainMemory[i] = "00";
-            }
-
-            this.updateMemory();
+        public store(index: number, str:string){
+            _MainMemory[index] = str;
         }
 
         /**
@@ -83,10 +87,10 @@ module TSOS {
 
             for(var i=0; i<_MainMemorySize;i+=8){
 
-                table += "<tr><td>" + "["+ _MainMemorySegment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                table += "<tr><td>" + "["+  this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
 
                 for(var j=i; j<=i+7;j++){
-                    if(_MainMemory[j] != "$$")
+                    if(_MainMemory[j] != "0")
                         table += "<td style='background-color: #ffffff;'>" + _MainMemory[j] + "</td>";
                     else
                         table += "<td>" + _MainMemory[j] + "</td>";
@@ -95,6 +99,11 @@ module TSOS {
             }
             table +="</table>";
             document.getElementById("table").innerHTML = table;
+        }
+
+        public clear(){
+            //TO DO
+            //Clears the Memory
         }
 
         public size(){

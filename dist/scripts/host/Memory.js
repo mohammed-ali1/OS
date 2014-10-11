@@ -5,6 +5,8 @@ var TSOS;
 (function (TSOS) {
     var Memory = (function () {
         function Memory() {
+            this.segment = -1;
+            this.createTable();
         }
         /**
         * Creates the Memory inside the Table
@@ -14,20 +16,20 @@ var TSOS;
             _MainMemoryBase = new Array();
 
             if (_MainMemorySize == 256)
-                _MainMemorySegment++;
+                this.segment = 0;
             if (_MainMemorySize == 256 * 2)
-                _MainMemorySegment++;
+                this.segment = 1;
             if (_MainMemorySize == 256 * 3)
-                _MainMemorySegment++;
+                this.segment = 2;
 
             var table = "<table>";
 
             for (var i = 0; i < _MainMemorySize; i += 8) {
                 _MainMemoryBase[i] = i.toString(16).toUpperCase();
-                table += "<tr><td>" + "[" + _MainMemorySegment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                table += "<tr><td>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
 
                 for (var j = i; j <= i + 7; j++) {
-                    _MainMemory[j] = "$$";
+                    _MainMemory[j] = "0";
                     table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
@@ -38,14 +40,16 @@ var TSOS;
         };
 
         /**
-        * Clears the Main Memory.
+        * Reads the Memory at the given index
+        * @param index
+        * @returns {string}
         */
-        Memory.prototype.clearMemory = function () {
-            for (var i = 0; i < _MainMemorySize; i++) {
-                _MainMemory[i] = "00";
-            }
+        Memory.prototype.read = function (index) {
+            return _MainMemory[index];
+        };
 
-            this.updateMemory();
+        Memory.prototype.store = function (index, str) {
+            _MainMemory[index] = str;
         };
 
         /**
@@ -74,10 +78,10 @@ var TSOS;
             var table = "<table>";
 
             for (var i = 0; i < _MainMemorySize; i += 8) {
-                table += "<tr><td>" + "[" + _MainMemorySegment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                table += "<tr><td>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
 
                 for (var j = i; j <= i + 7; j++) {
-                    if (_MainMemory[j] != "$$")
+                    if (_MainMemory[j] != "0")
                         table += "<td style='background-color: #ffffff;'>" + _MainMemory[j] + "</td>";
                     else
                         table += "<td>" + _MainMemory[j] + "</td>";
@@ -86,6 +90,11 @@ var TSOS;
             }
             table += "</table>";
             document.getElementById("table").innerHTML = table;
+        };
+
+        Memory.prototype.clear = function () {
+            //TO DO
+            //Clears the Memory
         };
 
         Memory.prototype.size = function () {

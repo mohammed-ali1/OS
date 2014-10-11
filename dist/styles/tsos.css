@@ -175,18 +175,19 @@ h3 {
     border-radius: 10px;
     /*overflow: hidden;*/
     /*height: 105px;*/
-    table-layout: fixed;
+    table-layout: auto;
 }
 
 #cpu th, #pcb th{
     text-align: center;
     color: firebrick;
     background-color: #FFD801;
+    width: auto;
 }
 
 #cpu td, #pcb td{
     /*padding: 5px;*/
-    width: inherit;
+    width: auto;
     text-align: center;
     border-radius: 5px;
     color: #ffffff;

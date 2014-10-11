@@ -65,9 +65,11 @@ var Glados = null;
 // MEMORY INFO
 var _MainMemory = null;
 var _MainMemorySize = 256;
-var _MainMemorySegment = -1;
 var _MainMemoryBase = null;
 var _Memory;
+
+//Memory Manager
+var _MemoryManager;
 
 //PCB
 var _Pcb;

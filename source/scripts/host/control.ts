@@ -100,12 +100,9 @@ module TSOS {
             //Display System Status...
             document.getElementById("status").innerHTML = "Status: Running...";
 
-            //Initialize the Memory
-            _Memory = new Memory();
-            _Memory.createTable();
+            //Initialize the Memory Manager
+            _MemoryManager = new MemoryManager();
 
-            //Initialize Ready Queue
-//            _ReadyQueue = new Queue();
         }
 
         public static hostBtnHaltOS_click(btn): void {
