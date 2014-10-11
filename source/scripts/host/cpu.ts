@@ -19,7 +19,7 @@ module TSOS {
 
     export class Cpu {
 
-        constructor(public PC: number = 1,
+        constructor(public PC: number = 0,
                     public Acc: number = 0,
                     public IR: string = "",
                     public Xreg: number = 0,
@@ -30,7 +30,7 @@ module TSOS {
         }
 
         public init(): void {
-            this.PC = 1;
+            this.PC = 0;
             this.Acc = 0;
             this.IR = "";
             this.Xreg = 0;
@@ -48,7 +48,7 @@ module TSOS {
             _CPU.manageOpCodes(_MainMemory[_CPU.PC].toString());
 
             //Update the Memory if Any Changes!
-//            _Memory.updateMemory();
+            _Memory.updateMemory();
 //
             //Update the CPU Table
             _CPU.displayCPU();
@@ -81,7 +81,7 @@ module TSOS {
                 this._AD_Instruction();
             }
             else if(str == "8D"){
-                this._8D_Instruction();
+                _CPU._8D_Instruction();
             }
             else if(str == "6D"){
                 this._6D_Instruction();
@@ -102,7 +102,7 @@ module TSOS {
                 this._EA_Instruction();
             }
             else if(str == "00"){
-                this._00_Instruction();
+                _CPU._00_Instruction();
             }
             else if(str == "EC"){
                 this._EC_Instruction();
@@ -116,6 +116,9 @@ module TSOS {
             else if(str == "FF"){
                 this._FF_Instruction();
             }
+            else if(str == "$$"){
+                this._00_Instruction();
+            }
             else{
                 _StdOut.putText("Instruction Not VALID!");
             }
@@ -128,12 +131,9 @@ module TSOS {
          */
         public _A9_Instruction(){
 
-            _CPU.IR = _MainMemory[_CPU.PC.toString()];
+            _CPU.IR = _MainMemory[_CPU.PC].toString();
             _CPU.PC++;
-            if((_CPU.PC % 8).toString(16) == 0){
-                _CPU.PC++;
-            }
-            _CPU.Acc = parseInt(_MainMemory[_CPU.PC].toString()); //read in base 10
+            _CPU.Acc = parseInt(_MainMemory[_CPU.PC],10); //read in base 10
         }
 
         /**
@@ -142,17 +142,9 @@ module TSOS {
          */
         public _AD_Instruction(){
 
-            _CPU.IR = _MainMemory[_CPU.PC.toString()];
-            var int = 0;
-            if(_CPU.PC + 1 % 8 == 0){
-                _CPU.PC += 3;
-                int = _CPU.PC;
-            }
-            if(_CPU.PC + 2 % 8 !=0){
-
-            }
-
-            this.Acc = parseInt(_MainMemory[++this.PC]);
+            _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.Acc = parseInt(_MainMemory[++_CPU.PC]);
+            _CPU++;
         }
 
         /**
@@ -161,8 +153,11 @@ module TSOS {
          */
         public _8D_Instruction(){
 
-
-            _MainMemory[(this.PC+1).toString(16)] = this.PC+1;
+             _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.PC++;
+            var temp = parseInt(_MainMemory[_CPU.PC],16);
+            _MainMemory[temp] = "" + _CPU.Acc;
+            _CPU.PC++;
         }
 
         /**
@@ -170,7 +165,12 @@ module TSOS {
          * @private
          */
         public _6D_Instruction(){
-            this.Acc += parseInt(_MainMemory[this.PC+1]);
+            _CPU.IR = _MainMemory[_CPU.PC];
+            _CPU.PC++;
+            var temp = parseInt(_MainMemory[_CPU.PC],16);
+            _CPU.Acc += parseInt(_MainMemory[temp],10);
+            _CPU.PC++;
+
         }
 
         /**
@@ -179,12 +179,9 @@ module TSOS {
          */
         public _A2_Instruction(){
 
-            _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.IR = _MainMemory[_CPU.PC];
             _CPU.PC++;
-            if(_CPU.PC %8 == 0){
-                _CPU.PC++;
-            }
-            _CPU.Xreg = parseInt(_MainMemory[this.PC].toString());
+            _CPU.Xreg = parseInt(_MainMemory[_CPU.PC],10);
         }
 
         /**
@@ -201,12 +198,9 @@ module TSOS {
          */
         public _A0_Instruction(){
 
-            _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.IR = _MainMemory[_CPU.PC];
             _CPU.PC++;
-            if(_CPU.PC %8 == 0){
-                _CPU.PC++;
-            }
-            this.Yreg = parseInt(_MainMemory[this.PC].toString());
+            _CPU.Yreg = parseInt(_MainMemory[_CPU.PC],10);
         }
 
         /**
@@ -214,7 +208,12 @@ module TSOS {
          * @private
          */
         public _AC_Instruction(){
-            this.Yreg = parseInt(_MainMemory[_MainMemory[this.PC+1]]);
+
+            _CPU.IR = _MainMemory[_CPU.PC];
+            _CPU.PC++;
+            var temp = parseInt(_MainMemory[_CPU.PC],16);
+            _CPU.Yreg = parseInt(_MainMemory[temp],10);
+            _CPU.PC++;
         }
 
         /**
@@ -241,9 +240,13 @@ module TSOS {
          */
         public _EC_Instruction(){
 
-            if(this.Zflag == _MainMemory[this.PC+1]){
-                this.Zflag = 0;
+            _CPU.IR = _MainMemory[_CPU.PC];
+            _CPU.PC++;
+            var temp = parseInt(_MainMemory[_CPU.PC],10);
+            if(_CPU.Zflag == temp){
+                _CPU.Zflag = 0;
             }
+            _CPU.PC++;
         }
 
         /**
@@ -252,17 +255,12 @@ module TSOS {
          */
         public _D0_Instruction(){
 
+            _CPU.IR = _MainMemory[_CPU.PC];
+
             if(_CPU.Zflag == 0){
-
                 _CPU.PC++;
-                if(_CPU.PC %8 == 0){
-                    _CPU.PC++;
-                }
-                _CPU.PC += parseInt(_MainMemory[_CPU.PC].toString());
-
-                if(_CPU.PC > _Memory.size()){
-                    _CPU.PC = _CPU.PC - _Memory.size();
-                }
+                var temp:number = parseInt(_MainMemory[_CPU.PC],10);
+                _CPU.PC = temp - _CPU.PC;
             }
         }
 

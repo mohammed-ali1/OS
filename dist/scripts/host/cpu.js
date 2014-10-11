@@ -14,7 +14,7 @@ var TSOS;
 (function (TSOS) {
     var Cpu = (function () {
         function Cpu(PC, Acc, IR, Xreg, Yreg, Zflag, isExecuting) {
-            if (typeof PC === "undefined") { PC = 1; }
+            if (typeof PC === "undefined") { PC = 0; }
             if (typeof Acc === "undefined") { Acc = 0; }
             if (typeof IR === "undefined") { IR = ""; }
             if (typeof Xreg === "undefined") { Xreg = 0; }
@@ -30,7 +30,7 @@ var TSOS;
             this.isExecuting = isExecuting;
         }
         Cpu.prototype.init = function () {
-            this.PC = 1;
+            this.PC = 0;
             this.Acc = 0;
             this.IR = "";
             this.Xreg = 0;
@@ -48,7 +48,8 @@ var TSOS;
             _CPU.manageOpCodes(_MainMemory[_CPU.PC].toString());
 
             //Update the Memory if Any Changes!
-            //            _Memory.updateMemory();
+            _Memory.updateMemory();
+
             //
             //Update the CPU Table
             _CPU.displayCPU();
@@ -77,7 +78,7 @@ var TSOS;
             } else if (str == "AD") {
                 this._AD_Instruction();
             } else if (str == "8D") {
-                this._8D_Instruction();
+                _CPU._8D_Instruction();
             } else if (str == "6D") {
                 this._6D_Instruction();
             } else if (str == "A2") {
@@ -91,7 +92,7 @@ var TSOS;
             } else if (str == "EA") {
                 this._EA_Instruction();
             } else if (str == "00") {
-                this._00_Instruction();
+                _CPU._00_Instruction();
             } else if (str == "EC") {
                 this._EC_Instruction();
             } else if (str == "D0") {
@@ -100,6 +101,8 @@ var TSOS;
                 this._EE_Instruction();
             } else if (str == "FF") {
                 this._FF_Instruction();
+            } else if (str == "$$") {
+                this._00_Instruction();
             } else {
                 _StdOut.putText("Instruction Not VALID!");
             }
@@ -111,12 +114,9 @@ var TSOS;
         * Takes 1 parameter (Constant)
         */
         Cpu.prototype._A9_Instruction = function () {
-            _CPU.IR = _MainMemory[_CPU.PC.toString()];
+            _CPU.IR = _MainMemory[_CPU.PC].toString();
             _CPU.PC++;
-            if ((_CPU.PC % 8).toString(16) == 0) {
-                _CPU.PC++;
-            }
-            _CPU.Acc = parseInt(_MainMemory[_CPU.PC].toString()); //read in base 10
+            _CPU.Acc = parseInt(_MainMemory[_CPU.PC], 10); //read in base 10
         };
 
         /**
@@ -124,16 +124,9 @@ var TSOS;
         * Takes 2 parameters.
         */
         Cpu.prototype._AD_Instruction = function () {
-            _CPU.IR = _MainMemory[_CPU.PC.toString()];
-            var int = 0;
-            if (_CPU.PC + 1 % 8 == 0) {
-                _CPU.PC += 3;
-                int = _CPU.PC;
-            }
-            if (_CPU.PC + 2 % 8 != 0) {
-            }
-
-            this.Acc = parseInt(_MainMemory[++this.PC]);
+            _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.Acc = parseInt(_MainMemory[++_CPU.PC]);
+            _CPU++;
         };
 
         /**
@@ -141,7 +134,11 @@ var TSOS;
         * @private
         */
         Cpu.prototype._8D_Instruction = function () {
-            _MainMemory[(this.PC + 1).toString(16)] = this.PC + 1;
+            _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.PC++;
+            var temp = parseInt(_MainMemory[_CPU.PC], 16);
+            _MainMemory[temp] = "" + _CPU.Acc;
+            _CPU.PC++;
         };
 
         /**
@@ -149,7 +146,11 @@ var TSOS;
         * @private
         */
         Cpu.prototype._6D_Instruction = function () {
-            this.Acc += parseInt(_MainMemory[this.PC + 1]);
+            _CPU.IR = _MainMemory[_CPU.PC];
+            _CPU.PC++;
+            var temp = parseInt(_MainMemory[_CPU.PC], 16);
+            _CPU.Acc += parseInt(_MainMemory[temp], 10);
+            _CPU.PC++;
         };
 
         /**
@@ -157,12 +158,9 @@ var TSOS;
         * @private
         */
         Cpu.prototype._A2_Instruction = function () {
-            _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.IR = _MainMemory[_CPU.PC];
             _CPU.PC++;
-            if (_CPU.PC % 8 == 0) {
-                _CPU.PC++;
-            }
-            _CPU.Xreg = parseInt(_MainMemory[this.PC].toString());
+            _CPU.Xreg = parseInt(_MainMemory[_CPU.PC], 10);
         };
 
         /**
@@ -178,12 +176,9 @@ var TSOS;
         * @private
         */
         Cpu.prototype._A0_Instruction = function () {
-            _CPU.IR = _MainMemory[_CPU.PC].toString();
+            _CPU.IR = _MainMemory[_CPU.PC];
             _CPU.PC++;
-            if (_CPU.PC % 8 == 0) {
-                _CPU.PC++;
-            }
-            this.Yreg = parseInt(_MainMemory[this.PC].toString());
+            _CPU.Yreg = parseInt(_MainMemory[_CPU.PC], 10);
         };
 
         /**
@@ -191,7 +186,11 @@ var TSOS;
         * @private
         */
         Cpu.prototype._AC_Instruction = function () {
-            this.Yreg = parseInt(_MainMemory[_MainMemory[this.PC + 1]]);
+            _CPU.IR = _MainMemory[_CPU.PC];
+            _CPU.PC++;
+            var temp = parseInt(_MainMemory[_CPU.PC], 16);
+            _CPU.Yreg = parseInt(_MainMemory[temp], 10);
+            _CPU.PC++;
         };
 
         /**
@@ -217,9 +216,13 @@ var TSOS;
         * @private
         */
         Cpu.prototype._EC_Instruction = function () {
-            if (this.Zflag == _MainMemory[this.PC + 1]) {
-                this.Zflag = 0;
+            _CPU.IR = _MainMemory[_CPU.PC];
+            _CPU.PC++;
+            var temp = parseInt(_MainMemory[_CPU.PC], 10);
+            if (_CPU.Zflag == temp) {
+                _CPU.Zflag = 0;
             }
+            _CPU.PC++;
         };
 
         /**
@@ -227,16 +230,12 @@ var TSOS;
         * @private
         */
         Cpu.prototype._D0_Instruction = function () {
+            _CPU.IR = _MainMemory[_CPU.PC];
+
             if (_CPU.Zflag == 0) {
                 _CPU.PC++;
-                if (_CPU.PC % 8 == 0) {
-                    _CPU.PC++;
-                }
-                _CPU.PC += parseInt(_MainMemory[_CPU.PC].toString());
-
-                if (_CPU.PC > _Memory.size()) {
-                    _CPU.PC = _CPU.PC - _Memory.size();
-                }
+                var temp = parseInt(_MainMemory[_CPU.PC], 10);
+                _CPU.PC = temp - _CPU.PC;
             }
         };
 

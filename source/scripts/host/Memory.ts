@@ -31,7 +31,7 @@ module TSOS {
                 table += "<tr><td>" + "["+ _MainMemorySegment + "x" + _MainMemoryBase[i] + "]" + "</td>";
 
                 for(var j=i; j<=i+7;j++){
-                    _MainMemory[j] = "00";
+                    _MainMemory[j] = "$$";
                     table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
@@ -86,7 +86,10 @@ module TSOS {
                 table += "<tr><td>" + "["+ _MainMemorySegment + "x" + _MainMemoryBase[i] + "]" + "</td>";
 
                 for(var j=i; j<=i+7;j++){
-                    table += "<td>" + _MainMemory[j] + "</td>";
+                    if(_MainMemory[j] != "$$")
+                        table += "<td style='background-color: #ffffff;'>" + _MainMemory[j] + "</td>";
+                    else
+                        table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
             }
