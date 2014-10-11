@@ -13,10 +13,11 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 var TSOS;
 (function (TSOS) {
     var Cpu = (function () {
-        function Cpu(PC, Acc, IR, Xreg, Yreg, Zflag, isExecuting) {
+        function Cpu(PC, Acc, IR, INS, Xreg, Yreg, Zflag, isExecuting) {
             if (typeof PC === "undefined") { PC = 0; }
             if (typeof Acc === "undefined") { Acc = 0; }
             if (typeof IR === "undefined") { IR = ""; }
+            if (typeof INS === "undefined") { INS = ""; }
             if (typeof Xreg === "undefined") { Xreg = 0; }
             if (typeof Yreg === "undefined") { Yreg = 0; }
             if (typeof Zflag === "undefined") { Zflag = 0; }
@@ -24,6 +25,7 @@ var TSOS;
             this.PC = PC;
             this.Acc = Acc;
             this.IR = IR;
+            this.INS = INS;
             this.Xreg = Xreg;
             this.Yreg = Yreg;
             this.Zflag = Zflag;
@@ -33,6 +35,7 @@ var TSOS;
             this.PC = 0;
             this.Acc = 0;
             this.IR = "";
+            this.INS = "";
             this.Xreg = 0;
             this.Yreg = 0;
             this.Zflag = 0;
@@ -68,6 +71,7 @@ var TSOS;
             document.getElementById("x").innerHTML = this.Xreg.toString();
             document.getElementById("y").innerHTML = this.Yreg.toString();
             document.getElementById("z").innerHTML = this.Zflag.toString();
+            document.getElementById("instruction").innerHTML = _CPU.INS;
         };
 
         Cpu.prototype.manageOpCodes = function (str) {
@@ -100,7 +104,7 @@ var TSOS;
             } else if (str == "EE") {
                 this._EE_Instruction();
             } else if (str == "FF") {
-                this._FF_Instruction();
+                _CPU._FF_Instruction();
             } else if (str == "$$") {
                 this._00_Instruction();
             } else {
@@ -117,6 +121,7 @@ var TSOS;
             _CPU.IR = _MainMemory[_CPU.PC].toString();
             _CPU.PC++;
             _CPU.Acc = parseInt(_MainMemory[_CPU.PC], 10); //read in base 10
+            _CPU.INS = "CPU -> [LDA #$" + _CPU.Acc + "]";
         };
 
         /**
@@ -125,8 +130,10 @@ var TSOS;
         */
         Cpu.prototype._AD_Instruction = function () {
             _CPU.IR = _MainMemory[_CPU.PC].toString();
-            _CPU.Acc = parseInt(_MainMemory[++_CPU.PC]);
+            _CPU.PC++;
+            _CPU.Acc = parseInt(_MainMemory[_CPU.PC]);
             _CPU++;
+            _CPU.INS = "CPU -> [LDA $00" + _CPU.Acc + "]";
         };
 
         /**
@@ -139,6 +146,7 @@ var TSOS;
             var temp = parseInt(_MainMemory[_CPU.PC], 16);
             _MainMemory[temp] = "" + _CPU.Acc;
             _CPU.PC++;
+            _CPU.INS = "CPU -> [STA $00" + temp.toString(16) + "]";
         };
 
         /**
@@ -251,6 +259,9 @@ var TSOS;
         * @private
         */
         Cpu.prototype._FF_Instruction = function () {
+            _CPU.IR = _MainMemory[_CPU.PC];
+            var temp = _CPU.Yreg;
+            _StdOut.putText("Y-Reg: " + temp);
         };
 
         Cpu.prototype.updatePcb = function (p) {

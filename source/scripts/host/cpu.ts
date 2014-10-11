@@ -22,6 +22,7 @@ module TSOS {
         constructor(public PC: number = 0,
                     public Acc: number = 0,
                     public IR: string = "",
+                    public INS: string = "",
                     public Xreg: number = 0,
                     public Yreg: number = 0,
                     public Zflag: number = 0,
@@ -33,6 +34,7 @@ module TSOS {
             this.PC = 0;
             this.Acc = 0;
             this.IR = "";
+            this.INS = "";
             this.Xreg = 0;
             this.Yreg = 0;
             this.Zflag = 0;
@@ -68,6 +70,7 @@ module TSOS {
             document.getElementById("x").innerHTML = this.Xreg.toString();
             document.getElementById("y").innerHTML = this.Yreg.toString();
             document.getElementById("z").innerHTML = this.Zflag.toString();
+            document.getElementById("instruction").innerHTML = _CPU.INS;
         }
 
         public manageOpCodes(str){
@@ -114,7 +117,7 @@ module TSOS {
                 this._EE_Instruction();
             }
             else if(str == "FF"){
-                this._FF_Instruction();
+                _CPU._FF_Instruction();
             }
             else if(str == "$$"){
                 this._00_Instruction();
@@ -134,6 +137,7 @@ module TSOS {
             _CPU.IR = _MainMemory[_CPU.PC].toString();
             _CPU.PC++;
             _CPU.Acc = parseInt(_MainMemory[_CPU.PC],10); //read in base 10
+            _CPU.INS = "CPU -> [LDA #$" + _CPU.Acc + "]";
         }
 
         /**
@@ -143,8 +147,11 @@ module TSOS {
         public _AD_Instruction(){
 
             _CPU.IR = _MainMemory[_CPU.PC].toString();
-            _CPU.Acc = parseInt(_MainMemory[++_CPU.PC]);
+            _CPU.PC++;
+            _CPU.Acc = parseInt(_MainMemory[_CPU.PC]);
             _CPU++;
+            _CPU.INS = "CPU -> [LDA $00" + _CPU.Acc + "]";
+
         }
 
         /**
@@ -158,6 +165,7 @@ module TSOS {
             var temp = parseInt(_MainMemory[_CPU.PC],16);
             _MainMemory[temp] = "" + _CPU.Acc;
             _CPU.PC++;
+            _CPU.INS = "CPU -> [STA $00" + temp.toString(16) + "]";
         }
 
         /**
@@ -170,7 +178,6 @@ module TSOS {
             var temp = parseInt(_MainMemory[_CPU.PC],16);
             _CPU.Acc += parseInt(_MainMemory[temp],10);
             _CPU.PC++;
-
         }
 
         /**
@@ -277,7 +284,9 @@ module TSOS {
          * @private
          */
         public _FF_Instruction(){
-
+            _CPU.IR = _MainMemory[_CPU.PC];
+            var temp = _CPU.Yreg;
+            _StdOut.putText("Y-Reg: " + temp);
         }
 
         public updatePcb(p:Pcb){
