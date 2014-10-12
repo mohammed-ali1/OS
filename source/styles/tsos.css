@@ -149,6 +149,16 @@ h3 {
     margin-bottom: 10px;
 }
 
+#table{
+    font-weight: bold;
+    font-size: 10px;
+}
+
+#memoryContents{
+    border: 2px solid #ffffff;
+    color: firebrick;
+    font-weight: bold;
+}
 
 /* Halloween Colors...WHY NOT?*/
 #tableID tr:nth-child(odd) {

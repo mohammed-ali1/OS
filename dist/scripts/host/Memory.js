@@ -83,7 +83,11 @@ var TSOS;
                 table += "<tr><td>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
 
                 for (var j = i; j <= i + 7; j++) {
-                    table += "<td>" + _MainMemory[j] + "</td>";
+                    if (_MainMemory[j] != 0 || j <= this.str - 1) {
+                        table += "<td id='memoryContents'>" + _MainMemory[j] + "</td>";
+                    } else {
+                        table += "<td>" + _MainMemory[j] + "</td>";
+                    }
                 }
                 table += "</tr>";
             }
