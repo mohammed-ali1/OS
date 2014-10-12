@@ -290,7 +290,7 @@ var TSOS;
             _StdOut.putText("Process ID: " + _Pcb.getPid());
 
             //Finally load into Memory
-            _MemoryManager.load(x.toString());
+            _MemoryManager.load(x.toUpperCase().toString());
         };
 
         /**

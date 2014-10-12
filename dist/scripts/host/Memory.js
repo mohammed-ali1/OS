@@ -29,7 +29,7 @@ var TSOS;
                 table += "<tr><td>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
 
                 for (var j = i; j <= i + 7; j++) {
-                    _MainMemory[j] = "0";
+                    _MainMemory[j] = "007";
                     table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
@@ -81,8 +81,8 @@ var TSOS;
                 table += "<tr><td>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
 
                 for (var j = i; j <= i + 7; j++) {
-                    if (_MainMemory[j] != "0")
-                        table += "<td style='background-color: #ffffff;'>" + _MainMemory[j] + "</td>";
+                    if (_MainMemory[j] != "007")
+                        table += "<td style='border: 1px solid #000000;'>" + _MainMemory[j] + "</td>";
                     else
                         table += "<td>" + _MainMemory[j] + "</td>";
                 }

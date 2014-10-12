@@ -78,9 +78,9 @@ var TSOS;
             str = str.toString();
 
             if (str.toUpperCase() == "A9") {
-                _CPU._A9_Instruction();
+                _CPU._A9_Instruction(str);
             } else if (str == "AD") {
-                _CPU._AD_Instruction();
+                _CPU._AD_Instruction(str);
             } else if (str == "8D") {
                 _CPU._8D_Instruction();
             } else if (str == "6D") {
@@ -105,7 +105,7 @@ var TSOS;
                 _CPU._EE_Instruction();
             } else if (str == "FF") {
                 _CPU._FF_Instruction();
-            } else if (str == "0") {
+            } else if (str == "007") {
                 _CPU._00_Instruction();
             } else {
                 _StdOut.putText("Instruction Not VALID!");
@@ -117,10 +117,10 @@ var TSOS;
         * Load the accumulator with a constant
         * Takes 1 parameter (Constant)
         */
-        Cpu.prototype._A9_Instruction = function () {
-            _CPU.IR = _MemoryManager.read(_CPU.PC);
+        Cpu.prototype._A9_Instruction = function (str) {
+            _CPU.IR = str;
             _CPU.PC++;
-            _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC), 16); //read in base 10
+            _CPU.Acc = parseInt(_MemoryManager.read(parseInt("" + _CPU.PC, 16)), 16); //read in base 10
             _CPU.INS = "CPU -> [LDA #$" + _CPU.Acc + "]";
         };
 
@@ -128,11 +128,12 @@ var TSOS;
         * Load the accumulator from the  Memory
         * Takes 2 parameters.
         */
-        Cpu.prototype._AD_Instruction = function () {
+        Cpu.prototype._AD_Instruction = function (str) {
             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC), 16);
-            _CPU++;
+            var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
+            _CPU.Acc = parseInt(_MemoryManager.read(temp), 10);
+            _CPU.PC++;
             _CPU.INS = "CPU -> [LDA $00" + _CPU.Acc + "]";
         };
 
@@ -143,8 +144,8 @@ var TSOS;
         Cpu.prototype._8D_Instruction = function () {
             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC), 16);
-            _MemoryManager.store(temp, _CPU.Acc.toString());
+            var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
+            _MemoryManager.store(parseInt("" + temp, 16), _CPU.Acc.toString());
             _CPU.PC++;
             _CPU.INS = "CPU -> [STA $00" + temp.toString(16) + "]";
         };
@@ -156,8 +157,9 @@ var TSOS;
         Cpu.prototype._6D_Instruction = function () {
             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC), 16);
+            var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
             _CPU.Acc += parseInt(_MemoryManager.read(temp), 10);
+            _CPU.INS = "CPU -> [ADC   $00" + _MemoryManager.read(_CPU.PC) + "]";
             _CPU.PC++;
         };
 
@@ -169,6 +171,7 @@ var TSOS;
             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
             _CPU.Xreg = parseInt(_MemoryManager.read(_CPU.PC), 10);
+            _CPU.INS = "CPU -> [LDX   #$" + _MemoryManager.read(_CPU.PC) + "]";
         };
 
         /**
@@ -176,7 +179,12 @@ var TSOS;
         * @private
         */
         Cpu.prototype._AE_Instruction = function () {
-            this.Xreg = parseInt(_MainMemory[_MainMemory[this.PC + 1]]);
+            _CPU.IR = _MemoryManager.read(_CPU.PC);
+            _CPU.PC++;
+            var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
+            _CPU.Xreg = parseInt(_MemoryManager.read(temp), 10);
+            _CPU.INS = "CPU -> [LDX   $00" + _MemoryManager.read(_CPU.PC) + "]";
+            _CPU.PC++;
         };
 
         /**
@@ -187,6 +195,7 @@ var TSOS;
             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
             _CPU.Yreg = parseInt(_MemoryManager.read(_CPU.PC), 10);
+            _CPU.INS = "CPU -> [LDY   #$" + _MemoryManager.read(_CPU.PC) + "]";
         };
 
         /**
@@ -196,8 +205,9 @@ var TSOS;
         Cpu.prototype._AC_Instruction = function () {
             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC), 16);
+            var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
             _CPU.Yreg = parseInt(_MemoryManager.read(temp), 10);
+            _CPU.INS = "CPU -> [LDY   $00" + _MemoryManager.read(_CPU.PC) + "]";
             _CPU.PC++;
         };
 
@@ -206,6 +216,7 @@ var TSOS;
         * @private
         */
         Cpu.prototype._EA_Instruction = function () {
+            _CPU.INS = "CPU -> [EA]";
             return;
         };
 
@@ -214,6 +225,7 @@ var TSOS;
         * @private
         */
         Cpu.prototype._00_Instruction = function () {
+            //            _CPU.INS = "CPU -> [00]";
             var int = new TSOS.Interrupt(-1, 0);
             _KernelInterruptQueue.enqueue(int);
         };
@@ -226,10 +238,13 @@ var TSOS;
         Cpu.prototype._EC_Instruction = function () {
             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
-            if (_CPU.Zflag == temp) {
-                _CPU.Zflag = 0;
+            var temp = parseInt(_MemoryManager.read(_CPU.PC), 16);
+            var int = parseInt(_MemoryManager.read(temp), 16);
+
+            if (_CPU.Xreg.toString(16) == int) {
+                _CPU.Zflag = 1;
             }
+            _CPU.INS = "CPU -> [EC   $00" + parseInt(_MemoryManager.read(_CPU.PC), 16) + "]";
             _CPU.PC++;
         };
 

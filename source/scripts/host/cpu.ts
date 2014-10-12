@@ -78,10 +78,10 @@ module TSOS {
             str = str.toString();
 
             if(str.toUpperCase() == "A9"){
-                _CPU._A9_Instruction();
+                _CPU._A9_Instruction(str);
             }
             else if(str == "AD"){
-                _CPU._AD_Instruction();
+                _CPU._AD_Instruction(str);
             }
             else if(str == "8D"){
                 _CPU._8D_Instruction();
@@ -119,7 +119,7 @@ module TSOS {
             else if(str == "FF"){
                 _CPU._FF_Instruction();
             }
-            else if(str == "0"){
+            else if(str == "007"){
                 _CPU._00_Instruction();
             }
             else{
@@ -132,11 +132,11 @@ module TSOS {
          * Load the accumulator with a constant
          * Takes 1 parameter (Constant)
          */
-        public _A9_Instruction(){
+        public _A9_Instruction(str:string){
 
-            _CPU.IR = _MemoryManager.read(_CPU.PC);
+            _CPU.IR = str;
             _CPU.PC++;
-            _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC),16); //read in base 10
+            _CPU.Acc = parseInt(_MemoryManager.read(parseInt(""+_CPU.PC,16)),16); //read in base 10
             _CPU.INS = "CPU -> [LDA #$" + _CPU.Acc + "]";
         }
 
@@ -144,14 +144,14 @@ module TSOS {
          * Load the accumulator from the  Memory
          * Takes 2 parameters.
          */
-        public _AD_Instruction(){
+        public _AD_Instruction(str:string){
 
             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC),16);
-            _CPU++;
+            var temp  = parseInt(_MemoryManager.read(_CPU.PC),10);
+            _CPU.Acc =  parseInt(_MemoryManager.read(temp),10);
+            _CPU.PC++;
             _CPU.INS = "CPU -> [LDA $00" + _CPU.Acc + "]";
-
         }
 
         /**
@@ -162,8 +162,8 @@ module TSOS {
 
              _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC),16);
-            _MemoryManager.store(temp,_CPU.Acc.toString());
+            var temp = parseInt(_MemoryManager.read(_CPU.PC),10);
+            _MemoryManager.store(parseInt(""+temp,16),_CPU.Acc.toString());
             _CPU.PC++;
             _CPU.INS = "CPU -> [STA $00" + temp.toString(16) + "]";
         }
@@ -175,8 +175,9 @@ module TSOS {
         public _6D_Instruction(){
             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC),16);
+            var temp = parseInt(_MemoryManager.read(_CPU.PC),10);
             _CPU.Acc += parseInt(_MemoryManager.read(temp),10);
+            _CPU.INS = "CPU -> [ADC   $00" + _MemoryManager.read(_CPU.PC) + "]";
             _CPU.PC++;
         }
 
@@ -189,6 +190,7 @@ module TSOS {
             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
             _CPU.Xreg = parseInt(_MemoryManager.read(_CPU.PC),10);
+            _CPU.INS = "CPU -> [LDX   #$" + _MemoryManager.read(_CPU.PC) + "]";
         }
 
         /**
@@ -196,7 +198,13 @@ module TSOS {
          * @private
          */
         public _AE_Instruction(){
-            this.Xreg = parseInt(_MainMemory[_MainMemory[this.PC+1]]);
+
+            _CPU.IR = _MemoryManager.read(_CPU.PC);
+            _CPU.PC++;
+            var temp = parseInt(_MemoryManager.read(_CPU.PC),10);
+            _CPU.Xreg = parseInt(_MemoryManager.read(temp),10);
+            _CPU.INS = "CPU -> [LDX   $00" + _MemoryManager.read(_CPU.PC) + "]";
+            _CPU.PC++;
         }
 
         /**
@@ -208,6 +216,7 @@ module TSOS {
             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
             _CPU.Yreg = parseInt(_MemoryManager.read(_CPU.PC),10);
+            _CPU.INS = "CPU -> [LDY   #$" + _MemoryManager.read(_CPU.PC) + "]";
         }
 
         /**
@@ -218,8 +227,9 @@ module TSOS {
 
             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC),16);
+            var temp = parseInt(_MemoryManager.read(_CPU.PC),10);
             _CPU.Yreg = parseInt(_MemoryManager.read(temp),10);
+            _CPU.INS = "CPU -> [LDY   $00" + _MemoryManager.read(_CPU.PC) + "]";
             _CPU.PC++;
         }
 
@@ -228,6 +238,8 @@ module TSOS {
          * @private
          */
         public _EA_Instruction(){
+
+            _CPU.INS = "CPU -> [EA]";
             return;
         }
 
@@ -236,6 +248,8 @@ module TSOS {
          * @private
          */
         public _00_Instruction(){
+
+//            _CPU.INS = "CPU -> [00]";
             var int = new Interrupt(-1,0);  //Pass -1 to re-start CPU.
             _KernelInterruptQueue.enqueue(int);
         }
@@ -249,10 +263,13 @@ module TSOS {
 
             _CPU.IR = _MemoryManager.read(_CPU.PC);
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC),10);
-            if(_CPU.Zflag == temp){
-                _CPU.Zflag = 0;
+            var temp = parseInt(_MemoryManager.read(_CPU.PC),16);
+            var int = parseInt(_MemoryManager.read(temp),16);
+
+            if(_CPU.Xreg.toString(16) == int){
+                _CPU.Zflag = 1;
             }
+            _CPU.INS = "CPU -> [EC   $00" + parseInt(_MemoryManager.read(_CPU.PC),16) + "]";
             _CPU.PC++;
         }
 
