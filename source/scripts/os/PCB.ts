@@ -14,14 +14,14 @@ module TSOS{
         public y:number = 0;
         public z:number = 0;
         public base: number = 0;
-        public limit:number = 0;
+        public limit:string = "";
         public state:string = "NEW";
 
-        constructor(b:number, l:number){
+        constructor(b:number, l:string){
 
             Pcb.PID++;  //Increment PID all the time!
             this.base = b;
-            this.limit = l;
+            this.limit = l.toUpperCase();
 
         }
 

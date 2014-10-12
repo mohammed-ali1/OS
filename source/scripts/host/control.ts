@@ -122,5 +122,22 @@ module TSOS {
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
         }
+
+        public static hostStepButton_click(btn){
+
+            document.getElementById("stepButton").style.visibility = "hidden";
+            document.getElementById("nextButton").style.visibility = "visible";
+            document.getElementById("stopButton").style.visibility = "visible";
+        }
+
+        public static hostNextButton_click(btn){
+            //To Do: start executing one OP code every click!
+        }
+
+        public  static hostStopButton_click(btn){
+            document.getElementById("stepButton").style.visibility = "visible";
+            document.getElementById("nextButton").style.visibility = "hidden";
+            document.getElementById("stopButton").style.visibility = "hidden";
+        }
     }
 }

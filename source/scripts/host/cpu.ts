@@ -159,10 +159,10 @@ module TSOS {
 
              _CPU.IR = str;
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC),10);
-            _MemoryManager.store(parseInt(""+temp,16),_CPU.Acc.toString());
+            var temp  =  _MemoryManager.read(_CPU.PC);
+            _MemoryManager.store(parseInt(temp,16),_CPU.Acc.toString(16));  //store in HEX
             _CPU.PC++;
-            _CPU.INS = "CPU   [STA $00" + temp.toString(16) + "]";
+            _CPU.INS = "CPU   [STA $00" + parseInt(temp.toString(),16) + "]";
         }
 
         /**

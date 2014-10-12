@@ -120,8 +120,19 @@
     <div style="margin:2%;">
         <p>
             <center>
+                <input id="stepButton" type="button" value="Single Step"
+                        onclick="TSOS.Control.hostStepButton_click(this);"/>
+
+            <input id="stopButton" type="button" value="Stop"
+                   onclick="TSOS.Control.hostStopButton_click(this);"
+                    style="visibility: hidden;"/>
+
+                <input id="nextButton" type="button" value="Next"
+                       onclick="TSOS.Control.hostNextButton_click(this);"
+                        style="float:right; visibility: hidden; "/>
 
                 <h3 style="margin-top:3%;">Main Memory</h3>
+
             </center>
         </p>
     </div>

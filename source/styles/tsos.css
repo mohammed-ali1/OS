@@ -160,6 +160,27 @@ h3 {
     font-weight: bold;
 }
 
+#stepButton, #stopButton, #nextButton{
+    background-color: ghostwhite;
+    width: 100px;
+    height: 30px;
+    border-radius: 10px;
+    float: left;
+    font-size: 15px;
+    background-color: floralwhite;
+}
+
+#nextButton{
+    background-color: green;
+    color: #ffffff;
+}
+
+#stopButton{
+    background-color: red;
+    color: #ffffff;
+    float: left;
+}
+
 /* Halloween Colors...WHY NOT?*/
 #tableID tr:nth-child(odd) {
     background-color: #FFD801;

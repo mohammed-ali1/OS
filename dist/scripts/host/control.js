@@ -117,6 +117,22 @@ var TSOS;
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
         };
+
+        Control.hostStepButton_click = function (btn) {
+            document.getElementById("stepButton").style.visibility = "hidden";
+            document.getElementById("nextButton").style.visibility = "visible";
+            document.getElementById("stopButton").style.visibility = "visible";
+        };
+
+        Control.hostNextButton_click = function (btn) {
+            //To Do: start executing one OP code every click!
+        };
+
+        Control.hostStopButton_click = function (btn) {
+            document.getElementById("stepButton").style.visibility = "visible";
+            document.getElementById("nextButton").style.visibility = "hidden";
+            document.getElementById("stopButton").style.visibility = "hidden";
+        };
         return Control;
     })();
     TSOS.Control = Control;

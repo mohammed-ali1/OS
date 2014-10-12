@@ -314,7 +314,9 @@ module TSOS {
             _Console.advanceLine();
 
             //Create New PCB
-            _Pcb = new Pcb(0,_Memory.size());  //Memory Size is 256...so base and limit works (for now)!
+            var size:number = parseInt(_Memory.size()-1,10);
+            var temp:string = size.toString(16);
+            _Pcb = new Pcb(0,temp);  //Memory Size is 256...so base and limit works (for now)!
 
             //Create New Resident Queue
             _ResidentQueue = new Array<Pcb>();
