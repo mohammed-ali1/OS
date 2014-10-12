@@ -28,5 +28,9 @@ module TSOS{
         public update(){
             _Memory.updateMemory();
         }
+
+        public size(){
+            _Memory.size();
+        }
     }
 }

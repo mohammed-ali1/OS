@@ -26,6 +26,10 @@ var TSOS;
         MemoryManager.prototype.update = function () {
             _Memory.updateMemory();
         };
+
+        MemoryManager.prototype.size = function () {
+            _Memory.size();
+        };
         return MemoryManager;
     })();
     TSOS.MemoryManager = MemoryManager;

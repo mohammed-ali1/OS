@@ -53,7 +53,6 @@ var TSOS;
             //Update the Memory if Any Changes!
             _MemoryManager.update();
 
-            //
             //Update the CPU Table
             _CPU.displayCPU();
 
@@ -82,31 +81,29 @@ var TSOS;
             } else if (str == "AD") {
                 _CPU._AD_Instruction(str);
             } else if (str == "8D") {
-                _CPU._8D_Instruction();
+                _CPU._8D_Instruction(str);
             } else if (str == "6D") {
-                _CPU._6D_Instruction();
+                _CPU._6D_Instruction(str);
             } else if (str == "A2") {
-                _CPU._A2_Instruction();
+                _CPU._A2_Instruction(str);
             } else if (str == "AE") {
-                _CPU._AE_Instruction();
+                _CPU._AE_Instruction(str);
             } else if (str == "A0") {
-                _CPU._A0_Instruction();
+                _CPU._A0_Instruction(str);
             } else if (str == "AC") {
-                _CPU._AC_Instruction();
+                _CPU._AC_Instruction(str);
             } else if (str == "EA") {
-                _CPU._EA_Instruction();
+                _CPU._EA_Instruction(str);
             } else if (str == "00") {
-                _CPU._00_Instruction();
+                _CPU._00_Instruction(str);
             } else if (str == "EC") {
-                _CPU._EC_Instruction();
+                _CPU._EC_Instruction(str);
             } else if (str == "D0") {
-                _CPU._D0_Instruction();
+                _CPU._D0_Instruction(str);
             } else if (str == "EE") {
-                _CPU._EE_Instruction();
+                _CPU._EE_Instruction(str);
             } else if (str == "FF") {
-                _CPU._FF_Instruction();
-            } else if (str == "007") {
-                _CPU._00_Instruction();
+                _CPU._FF_Instruction(str);
             } else {
                 _StdOut.putText("Instruction Not VALID!");
             }
@@ -120,8 +117,8 @@ var TSOS;
         Cpu.prototype._A9_Instruction = function (str) {
             _CPU.IR = str;
             _CPU.PC++;
-            _CPU.Acc = parseInt(_MemoryManager.read(parseInt("" + _CPU.PC, 16)), 16); //read in base 10
-            _CPU.INS = "CPU -> [LDA #$" + _CPU.Acc + "]";
+            _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC), 16); //read in base 16
+            _CPU.INS = "CPU   [LDA #$" + _CPU.Acc + "]";
         };
 
         /**
@@ -129,37 +126,37 @@ var TSOS;
         * Takes 2 parameters.
         */
         Cpu.prototype._AD_Instruction = function (str) {
-            _CPU.IR = _MemoryManager.read(_CPU.PC);
+            _CPU.IR = str;
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
-            _CPU.Acc = parseInt(_MemoryManager.read(temp), 10);
+            var temp = parseInt(_MemoryManager.read(_CPU.PC), 16);
+            _CPU.Acc = parseInt(_MemoryManager.read(temp), 16);
             _CPU.PC++;
-            _CPU.INS = "CPU -> [LDA $00" + _CPU.Acc + "]";
+            _CPU.INS = "CPU   [LDA $00" + _CPU.Acc + "]";
         };
 
         /**
         * Store the Accumulator in the memory.
         * @private
         */
-        Cpu.prototype._8D_Instruction = function () {
-            _CPU.IR = _MemoryManager.read(_CPU.PC);
+        Cpu.prototype._8D_Instruction = function (str) {
+            _CPU.IR = str;
             _CPU.PC++;
             var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
             _MemoryManager.store(parseInt("" + temp, 16), _CPU.Acc.toString());
             _CPU.PC++;
-            _CPU.INS = "CPU -> [STA $00" + temp.toString(16) + "]";
+            _CPU.INS = "CPU   [STA $00" + temp.toString(16) + "]";
         };
 
         /**
         * Add the contents of Address and store it in ACC.
         * @private
         */
-        Cpu.prototype._6D_Instruction = function () {
-            _CPU.IR = _MemoryManager.read(_CPU.PC);
+        Cpu.prototype._6D_Instruction = function (str) {
+            _CPU.IR = str;
             _CPU.PC++;
             var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
             _CPU.Acc += parseInt(_MemoryManager.read(temp), 10);
-            _CPU.INS = "CPU -> [ADC   $00" + _MemoryManager.read(_CPU.PC) + "]";
+            _CPU.INS = "CPU   [ADC   $00" + _MemoryManager.read(_CPU.PC) + "]";
             _CPU.PC++;
         };
 
@@ -167,23 +164,23 @@ var TSOS;
         * Load the X-Reg with Constant
         * @private
         */
-        Cpu.prototype._A2_Instruction = function () {
-            _CPU.IR = _MemoryManager.read(_CPU.PC);
+        Cpu.prototype._A2_Instruction = function (str) {
+            _CPU.IR = str;
             _CPU.PC++;
             _CPU.Xreg = parseInt(_MemoryManager.read(_CPU.PC), 10);
-            _CPU.INS = "CPU -> [LDX   #$" + _MemoryManager.read(_CPU.PC) + "]";
+            _CPU.INS = "CPU   [LDX   #$" + _MemoryManager.read(_CPU.PC) + "]";
         };
 
         /**
         * Load the X-Reg from Memory
         * @private
         */
-        Cpu.prototype._AE_Instruction = function () {
-            _CPU.IR = _MemoryManager.read(_CPU.PC);
+        Cpu.prototype._AE_Instruction = function (str) {
+            _CPU.IR = str;
             _CPU.PC++;
             var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
             _CPU.Xreg = parseInt(_MemoryManager.read(temp), 10);
-            _CPU.INS = "CPU -> [LDX   $00" + _MemoryManager.read(_CPU.PC) + "]";
+            _CPU.INS = "CPU   [LDX   $00" + _MemoryManager.read(_CPU.PC) + "]";
             _CPU.PC++;
         };
 
@@ -191,23 +188,23 @@ var TSOS;
         * Load the Y-Reg with Constant
         * @private
         */
-        Cpu.prototype._A0_Instruction = function () {
-            _CPU.IR = _MemoryManager.read(_CPU.PC);
+        Cpu.prototype._A0_Instruction = function (str) {
+            _CPU.IR = str;
             _CPU.PC++;
             _CPU.Yreg = parseInt(_MemoryManager.read(_CPU.PC), 10);
-            _CPU.INS = "CPU -> [LDY   #$" + _MemoryManager.read(_CPU.PC) + "]";
+            _CPU.INS = "CPU   [LDY   #$" + _MemoryManager.read(_CPU.PC) + "]";
         };
 
         /**
         * Load the Y_Reg from Memory
         * @private
         */
-        Cpu.prototype._AC_Instruction = function () {
-            _CPU.IR = _MemoryManager.read(_CPU.PC);
+        Cpu.prototype._AC_Instruction = function (str) {
+            _CPU.IR = str;
             _CPU.PC++;
             var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
             _CPU.Yreg = parseInt(_MemoryManager.read(temp), 10);
-            _CPU.INS = "CPU -> [LDY   $00" + _MemoryManager.read(_CPU.PC) + "]";
+            _CPU.INS = "CPU   [LDY   $00" + _MemoryManager.read(_CPU.PC) + "]";
             _CPU.PC++;
         };
 
@@ -215,8 +212,8 @@ var TSOS;
         * No Operation
         * @private
         */
-        Cpu.prototype._EA_Instruction = function () {
-            _CPU.INS = "CPU -> [EA]";
+        Cpu.prototype._EA_Instruction = function (str) {
+            _CPU.INS = "CPU   [EA]";
             return;
         };
 
@@ -224,8 +221,8 @@ var TSOS;
         * Break
         * @private
         */
-        Cpu.prototype._00_Instruction = function () {
-            //            _CPU.INS = "CPU -> [00]";
+        Cpu.prototype._00_Instruction = function (str) {
+            _CPU.INS = "CPU   [00]";
             var int = new TSOS.Interrupt(-1, 0);
             _KernelInterruptQueue.enqueue(int);
         };
@@ -235,8 +232,8 @@ var TSOS;
         * Set Z-Flag to "0" if Equal
         * @private
         */
-        Cpu.prototype._EC_Instruction = function () {
-            _CPU.IR = _MemoryManager.read(_CPU.PC);
+        Cpu.prototype._EC_Instruction = function (str) {
+            _CPU.IR = str;
             _CPU.PC++;
             var temp = parseInt(_MemoryManager.read(_CPU.PC), 16);
             var int = parseInt(_MemoryManager.read(temp), 16);
@@ -244,7 +241,7 @@ var TSOS;
             if (_CPU.Xreg.toString(16) == int) {
                 _CPU.Zflag = 1;
             }
-            _CPU.INS = "CPU -> [EC   $00" + parseInt(_MemoryManager.read(_CPU.PC), 16) + "]";
+            _CPU.INS = "CPU   [EC   $00" + parseInt(_MemoryManager.read(_CPU.PC), 16) + "]";
             _CPU.PC++;
         };
 
@@ -252,13 +249,18 @@ var TSOS;
         * Branch X bytes if Z-Flag Equals 0!
         * @private
         */
-        Cpu.prototype._D0_Instruction = function () {
-            _CPU.IR = _MemoryManager.read(_CPU.PC);
+        Cpu.prototype._D0_Instruction = function (str) {
+            _CPU.IR = str;
 
             if (_CPU.Zflag == 0) {
                 _CPU.PC++;
-                var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
-                _CPU.PC = temp - _CPU.PC;
+                var temp = parseInt(_MemoryManager.read(_CPU.PC), 16);
+                _CPU.PC += temp;
+
+                if (_CPU.PC > _MemoryManager.size()) {
+                    _CPU.PC = _CPU.PC - _MemoryManager.size();
+                }
+                alert("branch: " + _CPU.PC);
             }
         };
 
@@ -266,15 +268,16 @@ var TSOS;
         * Increment the value by a byte.
         * @private
         */
-        Cpu.prototype._EE_Instruction = function () {
+        Cpu.prototype._EE_Instruction = function (str) {
+            _CPU.IR = str;
         };
 
         /**
         * System Call!
         * @private
         */
-        Cpu.prototype._FF_Instruction = function () {
-            _CPU.IR = _MemoryManager.read(_CPU.PC);
+        Cpu.prototype._FF_Instruction = function (str) {
+            _CPU.IR = str;
             var temp = _CPU.Yreg;
             _StdOut.putText("Y-Reg: " + temp);
         };

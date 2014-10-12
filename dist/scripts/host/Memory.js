@@ -6,6 +6,7 @@ var TSOS;
     var Memory = (function () {
         function Memory() {
             this.segment = -1;
+            this.str = 0;
             this.createTable();
         }
         /**
@@ -29,7 +30,7 @@ var TSOS;
                 table += "<tr><td>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
 
                 for (var j = i; j <= i + 7; j++) {
-                    _MainMemory[j] = "007";
+                    _MainMemory[j] = "00";
                     table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
@@ -58,6 +59,7 @@ var TSOS;
         Memory.prototype.loadProgram = function (str) {
             var x = str.replace(/^\s+|\s+$/g, '');
             x = str.trim();
+            this.str = x.length / 2;
             var a = 0, b = 2;
 
             for (var i = _Pcb.base; i < x.length / 2; i++) {
@@ -81,10 +83,7 @@ var TSOS;
                 table += "<tr><td>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
 
                 for (var j = i; j <= i + 7; j++) {
-                    if (_MainMemory[j] != "007")
-                        table += "<td style='border: 1px solid #000000;'>" + _MainMemory[j] + "</td>";
-                    else
-                        table += "<td>" + _MainMemory[j] + "</td>";
+                    table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
             }
