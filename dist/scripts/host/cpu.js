@@ -64,7 +64,7 @@ var TSOS;
         };
 
         Cpu.prototype.displayCPU = function () {
-            document.getElementById("pc").innerHTML = this.PC.toString();
+            document.getElementById("pc").innerHTML = this.PC.toString(); //Off by one IDK why!
             document.getElementById("acc").innerHTML = this.Acc.toString();
             document.getElementById("ir").innerHTML = this.IR;
             document.getElementById("x").innerHTML = this.Xreg.toString();
@@ -117,8 +117,9 @@ var TSOS;
         Cpu.prototype._A9_Instruction = function (str) {
             _CPU.IR = str;
             _CPU.PC++;
-            _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC), 10); //read in base 16
-            _CPU.Acc = "" + _CPU.Acc.toString(16).toUpperCase();
+            _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC)); //read in base 16
+
+            //            _CPU.Acc = ""+_CPU.Acc.toString(16).toUpperCase();
             _CPU.INS = "CPU   [LDA #$" + _CPU.Acc + "]";
         };
 
@@ -130,7 +131,7 @@ var TSOS;
             _CPU.IR = str;
             _CPU.PC++;
             var temp = parseInt(_MemoryManager.read(_CPU.PC), 16);
-            _CPU.Acc = parseInt(_MemoryManager.read(temp), 16);
+            _CPU.Acc = parseInt(_MemoryManager.read(temp)); //store it in base 10?
             _CPU.PC++;
             _CPU.INS = "CPU   [LDA $00" + _CPU.Acc + "]";
         };
@@ -142,8 +143,8 @@ var TSOS;
         Cpu.prototype._8D_Instruction = function (str) {
             _CPU.IR = str;
             _CPU.PC++;
-            var temp = _MemoryManager.read(_CPU.PC);
-            _MemoryManager.store(parseInt(temp, 16), _CPU.Acc.toString(16)); //store in HEX
+            var temp = parseInt(_MemoryManager.read(_CPU.PC), 16);
+            _MemoryManager.store(temp, parseInt(_CPU.Acc.toString()).toString()); //store in decimal?
             _CPU.PC++;
             _CPU.INS = "CPU   [STA $00" + parseInt(temp.toString(), 16) + "]";
         };

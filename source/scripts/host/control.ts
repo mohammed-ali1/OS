@@ -142,6 +142,10 @@ module TSOS {
             if(!found){
                 _CPU.cycle();
                 _MemoryManager.update();
+                if(_MemoryManager.read(_CPU.PC+1) == "00"){
+                    this.hostStopButton_click(this);
+                    return;
+                }
             }
         }
 
