@@ -127,8 +127,8 @@ var TSOS;
 
         Control.hostNextButton_click = function (btn) {
             _CPU.cycle();
-            _MemoryManager.update();
             if (_MemoryManager.read(_CPU.PC + 1) == "00") {
+                _CPU._00_Instruction("00");
                 this.hostStopButton_click(this);
                 return;
             }

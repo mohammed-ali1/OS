@@ -117,10 +117,10 @@ var TSOS;
         Cpu.prototype._A9_Instruction = function (str) {
             _CPU.IR = str;
             _CPU.PC++;
-            _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC)); //read in base 16
+            _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC)); //read in base 10?
 
             //            _CPU.Acc = ""+_CPU.Acc.toString(16).toUpperCase();
-            _CPU.INS = "CPU   [LDA #$" + _CPU.Acc + "]";
+            _CPU.INS = "CPU   [LDA #$" + _CPU.Acc + "]   [" + _CPU.IR + ", " + _CPU.Acc + "]";
         };
 
         /**
@@ -131,9 +131,9 @@ var TSOS;
             _CPU.IR = str;
             _CPU.PC++;
             var temp = parseInt(_MemoryManager.read(_CPU.PC), 16);
-            _CPU.Acc = parseInt(_MemoryManager.read(temp)); //store it in base 10?
+            _CPU.Acc = parseInt(_MemoryManager.read(temp), 16); //store it in base 16?
             _CPU.PC++;
-            _CPU.INS = "CPU   [LDA $00" + _CPU.Acc + "]";
+            _CPU.INS = "CPU   [LDA $00" + _CPU.Acc.toString(16) + "]";
         };
 
         /**
@@ -143,10 +143,10 @@ var TSOS;
         Cpu.prototype._8D_Instruction = function (str) {
             _CPU.IR = str;
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC), 16);
-            _MemoryManager.store(temp, parseInt(_CPU.Acc.toString()).toString()); //store in decimal?
+            var temp = parseInt(_MemoryManager.read(_CPU.PC));
+            _MemoryManager.store(parseInt(temp.toString(), 16), _CPU.Acc.toString()); //store in hex?
             _CPU.PC++;
-            _CPU.INS = "CPU   [STA $00" + parseInt(temp.toString(), 16) + "]";
+            _CPU.INS = "CPU   [STA $00" + temp.toString() + "]   [" + _CPU.IR + ", " + temp + ", 00]";
         };
 
         /**
@@ -156,8 +156,8 @@ var TSOS;
         Cpu.prototype._6D_Instruction = function (str) {
             _CPU.IR = str;
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
-            _CPU.Acc += parseInt(_MemoryManager.read(temp), 10);
+            var temp = parseInt(_MemoryManager.read(_CPU.PC));
+            _CPU.Acc += parseInt(_MemoryManager.read(temp));
             _CPU.INS = "CPU   [ADC   $00" + _MemoryManager.read(_CPU.PC) + "]";
             _CPU.PC++;
         };
@@ -169,7 +169,7 @@ var TSOS;
         Cpu.prototype._A2_Instruction = function (str) {
             _CPU.IR = str;
             _CPU.PC++;
-            _CPU.Xreg = parseInt(_MemoryManager.read(_CPU.PC), 10);
+            _CPU.Xreg = parseInt(_MemoryManager.read(_CPU.PC));
             _CPU.INS = "CPU   [LDX   #$" + _MemoryManager.read(_CPU.PC) + "]";
         };
 
@@ -180,8 +180,8 @@ var TSOS;
         Cpu.prototype._AE_Instruction = function (str) {
             _CPU.IR = str;
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
-            _CPU.Xreg = parseInt(_MemoryManager.read(temp), 10);
+            var temp = parseInt(_MemoryManager.read(_CPU.PC));
+            _CPU.Xreg = parseInt(_MemoryManager.read(temp), 16);
             _CPU.INS = "CPU   [LDX   $00" + _MemoryManager.read(_CPU.PC) + "]";
             _CPU.PC++;
         };
@@ -193,7 +193,7 @@ var TSOS;
         Cpu.prototype._A0_Instruction = function (str) {
             _CPU.IR = str;
             _CPU.PC++;
-            _CPU.Yreg = parseInt(_MemoryManager.read(_CPU.PC), 10);
+            _CPU.Yreg = parseInt(_MemoryManager.read(_CPU.PC));
             _CPU.INS = "CPU   [LDY   #$" + _MemoryManager.read(_CPU.PC) + "]";
         };
 
@@ -204,8 +204,8 @@ var TSOS;
         Cpu.prototype._AC_Instruction = function (str) {
             _CPU.IR = str;
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC), 10);
-            _CPU.Yreg = parseInt(_MemoryManager.read(temp), 10);
+            var temp = parseInt(_MemoryManager.read(_CPU.PC));
+            _CPU.Yreg = parseInt(_MemoryManager.read(temp), 16);
             _CPU.INS = "CPU   [LDY   $00" + _MemoryManager.read(_CPU.PC) + "]";
             _CPU.PC++;
         };

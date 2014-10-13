@@ -12,7 +12,7 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 var APP_NAME = "BAD ASS OS";
 var APP_VERSION = "9.1.5";
 
-var CPU_CLOCK_INTERVAL = 1;
+var CPU_CLOCK_INTERVAL = 100;
 
 var TIMER_IRQ = 0;
 
