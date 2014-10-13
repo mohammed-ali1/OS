@@ -131,21 +131,12 @@ module TSOS {
         }
 
         public static hostNextButton_click(btn){
-            var found = false;
 
-            for(var i =0; i<_ConsoleHistory.length;i++){
-                if(_ConsoleHistory[i] == "run"){
-                    found = true;
-                    break;
-                }
-            }
-            if(!found){
-                _CPU.cycle();
-                _MemoryManager.update();
-                if(_MemoryManager.read(_CPU.PC+1) == "00"){
-                    this.hostStopButton_click(this);
-                    return;
-                }
+            _CPU.cycle();
+            _MemoryManager.update();
+            if(_MemoryManager.read(_CPU.PC+1) == "00"){
+                this.hostStopButton_click(this);
+                return;
             }
         }
 
