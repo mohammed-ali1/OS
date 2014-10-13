@@ -18,10 +18,10 @@ module TSOS {
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
                     public buffer = "",
-                    public consoleHistory = new Array(),
                     public historyIndex = 0
 
             ) {
+            _ConsoleHistory = new Array();
         }
 
         public init(): void {
@@ -50,9 +50,9 @@ module TSOS {
                     _OsShell.handleInput(this.buffer);
 
                     //Add buffer to the console history
-                    this.consoleHistory.push(this.buffer);
+                    _ConsoleHistory.push(this.buffer);
                     //Last index of the buffer
-                    this.historyIndex = this.consoleHistory.length;
+                    this.historyIndex = _ConsoleHistory.length;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }

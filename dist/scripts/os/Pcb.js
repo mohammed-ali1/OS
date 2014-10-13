@@ -12,11 +12,11 @@ var TSOS;
             this.y = 0;
             this.z = 0;
             this.base = 0;
-            this.limit = "";
+            this.limit = 0;
             this.state = "NEW";
             Pcb.PID++; //Increment PID all the time!
             this.base = b;
-            this.limit = l.toUpperCase();
+            this.limit = parseInt(l.toString(16));
         }
         /**
         * Displays the the status of the current PCB.

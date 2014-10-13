@@ -122,13 +122,26 @@ var TSOS;
             document.getElementById("stepButton").style.visibility = "hidden";
             document.getElementById("nextButton").style.visibility = "visible";
             document.getElementById("stopButton").style.visibility = "visible";
+            _StepButton = true;
         };
 
         Control.hostNextButton_click = function (btn) {
-            //To Do: start executing one OP code every click!
+            var found = false;
+
+            for (var i = 0; i < _ConsoleHistory.length; i++) {
+                if (_ConsoleHistory[i] == "run") {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                _CPU.cycle();
+                _MemoryManager.update();
+            }
         };
 
         Control.hostStopButton_click = function (btn) {
+            _StepButton = false;
             document.getElementById("stepButton").style.visibility = "visible";
             document.getElementById("nextButton").style.visibility = "hidden";
             document.getElementById("stopButton").style.visibility = "hidden";

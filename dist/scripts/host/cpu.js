@@ -117,7 +117,8 @@ var TSOS;
         Cpu.prototype._A9_Instruction = function (str) {
             _CPU.IR = str;
             _CPU.PC++;
-            _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC), 16); //read in base 16
+            _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC), 10); //read in base 16
+            _CPU.Acc = "" + _CPU.Acc.toString(16).toUpperCase();
             _CPU.INS = "CPU   [LDA #$" + _CPU.Acc + "]";
         };
 

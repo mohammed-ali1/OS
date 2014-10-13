@@ -78,6 +78,11 @@ var _Pcb;
 var _ResidentQueue = null;
 var _ReadyQueue;
 
+//
+var _ConsoleHistory = null;
+
+var _StepButton = false;
+
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();
 };

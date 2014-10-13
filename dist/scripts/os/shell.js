@@ -282,9 +282,9 @@ var TSOS;
             _Console.advanceLine();
 
             //Create New PCB
-            var size = parseInt(_Memory.size() - 1, 10);
+            var size = parseInt(_MemoryManager.size() - 1, 10);
             var temp = size.toString(16);
-            _Pcb = new TSOS.Pcb(0, temp); //Memory Size is 256...so base and limit works (for now)!
+            _Pcb = new TSOS.Pcb(0, _MainMemorySize); //Memory Size is 256...so base and limit works (for now)!
 
             //Create New Resident Queue
             _ResidentQueue = new Array();
@@ -392,6 +392,10 @@ var TSOS;
         };
 
         Shell.prototype.shellRun = function (args) {
+            if (_StepButton) {
+                _StdOut.putText("Single Step is on!");
+                return;
+            }
             _ReadyQueue = new TSOS.Queue();
             _ReadyQueue.enqueue(_ResidentQueue[args[0]]);
         };

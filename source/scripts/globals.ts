@@ -81,6 +81,11 @@ var _Pcb:TSOS.Pcb;
 var _ResidentQueue: any[] =  null;
 var _ReadyQueue : TSOS.Queue;
 
+//
+var _ConsoleHistory : any[] = null;
+
+var _StepButton: boolean = false;
+
 var onDocumentLoad = function() {
 	TSOS.Control.hostInit();
 };

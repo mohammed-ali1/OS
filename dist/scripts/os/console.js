@@ -8,21 +8,20 @@ Note: This is not the Shell.  The Shell is the "command line interface" (CLI) or
 var TSOS;
 (function (TSOS) {
     var Console = (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, consoleHistory, historyIndex) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, historyIndex) {
             if (typeof currentFont === "undefined") { currentFont = _DefaultFontFamily; }
             if (typeof currentFontSize === "undefined") { currentFontSize = _DefaultFontSize; }
             if (typeof currentXPosition === "undefined") { currentXPosition = 0; }
             if (typeof currentYPosition === "undefined") { currentYPosition = _DefaultFontSize; }
             if (typeof buffer === "undefined") { buffer = ""; }
-            if (typeof consoleHistory === "undefined") { consoleHistory = new Array(); }
             if (typeof historyIndex === "undefined") { historyIndex = 0; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
-            this.consoleHistory = consoleHistory;
             this.historyIndex = historyIndex;
+            _ConsoleHistory = new Array();
         }
         Console.prototype.init = function () {
             this.clearScreen();
@@ -50,10 +49,10 @@ var TSOS;
                     _OsShell.handleInput(this.buffer);
 
                     //Add buffer to the console history
-                    this.consoleHistory.push(this.buffer);
+                    _ConsoleHistory.push(this.buffer);
 
                     //Last index of the buffer
-                    this.historyIndex = this.consoleHistory.length;
+                    this.historyIndex = _ConsoleHistory.length;
 
                     // ... and reset our buffer.
                     this.buffer = "";
