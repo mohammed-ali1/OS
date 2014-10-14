@@ -133,6 +133,22 @@ var TSOS;
                 case _NextButton:
                     _CPU.cycle();
                     break;
+                case _SystemCall:
+                    if (_CPU.Xreg == 1) {
+                        _StdOut.putText("Contents of Y-Reg: " + _CPU.Yreg.toString());
+                    } else if (_CPU.Xreg == 2) {
+                        var temp = parseInt(_MemoryManager.read(_CPU.Yreg), 16);
+
+                        var index = 0;
+
+                        while (temp != 0) {
+                            _StdOut.putText(String.fromCharCode(temp));
+                            index++;
+                            temp = parseInt(_MemoryManager.read(_CPU.Yreg), 16);
+                        }
+                        _StdOut.putText("Y-Reg: " + temp);
+                    }
+                    break;
                 case _Break:
                     _Pcb.setState(2); //Pass 2 to mark Process as Terminated!
                     _Pcb.displayPCB(); //Display the PCB

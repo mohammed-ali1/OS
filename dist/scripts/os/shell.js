@@ -261,8 +261,8 @@ var TSOS;
             var f = document.getElementById("taProgramInput").value;
             var x = f.replace(/\s/g, '');
 
-            if (x.length == 0) {
-                _StdOut.putText("There's NOTHING to load!");
+            if (x.length == 0 || x.length % 2 != 0) {
+                _StdOut.putText("Invalid Input!");
                 return;
             }
 

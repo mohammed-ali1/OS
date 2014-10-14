@@ -88,6 +88,9 @@ var _NextButton = false;
 //Op Code to break
 var _Break = -1;
 
+//System Call
+var _SystemCall = "FF";
+
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();
 };

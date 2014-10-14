@@ -345,28 +345,10 @@ module TSOS {
             _CPU.PC += 2;
             var temp = _CPU.Xreg;
 
-            switch (temp){
+            _KernelInterruptQueue.enqueue(new Interrupt(_SystemCall,0));
 
-                case 1:
-                {
-                    _StdOut.putText("Contents of Y-Reg: " + _CPU.Yreg.toString());
-                }
-                case 2:{
-                    var temp = parseInt(_MemoryManager.read(_CPU.Yreg),16);
-
-                    var index = 0;
-
-                    while (temp != 0){
-                        _StdOut.putText(String.fromCharCode(temp));
-                        index++;
-                        temp = parseInt(_MemoryManager.read(_CPU.Yreg),16);
-                    }
-
-                }
-            }
-
-
-            _StdOut.putText("Y-Reg: " + temp);
+            _CPU.INS = "CPU [SYS]" +
+                "   ["+_CPU.IR+"]";
         }
 
         public updatePcb(p:Pcb){

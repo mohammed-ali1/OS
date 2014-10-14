@@ -129,6 +129,7 @@ module TSOS {
 
         public static hostStepButton_click(btn){
 
+
             document.getElementById("stepButton").style.visibility = "hidden";
             document.getElementById("nextButton").style.visibility = "visible";
             document.getElementById("stopButton").style.visibility = "visible";
