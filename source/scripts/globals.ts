@@ -86,8 +86,9 @@ var _ConsoleHistory : any[] = null;
 
 //step button to control the stepping
 var _StepButton: boolean = false;
+var _NextButton : boolean = false;
 
-//
+//Op Code to break
 var _Break : number = -1;
 
 var onDocumentLoad = function() {

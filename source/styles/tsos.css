@@ -150,12 +150,12 @@ h3 {
 }
 
 #table{
-    font-weight: bold;
-    font-size: 10px;
+    font-weight: normal;
+    font-size: 9px;
 }
 
 #memoryContents{
-    border: 2px solid #ffffff;
+    border: 2px solid #000000;
     color: firebrick;
     font-weight: bold;
 }

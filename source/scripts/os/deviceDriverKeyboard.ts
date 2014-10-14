@@ -69,37 +69,31 @@ module TSOS {
                     _Console.historyIndex--;
 
                     if (_Console.historyIndex < 0) {
-                        _Console.historyIndex = _Console.consoleHistory.length - 1;
+                        _Console.historyIndex = _ConsoleHistory.length - 1;
                     }
 
-                    this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
+                    this.pullHistory(_ConsoleHistory[_Console.historyIndex]);
 
                 }else{  //Down Arrow Key
 
                     _Console.historyIndex++;
 
-                    if (_Console.historyIndex >= _Console.consoleHistory.length) {
+                    if (_Console.historyIndex >= _ConsoleHistory.length) {
                         _Console.historyIndex = 0;
                     }
 
-                    this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
+                    this.pullHistory(_ConsoleHistory[_Console.historyIndex]);
                 }
 
             } else if(keyCode == 9){    //Tab key
 
-//                _Console.deleteCurrentLine();
-                var buffer = _Console.buffer.substring(0,3);
+                var buffer = _Console.buffer.substring(0,2);
 
-                if(buffer.length >=2) {
-                    for (var i = 0; i < _OsShell.commandList.length; i++) {
-
-                        if (buffer == _OsShell.commandList[i].command.substring(0, 3)) {
-
-                            _StdOut.deleteCurrentLine();
-                            _StdOut.putText(_OsShell.commandList[i].command);
-                            _StdOut.handleInput();
-                            return;
-                        }
+                for(var i=0; i<_OsShell.commandList.length;i++){
+                    if(buffer ==_OsShell.commandList[i].command.substring(0,2)){
+                        _Console.deleteCurrentLine();
+                        _StdOut.putText(_OsShell.commandList[i].command);
+                        return;
                     }
                 }
             }

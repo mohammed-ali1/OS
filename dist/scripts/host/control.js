@@ -61,7 +61,8 @@ var TSOS;
             // Update the log console.
             var taLog = document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
-            taLog.style.color = "#" + Math.floor(Math.random() * 16777215).toString(16); //YOU LIKE COLORS?
+            //IF YOU LIKE COLORS UN-COMMENT THIS!
+            //            taLog.style.color = "#" + Math.floor(Math.random()*16777215).toString(16); //YOU LIKE COLORS?
             // Optionally update a log database or some streaming service.
             //            _CPU.init(); // THIS ONE GOT ME IN TROUBLE....CPU WAS GOING FOR ONLY 1 CYCLE!
         };
@@ -126,12 +127,13 @@ var TSOS;
         };
 
         Control.hostNextButton_click = function (btn) {
-            _CPU.cycle();
-            if (_MemoryManager.read(_CPU.PC + 1) == "00") {
-                _CPU._00_Instruction("00");
-                this.hostStopButton_click(this);
-                return;
-            }
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_NextButton, 0));
+            //            _CPU.cycle();
+            //            if(_MemoryManager.read(_CPU.PC+1) == "00"){
+            //                _CPU._00_Instruction("00");
+            //                this.hostStopButton_click(this);
+            //                return;
+            //            }
         };
 
         Control.hostStopButton_click = function (btn) {
