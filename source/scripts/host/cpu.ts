@@ -254,7 +254,7 @@ module TSOS {
          */
         public _EA_Instruction(str:string){
 
-            _CPU.INS = "CPU   [EA]";
+            _CPU.INS = "CPU   [EA]";  //Ha Ha this was easy!
             return;
         }
 
@@ -265,7 +265,7 @@ module TSOS {
         public _00_Instruction(str:string){
 
             _CPU.INS = "CPU   [00]";
-            var int = new Interrupt(-1,0);  //Pass -1 to re-start CPU.
+            var int = new Interrupt(_Break,0);  //Pass -1 to re-start CPU.
             _KernelInterruptQueue.enqueue(int);
         }
 
@@ -278,13 +278,17 @@ module TSOS {
 
             _CPU.IR = str;
             _CPU.PC++;
-            var temp = parseInt(_MemoryManager.read(_CPU.PC),16);
-            var int = parseInt(_MemoryManager.read(temp),16);
+            var address = parseInt(_MemoryManager.read(_CPU.PC),16);
+            var temp = _MemoryManager.read(address);
 
-            if(_CPU.Xreg.toString(16) == int){
+            if(temp == _CPU.Xreg){
                 _CPU.Zflag = 1;
+            }else{
+                _CPU.Zflag = 0;
             }
-            _CPU.INS = "CPU   [EC   $00" + parseInt(_MemoryManager.read(_CPU.PC),16) + "]";
+
+            _CPU.INS = "CPU   [EC   $00" + parseInt(_MemoryManager.read(_CPU.PC),16) + "]" +
+                "   ["+_CPU.IR+ ", "+address.toString(16)+", 00]";
             _CPU.PC++;
         }
 
@@ -298,13 +302,19 @@ module TSOS {
 
             if(_CPU.Zflag == 0){
                 _CPU.PC++;
-                var temp:number = parseInt(_MemoryManager.read(_CPU.PC),16);
-                _CPU.PC += temp;
+                var address:number = parseInt(_MemoryManager.read(_CPU.PC),16);
+                _CPU.PC += address;
 
                 if(_CPU.PC > _MemoryManager.size()){
                     _CPU.PC = _CPU.PC - _MemoryManager.size();
                 }
-                alert("branch: " +_CPU.PC);
+                _CPU.INS = "CPU [D0 $EF]" +
+                    "   ["+_CPU.IR+", "+address.toString(16).toUpperCase()+"]";
+            }
+            else{
+                _CPU.PC++;
+                _CPU.INS = "CPU [D0 $EF]" +
+                    "   ["+_CPU.IR+", "+address.toString(16).toUpperCase()+"]";
             }
         }
 
@@ -314,6 +324,15 @@ module TSOS {
          */
         public _EE_Instruction(str:string){
             _CPU.IR = str;
+            _CPU.PC++;
+            var address = parseInt(_MemoryManager.read(_CPU.PC),16);
+            var temp = _MemoryManager.read(address);
+            temp++;
+            var store = parseInt(temp.toString(),16);
+            _MemoryManager.store(address,store.toString());
+            _CPU.PC++;
+            _CPU.INS = "CPU [EC $00" + address.toString(16)+"]" +
+                "[   "+_CPU.IR+", "+address.toString(16)+", 00]";
         }
 
         /**
@@ -321,8 +340,32 @@ module TSOS {
          * @private
          */
         public _FF_Instruction(str:string){
+
             _CPU.IR = str;
-            var temp = _CPU.Yreg;
+            _CPU.PC += 2;
+            var temp = _CPU.Xreg;
+
+            switch (temp){
+
+                case 1:
+                {
+                    _StdOut.putText("Contents of Y-Reg: " + _CPU.Yreg.toString());
+                }
+                case 2:{
+                    var temp = parseInt(_MemoryManager.read(_CPU.Yreg),16);
+
+                    var index = 0;
+
+                    while (temp != 0){
+                        _StdOut.putText(String.fromCharCode(temp));
+                        index++;
+                        temp = parseInt(_MemoryManager.read(_CPU.Yreg),16);
+                    }
+
+                }
+            }
+
+
             _StdOut.putText("Y-Reg: " + temp);
         }
 

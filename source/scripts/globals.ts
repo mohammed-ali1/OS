@@ -81,10 +81,14 @@ var _Pcb:TSOS.Pcb;
 var _ResidentQueue: any[] =  null;
 var _ReadyQueue : TSOS.Queue;
 
-//
+//history of commands
 var _ConsoleHistory : any[] = null;
 
+//step button to control the stepping
 var _StepButton: boolean = false;
+
+//
+var _Break : number = -1;
 
 var onDocumentLoad = function() {
 	TSOS.Control.hostInit();

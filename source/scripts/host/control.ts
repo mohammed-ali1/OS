@@ -65,7 +65,7 @@ module TSOS {
             // Update the log console.
             var taLog = <HTMLInputElement> document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
-            //taLog.style.color = "#" + Math.floor(Math.random()*16777215).toString(16);
+            taLog.style.color = "#" + Math.floor(Math.random()*16777215).toString(16); //YOU LIKE COLORS?
             // Optionally update a log database or some streaming service.
 
 //            _CPU.init(); // THIS ONE GOT ME IN TROUBLE....CPU WAS GOING FOR ONLY 1 CYCLE!
@@ -124,6 +124,7 @@ module TSOS {
         }
 
         public static hostStepButton_click(btn){
+
             document.getElementById("stepButton").style.visibility = "hidden";
             document.getElementById("nextButton").style.visibility = "visible";
             document.getElementById("stopButton").style.visibility = "visible";

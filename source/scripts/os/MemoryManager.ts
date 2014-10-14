@@ -5,6 +5,9 @@ module TSOS{
 
     export class MemoryManager{
 
+        //Address Translation Coming Soon
+        //Prior to Project 3!
+
         constructor(){
             _Memory = new Memory();
         }

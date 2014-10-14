@@ -138,7 +138,7 @@ module TSOS {
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
-                case -1: //-1 Denotes END of a process!
+                case _Break: //-1 Denotes END of a process!
                     _Pcb.setState(2);   //Pass 2 to mark Process as Terminated!
                     _Pcb.displayPCB();  //Display the PCB
                     _CPU.init();//Re-Start the CPU!

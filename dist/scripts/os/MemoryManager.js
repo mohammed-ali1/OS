@@ -4,6 +4,8 @@
 var TSOS;
 (function (TSOS) {
     var MemoryManager = (function () {
+        //Address Translation Coming Soon
+        //Prior to Project 3!
         function MemoryManager() {
             _Memory = new TSOS.Memory();
         }
