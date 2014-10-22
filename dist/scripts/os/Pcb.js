@@ -14,6 +14,7 @@ var TSOS;
             this.base = 0;
             this.limit = "0";
             this.state = "NEW";
+            this.length = 0;
             Pcb.PID++; //Increment PID all the time!
             this.base = b;
             this.limit = l.toString(16).toUpperCase();
@@ -37,6 +38,10 @@ var TSOS;
 
         Pcb.prototype.getPid = function () {
             return Pcb.PID;
+        };
+
+        Pcb.prototype.setLength = function (length) {
+            this.length = length;
         };
 
         Pcb.prototype.setState = function (s) {

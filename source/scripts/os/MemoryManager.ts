@@ -33,7 +33,7 @@ module TSOS{
         }
 
         public size(){
-            _Memory.size();
+           return _Memory.size();
         }
     }
 }

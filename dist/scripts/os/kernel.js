@@ -132,6 +132,9 @@ var TSOS;
                     break;
                 case _NextButton:
                     _CPU.cycle();
+                    if (_CPU.PC == _Pcb.length) {
+                        TSOS.Control.hostStopButton_click(this); //helps us exit next button!
+                    }
                     break;
                 case _SystemCall:
                     if (_CPU.Xreg == 1) {

@@ -134,7 +134,8 @@ module TSOS {
             _CPU.IR = str;
             _CPU.PC++;
             _CPU.Acc = parseInt(_MemoryManager.read(_CPU.PC),16);
-            _CPU.INS = "CPU   [LDA #$" + _CPU.Acc.toString(16) + "]   ["+_CPU.IR+", "+_CPU.Acc.toString(16)+"]";
+            _CPU.INS = "CPU   [LDA #$" + _CPU.Acc.toString(16) + "]" +
+                "   ["+_CPU.IR+", "+_CPU.Acc.toString(16)+"]";
         }
 
         /**
@@ -145,8 +146,9 @@ module TSOS {
 
             _CPU.IR = str;
             _CPU.PC++;
-            var address  = _MemoryManager.read(_CPU.PC);  //Get the address first
-            _CPU.Acc =    parseInt(_MemoryManager.read(parseInt(address)),16); //store it but change base first
+            var address  = parseInt(_MemoryManager.read(_CPU.PC),16)  //Get the address first in hex
+            var value =  parseInt(_MemoryManager.read(address)); // Get the contents of the address
+            _CPU.Acc =     parseInt(value.toString(),16); //Store Acc with the contents in hex
             _CPU.PC++;
             _CPU.INS = "CPU   [LDA $00" + address + "]   " +
                 "[" +_CPU.IR+", "+address+", 00]";
@@ -160,12 +162,12 @@ module TSOS {
 
             _CPU.IR = str;
             _CPU.PC++;
-            var temp = _CPU.Acc.toString(16)   //Get the current Acc
-            var address = _MemoryManager.read(_CPU.PC)//Get the address
-            _MemoryManager.store(parseInt(address.toString(),16),temp.toString()); //Store it in hex?
+            var temp = _CPU.Acc;  //Get the current Acc
+            var address = parseInt(_MemoryManager.read(_CPU.PC),16); //Get the address in hex
+            _MemoryManager.store(address,temp.toString(16)); //Store it in hex
             _CPU.PC++;
-            _CPU.INS = "CPU   [STA $00" +address + "]   " +
-                "["+_CPU.IR+", "+address+", 00]";
+            _CPU.INS = "CPU   [STA $00" +address.toString(16) + "]   " +
+                "["+_CPU.IR+", "+address.toString(16)+", 00]";
         }
 
         /**
@@ -176,12 +178,12 @@ module TSOS {
 
             _CPU.IR = str;
             _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC));//Get the address
-            var currentAcc  = parseInt(_CPU.Acc.toString(),16);   //Get the current ACC
-            var target = parseInt(_MemoryManager.read(parseInt(address.toString(),16)));
-            var total = currentAcc + target;
-//            alert("address: " +address+", currentacc "+currentAcc+", target addr: "+target+", total "+total);
-            _CPU.Acc = total;//store it
+
+            var address = parseInt(_MemoryManager.read(_CPU.PC),16);//Get the address in hex
+            var value = parseInt(_MemoryManager.read(address)); //Get the contents of the address
+            var currentAcc  = parseInt(_CPU.Acc.toString(16),10); //Get the current ACC in decimal
+            _CPU.Acc = parseInt(value+currentAcc,16);// Add everything to the Acc
+
             _CPU.INS = "CPU   [ADC   $00" + _MemoryManager.read(_CPU.PC) + "]" +
                 "   ["+_CPU.IR+", "+ address+", 00]";
             _CPU.PC++;
@@ -196,7 +198,7 @@ module TSOS {
             _CPU.IR = str;
             _CPU.PC++;
             var temp = _MemoryManager.read(_CPU.PC); //Get the value first
-            _CPU.Xreg = parseInt(temp.toString(),16);//store into x as hex
+            _CPU.Xreg = parseInt(temp.toString(),16);//store into x-reg as hex
             _CPU.INS = "CPU   [LDX   #$" + _MemoryManager.read(_CPU.PC) + "]" +
                 "   ["+_CPU.IR+", "+temp+"]";
         }
@@ -209,10 +211,9 @@ module TSOS {
 
             _CPU.IR = str;
             _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC),16); //get the address
-            var temp = parseInt(_MemoryManager.read(address)); //get the content of the address
-//            alert("addres: "+address+", temp: "+temp);
-            _CPU.Xreg = parseInt(temp.toString(),16); // store it as hex
+            var address = parseInt(_MemoryManager.read(_CPU.PC),16); //get the address in hex
+            var temp = parseInt(_MemoryManager.read(address)); //get the contents of the address
+            _CPU.Xreg = parseInt(temp.toString(),16); // store it as hex in x-reg
             _CPU.INS = "CPU   [LDX   $00" + _MemoryManager.read(_CPU.PC) + "]" +
                 "   ["+_CPU.IR+", "+address.toString(16)+", 00]";
             _CPU.PC++;
@@ -227,7 +228,7 @@ module TSOS {
             _CPU.IR = str;
             _CPU.PC++;
             var temp = _MemoryManager.read(_CPU.PC); //get the value first
-            _CPU.Yreg = parseInt(temp.toString(),16);
+            _CPU.Yreg = parseInt(temp.toString(),16); //store into y-reg as hex
             _CPU.INS = "CPU   [LDY   #$" + _MemoryManager.read(_CPU.PC) + "]" +
                 "   ["+_CPU.IR+", "+temp+"]";
         }
@@ -240,9 +241,9 @@ module TSOS {
 
             _CPU.IR = str;
             _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC),16);//get the address
-            var temp = parseInt(_MemoryManager.read(address));
-            _CPU.Yreg = parseInt(temp.toString(),16);
+            var address = parseInt(_MemoryManager.read(_CPU.PC),16);//get the address in hex
+            var temp = parseInt(_MemoryManager.read(address)); //get the contents of the address
+            _CPU.Yreg = parseInt(temp.toString(),16); // store it as hex in y-reg
             _CPU.INS = "CPU   [LDY   $00" + _MemoryManager.read(_CPU.PC) + "]" +
                 "   ["+_CPU.IR+", "+address.toString(16)+", 00]";
             _CPU.PC++;
@@ -253,7 +254,6 @@ module TSOS {
          * @private
          */
         public _EA_Instruction(str:string){
-
             _CPU.INS = "CPU   [EA]";  //Ha Ha this was easy!
             return;
         }
@@ -264,6 +264,7 @@ module TSOS {
          */
         public _00_Instruction(str:string){
 
+            _CPU.IR = str;
             _CPU.INS = "CPU   [00]";
             var int = new Interrupt(_Break,0);  //Pass -1 to re-start CPU.
             _KernelInterruptQueue.enqueue(int);
@@ -271,23 +272,23 @@ module TSOS {
 
         /**
          * Compare a byte in Memory to the X-Reg
-         * Set Z-Flag to "0" if Equal
+         * Set Z-Flag to if Equal
          * @private
          */
         public _EC_Instruction(str:string){
 
             _CPU.IR = str;
             _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC),16);
-            var temp = _MemoryManager.read(address);
+            var address = parseInt(_MemoryManager.read(_CPU.PC),16); //get the address in hex.
+            var value = _MemoryManager.read(address); // get the contents of the address.
 
-            if(temp == _CPU.Xreg){
+            if(value == _CPU.Xreg){
                 _CPU.Zflag = 1;
             }else{
                 _CPU.Zflag = 0;
             }
 
-            _CPU.INS = "CPU   [EC   $00" + parseInt(_MemoryManager.read(_CPU.PC),16) + "]" +
+            _CPU.INS = "CPU   [EC   $00" + address.toString(16) + "]" +
                 "   ["+_CPU.IR+ ", "+address.toString(16)+", 00]";
             _CPU.PC++;
         }
@@ -304,17 +305,18 @@ module TSOS {
                 _CPU.PC++;
                 var address:number = parseInt(_MemoryManager.read(_CPU.PC),16);
                 _CPU.PC += address;
+                var size = _MemoryManager.size();
 
-                if(_CPU.PC > _MemoryManager.size()){
-                    _CPU.PC = _CPU.PC - _MemoryManager.size();
+                if(_CPU.PC > size){
+                    _CPU.PC = _CPU.PC - size;
                 }
                 _CPU.INS = "CPU [D0 $EF]" +
-                    "   ["+_CPU.IR+", "+address.toString(16).toUpperCase()+"]";
+                    "   ["+_CPU.IR+", "+address+"]";
             }
             else{
                 _CPU.PC++;
                 _CPU.INS = "CPU [D0 $EF]" +
-                    "   ["+_CPU.IR+", "+address.toString(16).toUpperCase()+"]";
+                    "   ["+_CPU.IR+", "+address+"]";
             }
         }
 
@@ -325,11 +327,11 @@ module TSOS {
         public _EE_Instruction(str:string){
             _CPU.IR = str;
             _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC),16);
-            var temp = _MemoryManager.read(address);
-            temp++;
-            var store = parseInt(temp.toString(),16);
-            _MemoryManager.store(address,store.toString());
+            var address = parseInt(_MemoryManager.read(_CPU.PC),16); //get the address in hex
+            var value = _MemoryManager.read(address); //get the address contents
+            value++; // increment
+            var store = parseInt(value.toString(),16);
+            _MemoryManager.store(address,store.toString()); //store value at the address
             _CPU.PC++;
             _CPU.INS = "CPU [EC $00" + address.toString(16)+"]" +
                 "[   "+_CPU.IR+", "+address.toString(16)+", 00]";

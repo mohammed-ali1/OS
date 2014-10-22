@@ -119,6 +119,10 @@ var TSOS;
             // page from its cache, which is not what we want.
         };
 
+        /**
+        * Handles the step button
+        * @param btn, the button to handle.
+        */
         Control.hostStepButton_click = function (btn) {
             document.getElementById("stepButton").style.visibility = "hidden";
             document.getElementById("nextButton").style.visibility = "visible";
@@ -126,16 +130,18 @@ var TSOS;
             _StepButton = true;
         };
 
+        /**
+        * Handles the next button as an interrupt
+        * @param btn, the button to handle.
+        */
         Control.hostNextButton_click = function (btn) {
             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_NextButton, 0));
-            //            _CPU.cycle();
-            //            if(_MemoryManager.read(_CPU.PC+1) == "00"){
-            //                _CPU._00_Instruction("00");
-            //                this.hostStopButton_click(this);
-            //                return;
-            //            }
         };
 
+        /**
+        * Handles the stop button
+        * @param btn, the button to handle.
+        */
         Control.hostStopButton_click = function (btn) {
             _StepButton = false;
             document.getElementById("stepButton").style.visibility = "visible";

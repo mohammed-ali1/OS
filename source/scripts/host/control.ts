@@ -127,26 +127,29 @@ module TSOS {
             // page from its cache, which is not what we want.
         }
 
+        /**
+         * Handles the step button
+         * @param btn, the button to handle.
+         */
         public static hostStepButton_click(btn){
-
-
             document.getElementById("stepButton").style.visibility = "hidden";
             document.getElementById("nextButton").style.visibility = "visible";
             document.getElementById("stopButton").style.visibility = "visible";
             _StepButton = true;
         }
 
+        /**
+         * Handles the next button as an interrupt
+         * @param btn, the button to handle.
+         */
         public static hostNextButton_click(btn){
-
             _KernelInterruptQueue.enqueue(new Interrupt(_NextButton,0));
-//            _CPU.cycle();
-//            if(_MemoryManager.read(_CPU.PC+1) == "00"){
-//                _CPU._00_Instruction("00");
-//                this.hostStopButton_click(this);
-//                return;
-//            }
         }
 
+        /**
+         * Handles the stop button
+         * @param btn, the button to handle.
+         */
         public  static hostStopButton_click(btn){
             _StepButton = false;
             document.getElementById("stepButton").style.visibility = "visible";

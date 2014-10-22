@@ -16,13 +16,13 @@ module TSOS{
         public base: number = 0;
         public limit:string = "0";
         public state:string = "NEW";
+        public length:number = 0; //Length of the program
 
         constructor(b:number, l:number){
 
             Pcb.PID++;  //Increment PID all the time!
             this.base = b;
             this.limit = l.toString(16).toUpperCase();
-
         }
 
         /**
@@ -45,6 +45,10 @@ module TSOS{
 
         public getPid() : number{
             return Pcb.PID;
+        }
+
+        public setLength(length:number){
+            this.length = length;
         }
 
         public setState(s:number){

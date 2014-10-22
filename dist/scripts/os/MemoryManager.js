@@ -30,7 +30,7 @@ var TSOS;
         };
 
         MemoryManager.prototype.size = function () {
-            _Memory.size();
+            return _Memory.size();
         };
         return MemoryManager;
     })();

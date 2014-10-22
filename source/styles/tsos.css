@@ -136,13 +136,13 @@ h3 {
 }
 
 #tableID{
-    width:360px;
+    width:370px;
     resize: none;
     float: left;
     height:290px;
     overflow: scroll;
     background-color: transparent;
-    font-size:10px;
+    font-size:9px;
     font-weight: normal;
     margin-right: 1%;
     border-radius: 5px;
@@ -171,14 +171,13 @@ h3 {
 }
 
 #nextButton{
-    background-color: green;
-    color: #ffffff;
+    background-color: lawngreen;
+    color: #000000;
 }
 
 #stopButton{
     background-color: red;
     color: #ffffff;
-    float: left;
 }
 
 /* Halloween Colors...WHY NOT?*/
