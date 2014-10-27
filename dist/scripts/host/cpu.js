@@ -105,6 +105,7 @@ var TSOS;
             } else if (str == "FF") {
                 _CPU._FF_Instruction(str);
             } else {
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_InvalidOpCode, 0));
                 _StdOut.putText("Instruction Not VALID!");
             }
             _CPU.PC++;
@@ -127,12 +128,9 @@ var TSOS;
         */
         Cpu.prototype._AD_Instruction = function (str) {
             _CPU.IR = str;
-            _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC), 16);
-            var value = parseInt(_MemoryManager.read(address));
-            _CPU.Acc = parseInt(value.toString(), 16); //Store Acc with the contents in hex
-            _CPU.PC++;
-            _CPU.INS = "CPU   [LDA $00" + address + "]   " + "[" + _CPU.IR + ", " + address + ", 00]";
+            var address = this.loadTwoBytes();
+            _CPU.Acc = (parseInt(_MemoryManager.read(address), 16)); //store in the Acc from memory
+            _CPU.INS = "CPU   [LDA $00" + address.toString(16) + "]   " + "[" + _CPU.IR + ", " + address.toString(16) + ", 00]";
         };
 
         /**
@@ -141,11 +139,8 @@ var TSOS;
         */
         Cpu.prototype._8D_Instruction = function (str) {
             _CPU.IR = str;
-            _CPU.PC++;
-            var temp = _CPU.Acc;
-            var address = parseInt(_MemoryManager.read(_CPU.PC), 16);
-            _MemoryManager.store(address, temp.toString(16)); //Store it in hex
-            _CPU.PC++;
+            var address = this.loadTwoBytes();
+            _MemoryManager.store(address, _CPU.Acc.toString(16)); //store in hex
             _CPU.INS = "CPU   [STA $00" + address.toString(16) + "]   " + "[" + _CPU.IR + ", " + address.toString(16) + ", 00]";
         };
 
@@ -155,15 +150,10 @@ var TSOS;
         */
         Cpu.prototype._6D_Instruction = function (str) {
             _CPU.IR = str;
-            _CPU.PC++;
-
-            var address = parseInt(_MemoryManager.read(_CPU.PC), 16);
-            var value = parseInt(_MemoryManager.read(address));
-            var currentAcc = parseInt(_CPU.Acc.toString(16), 10);
-            _CPU.Acc = parseInt(value + currentAcc, 16); // Add everything to the Acc
-
-            _CPU.INS = "CPU   [ADC   $00" + _MemoryManager.read(_CPU.PC) + "]" + "   [" + _CPU.IR + ", " + address + ", 00]";
-            _CPU.PC++;
+            var address = this.loadTwoBytes();
+            var value = parseInt(_MemoryManager.read(address), 16);
+            _CPU.Acc += value;
+            _CPU.INS = "CPU   [ADC   $00" + address.toString(16) + "]" + "   [" + _CPU.IR + ", " + address.toString(16) + ", 00]";
         };
 
         /**
@@ -175,7 +165,7 @@ var TSOS;
             _CPU.PC++;
             var temp = _MemoryManager.read(_CPU.PC);
             _CPU.Xreg = parseInt(temp.toString(), 16); //store into x-reg as hex
-            _CPU.INS = "CPU   [LDX   #$" + _MemoryManager.read(_CPU.PC) + "]" + "   [" + _CPU.IR + ", " + temp + "]";
+            _CPU.INS = "CPU   [LDX   #$" + temp + "]" + "   [" + _CPU.IR + ", " + temp + "]";
         };
 
         /**
@@ -184,12 +174,9 @@ var TSOS;
         */
         Cpu.prototype._AE_Instruction = function (str) {
             _CPU.IR = str;
-            _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC), 16);
-            var temp = parseInt(_MemoryManager.read(address));
-            _CPU.Xreg = parseInt(temp.toString(), 16); // store it as hex in x-reg
-            _CPU.INS = "CPU   [LDX   $00" + _MemoryManager.read(_CPU.PC) + "]" + "   [" + _CPU.IR + ", " + address.toString(16) + ", 00]";
-            _CPU.PC++;
+            var address = this.loadTwoBytes();
+            _CPU.Xreg = parseInt(_MemoryManager.read(address), 16);
+            _CPU.INS = "CPU   [LDX   $00" + address.toString(16) + "]" + "   [" + _CPU.IR + ", " + address.toString(16) + ", 00]";
         };
 
         /**
@@ -201,7 +188,7 @@ var TSOS;
             _CPU.PC++;
             var temp = _MemoryManager.read(_CPU.PC);
             _CPU.Yreg = parseInt(temp.toString(), 16); //store into y-reg as hex
-            _CPU.INS = "CPU   [LDY   #$" + _MemoryManager.read(_CPU.PC) + "]" + "   [" + _CPU.IR + ", " + temp + "]";
+            _CPU.INS = "CPU   [LDY   #$" + temp + "]" + "   [" + _CPU.IR + ", " + temp + "]";
         };
 
         /**
@@ -210,12 +197,9 @@ var TSOS;
         */
         Cpu.prototype._AC_Instruction = function (str) {
             _CPU.IR = str;
-            _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC), 16);
-            var temp = parseInt(_MemoryManager.read(address));
-            _CPU.Yreg = parseInt(temp.toString(), 16); // store it as hex in y-reg
-            _CPU.INS = "CPU   [LDY   $00" + _MemoryManager.read(_CPU.PC) + "]" + "   [" + _CPU.IR + ", " + address.toString(16) + ", 00]";
-            _CPU.PC++;
+            var address = this.loadTwoBytes();
+            _CPU.Yreg = parseInt(_MemoryManager.read(address), 16);
+            _CPU.INS = "CPU   [LDY   $00" + address.toString(16) + "]" + "   [" + _CPU.IR + ", " + address.toString(16) + ", 00]";
         };
 
         /**
@@ -245,9 +229,8 @@ var TSOS;
         */
         Cpu.prototype._EC_Instruction = function (str) {
             _CPU.IR = str;
-            _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC), 16);
-            var value = _MemoryManager.read(address);
+            var address = this.loadTwoBytes();
+            var value = parseInt(_MemoryManager.read(address), 16);
 
             if (value == _CPU.Xreg) {
                 _CPU.Zflag = 1;
@@ -256,7 +239,6 @@ var TSOS;
             }
 
             _CPU.INS = "CPU   [EC   $00" + address.toString(16) + "]" + "   [" + _CPU.IR + ", " + address.toString(16) + ", 00]";
-            _CPU.PC++;
         };
 
         /**
@@ -267,12 +249,11 @@ var TSOS;
             _CPU.IR = str;
 
             if (_CPU.Zflag == 0) {
-                _CPU.PC++;
-                var address = parseInt(_MemoryManager.read(_CPU.PC), 16);
+                var address = parseInt(_MemoryManager.read(++_CPU.PC), 16);
                 _CPU.PC += address;
                 var size = _MemoryManager.size();
 
-                if (_CPU.PC > size) {
+                if (_CPU.PC > size - 1) {
                     _CPU.PC = _CPU.PC - size;
                 }
                 _CPU.INS = "CPU [D0 $EF]" + "   [" + _CPU.IR + ", " + address + "]";
@@ -288,13 +269,10 @@ var TSOS;
         */
         Cpu.prototype._EE_Instruction = function (str) {
             _CPU.IR = str;
-            _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC), 16);
-            var value = _MemoryManager.read(address);
+            var address = this.loadTwoBytes();
+            var value = parseInt(_MemoryManager.read(address), 16);
             value++; // increment
-            var store = parseInt(value.toString(), 16);
-            _MemoryManager.store(address, store.toString()); //store value at the address
-            _CPU.PC++;
+            _MemoryManager.store(address, value.toString(16)); //store value at the address
             _CPU.INS = "CPU [EC $00" + address.toString(16) + "]" + "[   " + _CPU.IR + ", " + address.toString(16) + ", 00]";
         };
 
@@ -304,12 +282,14 @@ var TSOS;
         */
         Cpu.prototype._FF_Instruction = function (str) {
             _CPU.IR = str;
-            _CPU.PC += 2;
-            var temp = _CPU.Xreg;
-
-            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_SystemCall, 0));
-
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_SystemCall, _CPU.Xreg));
             _CPU.INS = "CPU [SYS]" + "   [" + _CPU.IR + "]";
+        };
+
+        Cpu.prototype.loadTwoBytes = function () {
+            var first = parseInt(_MemoryManager.read(++_CPU.PC), 16);
+            var second = parseInt(_MemoryManager.read(++_CPU.PC), 16);
+            return parseInt((first + second));
         };
 
         Cpu.prototype.updatePcb = function (p) {
@@ -319,10 +299,6 @@ var TSOS;
             p.x = _CPU.Xreg;
             p.y = _CPU.Yreg;
             p.z = _CPU.Zflag;
-            if (_CPU.isExecuting)
-                p.setState(1);
-            else
-                p.setState(2);
         };
         return Cpu;
     })();

@@ -13,11 +13,13 @@ var TSOS;
             this.z = 0;
             this.base = 0;
             this.limit = "0";
-            this.state = "NEW";
+            this.state = "?";
             this.length = 0;
+            this.inuse = false;
             Pcb.PID++; //Increment PID all the time!
             this.base = b;
             this.limit = l.toString(16).toUpperCase();
+            this.inuse = true;
         }
         /**
         * Displays the the status of the current PCB.
@@ -27,7 +29,6 @@ var TSOS;
             document.getElementById("pcbBase").innerHTML = "" + this.base;
             document.getElementById("pcbLimit").innerHTML = "" + this.limit;
             document.getElementById("pcbStatus").innerHTML = this.state.toString();
-
             document.getElementById("pcbPc").innerHTML = "" + this.pc;
             document.getElementById("pcbAcc").innerHTML = "" + this.acc;
             document.getElementById("pcbIr").innerHTML = this.ir;
@@ -58,6 +59,14 @@ var TSOS;
                 default:
                     _Pcb.state = "???";
             }
+        };
+
+        Pcb.prototype.blockFree = function () {
+            return this.inuse;
+        };
+
+        Pcb.prototype.getLength = function () {
+            return this.length;
         };
         Pcb.PID = -1;
         return Pcb;

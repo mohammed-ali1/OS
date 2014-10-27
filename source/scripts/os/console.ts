@@ -101,14 +101,10 @@ module TSOS {
          */
         public renderDate(){
 
-                // CLOCK WHICH IS NOT WORKING :(
-//            document.getElementById("status").innerHTML = "Type status to change me!";
-//
-//            $(document).ready(function () {
-//                var clock; clock = $('.clock').FlipClock({
-//                    clockFace: 'TwelveHourClock'
-//                });
-//            });
+//                CLOCK WHICH IS NOT WORKING :(
+//            document.getElementById("clock").innerHTML = "Type status to change me!";
+
+            var clock;
         }
 
         public advanceLine(): void {

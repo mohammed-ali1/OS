@@ -32,7 +32,7 @@ module TSOS{
             _Memory.updateMemory();
         }
 
-        public size(){
+        public size():number{
            return _Memory.size();
         }
     }

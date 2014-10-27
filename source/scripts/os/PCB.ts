@@ -15,26 +15,26 @@ module TSOS{
         public z:number = 0;
         public base: number = 0;
         public limit:string = "0";
-        public state:string = "NEW";
+        public state:string = "?";
         public length:number = 0; //Length of the program
+        public inuse:boolean = false;
 
         constructor(b:number, l:number){
 
             Pcb.PID++;  //Increment PID all the time!
             this.base = b;
             this.limit = l.toString(16).toUpperCase();
+            this.inuse = true;
         }
 
         /**
          * Displays the the status of the current PCB.
          */
         public displayPCB(){
-
             document.getElementById("pcbPid").innerHTML = "" + this.getPid();
             document.getElementById("pcbBase").innerHTML = "" + this.base;
             document.getElementById("pcbLimit").innerHTML =  "" + this.limit;
             document.getElementById("pcbStatus").innerHTML = this.state.toString();
-
             document.getElementById("pcbPc").innerHTML = "" + this.pc;
             document.getElementById("pcbAcc").innerHTML = "" + this.acc;
             document.getElementById("pcbIr").innerHTML = this.ir;
@@ -65,8 +65,15 @@ module TSOS{
                     break;
                 default :
                     _Pcb.state = "???";
-
             }
+        }
+
+        public blockFree():boolean{
+            return this.inuse;
+        }
+
+        public getLength():number{
+            return this.length;
         }
     }
 }

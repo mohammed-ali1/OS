@@ -4,10 +4,13 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <meta name="author"             content="Alan G. Labouseur" />
     <link rel="stylesheet" href="dist/styles/tsos.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="dist/styles/flipclock.css" />
+    <script type="text/javascript" src="dist/styles/flipclock.js"></script>
     <title>BAD ASS OS -- 9.1.5</title>
 
     <!-- Globals CONSTANTS and _Variables. Must included be first. -->
     <script type="text/javascript" src="dist/scripts/globals.js"></script>
+
 
     <!-- Host (Hardware Simulation) Routines -->
     <script type="text/javascript" src="dist/scripts/host/control.js"></script>
@@ -36,12 +39,22 @@
 
 <div id="top">
 
+    <!--<h1 class="clock2" style="float:right;">clock</h1>-->
+    <!--<script>-->
+        <!--$(document).ready(function () {-->
+            <!--var clock; clock = $('.clock2').FlipClock({-->
+                <!--clockFace: 'TwelveHourClock',-->
+                <!--countdown: true,-->
+                <!--autoStart: true-->
+            <!--});-->
+        <!--});-->
+    <!--</script>-->
+
     <p id="status">
         Status: off
     </p>
 
     <p id="clock">
-
         <script>
             setInterval(function(){
                 document.getElementById("clock").innerHTML = "[" + new Date().toLocaleDateString() +
@@ -96,26 +109,60 @@
 
 <div id="divLog" style="margin-left:2px; float: left; width: auto; height: auto;">
 
+
+    <div>
         <center><h3 style="color: firebrick; margin-top:3%;">Host Logger</h3></center>
         <textarea name="taHostLog"
                   id  ="taHostLog"
                   rows="26"
                   cols="20"
                 ></textarea>
+    </div>
 
-    <div id="divUserProgramInput">
-
-        <center><h3 style="color: firebrick;margin-top:26%;">User Program</h3></center>
+    <div>
+        <center><h3 style="color: firebrick;">User Program</h3></center>
         <textarea name="taProgramInput"
                   id  ="taProgramInput"
                   rows="8"
                   cols="40"
-                  style="margin-top: -2%;"
+                  placeholder="Enter Program to RUN"
                 ></textarea>
+    </div>
+
+    <div>
+        <h4 style="color: firebrick;">Ready Queue</h4>
+        <table id="readyQueue">
+
+            <tr>
+                <th>PID</th>
+                <th>Base</th>
+                <th>Limit</th>
+                <th>Status</th>
+                <th>PC</th>
+                <th>IR</th>
+                <th>ACC</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Z</th>
+            </tr>
+
+            <tr>
+                <td id="pcbPid">0</td>
+                <td id="pcbBase">0</td>
+                <td id="pcbLimit">0</td>
+                <td id="pcbStatus">007</td>
+                <td id="pcbPc">0</td>
+                <td id="pcbIr">0</td>
+                <td id="pcbAcc">0</td>
+                <td id="pcbX">0</td>
+                <td id="pcbY">0</td>
+                <td id="pcbZ">0</td>
+            </tr>
+        </table>
     </div>
 </div>
 
-<div id="memoryTable" style="margin-left:2px;; height: auto;float:left;">
+<div id="memoryTable" style="margin-left:5px; height: auto;float:left;">
 
     <div style="margin:2%;">
         <p>
@@ -131,7 +178,6 @@
                        onclick="TSOS.Control.hostNextButton_click(this);"
                         style="float:right; visibility: hidden; "/>
             </center>
-
         </p>
 
         <p>
@@ -163,61 +209,25 @@
                 </tr>
 
                 <tr>
-                    <td id="pc">0</td>
-                    <td id="ir">0</td>
-                    <td id="acc">0</td>
-                    <td id="x">0</td>
-                    <td id="y">0</td>
-                    <td id="z">0</td>
-                </tr>
-            </table>
-        </div>
-
-        <div>
-            <p style="float: left;" >
-                <h4 style="color: firebrick; text-align: center;">PCB</h4>
-            </p>
-
-            <table id="pcb">
-                <tr>
-                    <th>PID</th>
-                    <th>Base</th>
-                    <th>Limit</th>
-                    <th>Status</th>
-                </tr>
-
-                <tr>
-                    <td id="pcbPid">0</td>
-                    <td id="pcbBase">0</td>
-                    <td id="pcbLimit">0</td>
-                    <td id="pcbStatus">0</td>
-                </tr>
-                    <th>PC</th>
-                    <th>IR</th>
-                    <th>ACC</th>
-                    <th>X</th>
-                    <th>Y</th>
-                    <th>Z</th>
-                <tr>
-                    <td id="pcbPc">0</td>
-                    <td id="pcbIr">0</td>
-                    <td id="pcbAcc">0</td>
-                    <td id="pcbX">0</td>
-                    <td id="pcbY">0</td>
-                    <td id="pcbZ">0</td>
+                    <td id="pc">007</td>
+                    <td id="ir">007</td>
+                    <td id="acc">007</td>
+                    <td id="x">007</td>
+                    <td id="y">007</td>
+                    <td id="z">007</td>
                 </tr>
             </table>
         </div>
     </div>
 </div>
 
-<p class="footerText" style="clear:both;">
+<footer class="footerText" style="clear:both;">
     <br>
     Copyright &copy; 2008 - 2014 No Rights Reserved.
     <br>
     Reproduction is prohibited without the express written consent of
     Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
-</p>
+</footer>
 
 </body>
 </html>

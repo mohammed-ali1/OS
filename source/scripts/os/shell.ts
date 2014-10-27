@@ -315,9 +315,11 @@ module TSOS {
 
             //Create New PCB
             var size:number = parseInt(_MemoryManager.size()-1,10);
-            var temp:string = size.toString(16);
-            _Pcb = new Pcb(0,_MainMemorySize-1);  //Memory Size is 256...so base and limit works (for now)!
+            var temp:any = size.toString(16);
+            var a = _MemoryManager.size();
+            _Pcb = new Pcb(0,a-1);  //Memory Size is 256...so base and limit works (for now)!
             _Pcb.setLength((x.length/2)); //set the length of the program.
+            _Pcb.setState(0);//set state "NEW"
 
             //Create New Resident Queue
             _ResidentQueue = new Array<Pcb>();
@@ -325,6 +327,7 @@ module TSOS {
             _StdOut.putText("Process ID: " + _Pcb.getPid());
 
             //Finally load into Memory
+            _MemoryManager.clear();
             _MemoryManager.load(x.toUpperCase().toString());
         }
 
@@ -428,10 +431,11 @@ module TSOS {
         public shellRun(args){
 
             if(_StepButton){
+                _Pcb.setState(1);
                 _StdOut.putText("Single Step is on!");
                 return;
             }
-            _ReadyQueue = new Queue();
+//            _ReadyQueue = new Queue();
             _ReadyQueue.enqueue(_ResidentQueue[args[0]]);
         }
     }

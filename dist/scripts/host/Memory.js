@@ -16,18 +16,24 @@ var TSOS;
             _MainMemory = new Array();
             _MainMemoryBase = new Array();
 
-            if (_MainMemorySize == 256)
+            var temp = _MainMemorySize;
+
+            if (temp == 256)
                 this.segment = 0;
-            if (_MainMemorySize == 256 * 2)
+            if (temp == 256 * 2)
                 this.segment = 1;
-            if (_MainMemorySize == 256 * 3)
+            if (temp == 256 * 3)
                 this.segment = 2;
 
             var table = "<table>";
 
             for (var i = 0; i < _MainMemorySize; i += 8) {
                 _MainMemoryBase[i] = i.toString(16).toUpperCase();
-                table += "<tr><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                if (i % 256 == 0) {
+                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                } else {
+                    table += "<tr><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                }
 
                 for (var j = i; j <= i + 7; j++) {
                     _MainMemory[j] = "00";
@@ -80,8 +86,11 @@ var TSOS;
             var table = "<table>";
 
             for (var i = 0; i < _MainMemorySize; i += 8) {
-                table += "<tr><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
-
+                if (i % 256 == 0) {
+                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                } else {
+                    table += "<tr><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                }
                 for (var j = i; j <= i + 7; j++) {
                     if (_MainMemory[j] != 0 || j <= this.str - 1) {
                         table += "<td id='memoryContents'>" + _MainMemory[j] + "</td>";
@@ -96,12 +105,19 @@ var TSOS;
         };
 
         Memory.prototype.clear = function () {
-            //TO DO
-            //Clears the Memory
+            for (var i = 0; i < _MainMemorySize; i += 8) {
+                for (var j = i; j <= i + 7; j++) {
+                    _MainMemory[j] = "00";
+                }
+            }
+            this.updateMemory();
         };
 
         Memory.prototype.size = function () {
             return _MainMemorySize;
+        };
+
+        Memory.prototype.blah = function () {
         };
         return Memory;
     })();

@@ -19,7 +19,10 @@ var CPU_CLOCK_INTERVAL: number = 100;   // This is in ms, or milliseconds, so 10
 
 var TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
                             // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
-var KEYBOARD_IRQ: number = 1;
+var KEYBOARD_IRQ: number = 100;
+
+//Color for the Logger!
+var _FancyColor:number = 0;
 
 //
 // Global Variables
@@ -70,6 +73,8 @@ var _MainMemory: string[] = null;
 var _MainMemorySize: number = 256;
 var _MainMemoryBase : string[] = null;
 var _Memory : TSOS.Memory;
+var _MemoryPartitions:number = 1;
+var _Inuse:boolean = false;
 
 //Memory Manager
 var _MemoryManager : TSOS.MemoryManager;
@@ -92,7 +97,11 @@ var _NextButton : boolean = false;
 var _Break : number = -1;
 
 //System Call
-var _SystemCall : string = "FF";
+var _SystemCall : number = 9;
+var _InvalidOpCode: number = 999;
+
+// CPU Scheduling
+var _RoundRobin:number = 6;
 
 var onDocumentLoad = function() {
 	TSOS.Control.hostInit();

@@ -104,6 +104,7 @@ module TSOS {
            _CPU.isExecuting = true;
             _CPU.PC = p.base;
             _CPU.displayCPU();
+            _Pcb.setState(1); //set state "Running"
         }
 
         //
@@ -139,32 +140,44 @@ module TSOS {
                     _StdIn.handleInput();
                     break;
                 case _NextButton:
+                    _Pcb.setState(1);
                     _CPU.cycle();
-                    if(_CPU.PC == _Pcb.length){ //Use the program length to break
+                    if(_CPU.PC > _Pcb.getLength()){ //Use the program length to break
                         Control.hostStopButton_click(this); //helps us exit next button!
+                        _Pcb.setState(2);
+                        _Pcb.displayPCB();
+                        _CPU.cycle();
                     }
                     break;
                 case _SystemCall:
-                    if(_CPU.Xreg == 1){
-                        _StdOut.putText("Contents of Y-Reg: " + _CPU.Yreg.toString());
-                    }
-                    else if (_CPU.Xreg == 2){
-                        var temp = parseInt(_MemoryManager.read(_CPU.Yreg),16);
-
-                        var index = 0;
+                    if(params == 1){
+                        _StdOut.putText(_CPU.Yreg.toString());
+                        _Console.advanceLine();
+                        _OsShell.putPrompt();
+                    } else if (params == 2){
+                        var address :number = _CPU.Yreg;
+                        var print = "";
+                        var temp = parseInt(_MemoryManager.read(address),16);
+                        var index : number = 0;
 
                         while (temp != 0){
-                            _StdOut.putText(String.fromCharCode(temp));
+                            print += String.fromCharCode(temp);
                             index++;
-                            temp = parseInt(_MemoryManager.read(_CPU.Yreg),16);
+                            temp = parseInt(_MemoryManager.read((address+index)),16);
                         }
-                        _StdOut.putText("Y-Reg: " + temp);
+                        _StdOut.putText(print);
+                        _Console.advanceLine();
+                        _OsShell.putPrompt();
                     }
                     break;
                 case _Break: //-1 Denotes END of a process!
                     _Pcb.setState(2);   //Pass 2 to mark Process as Terminated!
                     _Pcb.displayPCB();  //Display the PCB
                     _CPU.init();//Re-Start the CPU!
+//                    _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
+                    break;
+                case _InvalidOpCode:
+                    _StdOut.putText("WTF is this?");
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

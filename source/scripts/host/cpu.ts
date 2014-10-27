@@ -120,6 +120,7 @@ module TSOS {
                 _CPU._FF_Instruction(str);
             }
             else{
+                _KernelInterruptQueue.enqueue(new Interrupt(_InvalidOpCode,0));
                 _StdOut.putText("Instruction Not VALID!");
             }
             _CPU.PC++;
@@ -145,13 +146,10 @@ module TSOS {
         public _AD_Instruction(str:string){
 
             _CPU.IR = str;
-            _CPU.PC++;
-            var address  = parseInt(_MemoryManager.read(_CPU.PC),16)  //Get the address first in hex
-            var value =  parseInt(_MemoryManager.read(address)); // Get the contents of the address
-            _CPU.Acc =     parseInt(value.toString(),16); //Store Acc with the contents in hex
-            _CPU.PC++;
-            _CPU.INS = "CPU   [LDA $00" + address + "]   " +
-                "[" +_CPU.IR+", "+address+", 00]";
+            var address = this.loadTwoBytes();  //load 2 bytes
+            _CPU.Acc = (parseInt(_MemoryManager.read(address),16)); //store in the Acc from memory
+            _CPU.INS = "CPU   [LDA $00" + address.toString(16) + "]   " +
+                "[" +_CPU.IR+", "+address.toString(16)+", 00]";
         }
 
         /**
@@ -161,11 +159,8 @@ module TSOS {
         public _8D_Instruction(str:string){
 
             _CPU.IR = str;
-            _CPU.PC++;
-            var temp = _CPU.Acc;  //Get the current Acc
-            var address = parseInt(_MemoryManager.read(_CPU.PC),16); //Get the address in hex
-            _MemoryManager.store(address,temp.toString(16)); //Store it in hex
-            _CPU.PC++;
+            var address = this.loadTwoBytes(); //load 2 bytes
+            _MemoryManager.store(address,_CPU.Acc.toString(16)); //store in hex
             _CPU.INS = "CPU   [STA $00" +address.toString(16) + "]   " +
                 "["+_CPU.IR+", "+address.toString(16)+", 00]";
         }
@@ -177,16 +172,11 @@ module TSOS {
         public _6D_Instruction(str:string){
 
             _CPU.IR = str;
-            _CPU.PC++;
-
-            var address = parseInt(_MemoryManager.read(_CPU.PC),16);//Get the address in hex
-            var value = parseInt(_MemoryManager.read(address)); //Get the contents of the address
-            var currentAcc  = parseInt(_CPU.Acc.toString(16),10); //Get the current ACC in decimal
-            _CPU.Acc = parseInt(value+currentAcc,16);// Add everything to the Acc
-
-            _CPU.INS = "CPU   [ADC   $00" + _MemoryManager.read(_CPU.PC) + "]" +
-                "   ["+_CPU.IR+", "+ address+", 00]";
-            _CPU.PC++;
+            var address = this.loadTwoBytes(); // load 2 bytes
+            var value = parseInt(_MemoryManager.read(address),16);
+            _CPU.Acc += value;
+            _CPU.INS = "CPU   [ADC   $00" + address.toString(16) + "]" +
+                "   ["+_CPU.IR+", "+ address.toString(16)+", 00]";
         }
 
         /**
@@ -199,7 +189,7 @@ module TSOS {
             _CPU.PC++;
             var temp = _MemoryManager.read(_CPU.PC); //Get the value first
             _CPU.Xreg = parseInt(temp.toString(),16);//store into x-reg as hex
-            _CPU.INS = "CPU   [LDX   #$" + _MemoryManager.read(_CPU.PC) + "]" +
+            _CPU.INS = "CPU   [LDX   #$" + temp + "]" +
                 "   ["+_CPU.IR+", "+temp+"]";
         }
 
@@ -210,13 +200,10 @@ module TSOS {
         public _AE_Instruction(str:string){
 
             _CPU.IR = str;
-            _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC),16); //get the address in hex
-            var temp = parseInt(_MemoryManager.read(address)); //get the contents of the address
-            _CPU.Xreg = parseInt(temp.toString(),16); // store it as hex in x-reg
-            _CPU.INS = "CPU   [LDX   $00" + _MemoryManager.read(_CPU.PC) + "]" +
+            var address = this.loadTwoBytes(); // load 2 bytes
+            _CPU.Xreg = parseInt(_MemoryManager.read(address),16);
+            _CPU.INS = "CPU   [LDX   $00" + address.toString(16) + "]" +
                 "   ["+_CPU.IR+", "+address.toString(16)+", 00]";
-            _CPU.PC++;
         }
 
         /**
@@ -229,7 +216,7 @@ module TSOS {
             _CPU.PC++;
             var temp = _MemoryManager.read(_CPU.PC); //get the value first
             _CPU.Yreg = parseInt(temp.toString(),16); //store into y-reg as hex
-            _CPU.INS = "CPU   [LDY   #$" + _MemoryManager.read(_CPU.PC) + "]" +
+            _CPU.INS = "CPU   [LDY   #$" + temp + "]" +
                 "   ["+_CPU.IR+", "+temp+"]";
         }
 
@@ -240,13 +227,10 @@ module TSOS {
         public _AC_Instruction(str:string){
 
             _CPU.IR = str;
-            _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC),16);//get the address in hex
-            var temp = parseInt(_MemoryManager.read(address)); //get the contents of the address
-            _CPU.Yreg = parseInt(temp.toString(),16); // store it as hex in y-reg
-            _CPU.INS = "CPU   [LDY   $00" + _MemoryManager.read(_CPU.PC) + "]" +
+            var address = this.loadTwoBytes(); // load 2 bytes
+            _CPU.Yreg = parseInt(_MemoryManager.read(address),16);
+            _CPU.INS = "CPU   [LDY   $00" + address.toString(16)+ "]" +
                 "   ["+_CPU.IR+", "+address.toString(16)+", 00]";
-            _CPU.PC++;
         }
 
         /**
@@ -278,9 +262,8 @@ module TSOS {
         public _EC_Instruction(str:string){
 
             _CPU.IR = str;
-            _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC),16); //get the address in hex.
-            var value = _MemoryManager.read(address); // get the contents of the address.
+            var address = this.loadTwoBytes(); // load 2 bytes
+            var value = parseInt(_MemoryManager.read(address),16); // get the contents of the address.
 
             if(value == _CPU.Xreg){
                 _CPU.Zflag = 1;
@@ -290,7 +273,6 @@ module TSOS {
 
             _CPU.INS = "CPU   [EC   $00" + address.toString(16) + "]" +
                 "   ["+_CPU.IR+ ", "+address.toString(16)+", 00]";
-            _CPU.PC++;
         }
 
         /**
@@ -302,12 +284,12 @@ module TSOS {
             _CPU.IR = str;
 
             if(_CPU.Zflag == 0){
-                _CPU.PC++;
-                var address:number = parseInt(_MemoryManager.read(_CPU.PC),16);
+
+                var address:number = parseInt(_MemoryManager.read(++_CPU.PC),16);
                 _CPU.PC += address;
                 var size = _MemoryManager.size();
 
-                if(_CPU.PC > size){
+                if(_CPU.PC > size - 1){
                     _CPU.PC = _CPU.PC - size;
                 }
                 _CPU.INS = "CPU [D0 $EF]" +
@@ -326,13 +308,10 @@ module TSOS {
          */
         public _EE_Instruction(str:string){
             _CPU.IR = str;
-            _CPU.PC++;
-            var address = parseInt(_MemoryManager.read(_CPU.PC),16); //get the address in hex
-            var value = _MemoryManager.read(address); //get the address contents
+            var address = this.loadTwoBytes(); // load 2 bytes
+            var value = parseInt(_MemoryManager.read(address),16); //get the address contents
             value++; // increment
-            var store = parseInt(value.toString(),16);
-            _MemoryManager.store(address,store.toString()); //store value at the address
-            _CPU.PC++;
+            _MemoryManager.store(address,value.toString(16)); //store value at the address
             _CPU.INS = "CPU [EC $00" + address.toString(16)+"]" +
                 "[   "+_CPU.IR+", "+address.toString(16)+", 00]";
         }
@@ -344,13 +323,15 @@ module TSOS {
         public _FF_Instruction(str:string){
 
             _CPU.IR = str;
-            _CPU.PC += 2;
-            var temp = _CPU.Xreg;
-
-            _KernelInterruptQueue.enqueue(new Interrupt(_SystemCall,0));
-
+            _KernelInterruptQueue.enqueue(new Interrupt(_SystemCall,_CPU.Xreg));
             _CPU.INS = "CPU [SYS]" +
                 "   ["+_CPU.IR+"]";
+        }
+
+        public loadTwoBytes():number{
+            var first:number = parseInt(_MemoryManager.read(++_CPU.PC),16);
+            var second:number = parseInt(_MemoryManager.read(++_CPU.PC),16);
+            return parseInt((first+second));
         }
 
         public updatePcb(p:Pcb){
@@ -361,10 +342,6 @@ module TSOS {
             p.x = _CPU.Xreg;
             p.y = _CPU.Yreg;
             p.z = _CPU.Zflag;
-            if(_CPU.isExecuting)
-                p.setState(1)
-            else
-                p.setState(2);
         }
     }
 }
