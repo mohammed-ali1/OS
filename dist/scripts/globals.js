@@ -67,10 +67,10 @@ var Glados = null;
 
 // MEMORY INFO
 var _MainMemory = null;
-var _MainMemorySize = 256;
+var _MainMemorySize = 768;
 var _MainMemoryBase = null;
 var _Memory;
-var _MemoryPartitions = 1;
+var _MemoryPartitions = 3;
 var _Inuse = false;
 
 //Memory Manager
@@ -82,6 +82,7 @@ var _Pcb;
 //Ready and Resident Queues
 var _ResidentQueue = null;
 var _ReadyQueue;
+var _CurrentProcess;
 
 //history of commands
 var _ConsoleHistory = null;
@@ -98,7 +99,7 @@ var _SystemCall = 9;
 var _InvalidOpCode = 999;
 
 // CPU Scheduling
-var _RoundRobin = 6;
+var _Quantum = 6;
 
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();

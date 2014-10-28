@@ -119,7 +119,6 @@ module TSOS {
 
             //Display clock here!
             _Console.renderDate();
-
         }
 
         public static hostBtnHaltOS_click(btn): void {

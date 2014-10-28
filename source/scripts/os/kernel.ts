@@ -34,6 +34,9 @@ module TSOS {
             //Initialize Ready Queue for the Processes to be loaded
             _ReadyQueue = new Queue();
 
+            //Initialize Resident Queue
+            _ResidentQueue = new Array();
+
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new DeviceDriverKeyboard();     // Construct it.
@@ -104,7 +107,7 @@ module TSOS {
            _CPU.isExecuting = true;
             _CPU.PC = p.base;
             _CPU.displayCPU();
-            _Pcb.setState(1); //set state "Running"
+            p.setState(1); //set state "Running"
         }
 
         //
@@ -140,12 +143,12 @@ module TSOS {
                     _StdIn.handleInput();
                     break;
                 case _NextButton:
-                    _Pcb.setState(1);
+                    _CurrentProcess.setState(1);
                     _CPU.cycle();
-                    if(_CPU.PC > _Pcb.getLength()){ //Use the program length to break
+                    if(_CPU.PC > _CurrentProcess.getLength()){ //Use the program length to break
                         Control.hostStopButton_click(this); //helps us exit next button!
-                        _Pcb.setState(2);
-                        _Pcb.displayPCB();
+                        _CurrentProcess.setState(2);
+                        _CurrentProcess.displayPCB();
                         _CPU.cycle();
                     }
                     break;
@@ -171,10 +174,13 @@ module TSOS {
                     }
                     break;
                 case _Break: //-1 Denotes END of a process!
-                    _Pcb.setState(2);   //Pass 2 to mark Process as Terminated!
-                    _Pcb.displayPCB();  //Display the PCB
+//                    _Pcb.setState(2);   //Pass 2 to mark Process as Terminated!
+//                    _Pcb.displayPCB();  //Display the PCB
                     _CPU.init();//Re-Start the CPU!
-//                    _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
+                    _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
+                    alert("current process end pid: "+_CurrentProcess.getPid());
+                    _CurrentProcess.setState(2);
+                    _CurrentProcess.displayPCB();
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this?");

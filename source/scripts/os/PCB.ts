@@ -8,6 +8,7 @@ module TSOS{
 
         private static PID : number = -1;   //Start at -1 so we can start incrementing from 0!
         public pc:number = 0;
+        public ppid:number = 0;
         public acc:number = 0;
         public ir:string = "";
         public x:number = 0;
@@ -22,6 +23,7 @@ module TSOS{
         constructor(b:number, l:number){
 
             Pcb.PID++;  //Increment PID all the time!
+            this.ppid = Pcb.PID;
             this.base = b;
             this.limit = l.toString(16).toUpperCase();
             this.inuse = true;
@@ -44,7 +46,7 @@ module TSOS{
         }
 
         public getPid() : number{
-            return Pcb.PID;
+            return this.ppid;   //return the local data member (NON - STATIC)
         }
 
         public setLength(length:number){
@@ -55,17 +57,21 @@ module TSOS{
 
             switch (s){
                 case 0:
-                    _Pcb.state = "NEW";
+                    this.state = "NEW";
                     break;
                 case 1:
-                    _Pcb.state = "Running";
+                    this.state = "Running";
                     break;
                 case 2:
-                    _Pcb.state = "Terminated";
+                    this.state = "Terminated";
                     break;
                 default :
-                    _Pcb.state = "???";
+                    this.state = "???";
             }
+        }
+
+        public getState(){
+            return this.state;
         }
 
         public blockFree():boolean{

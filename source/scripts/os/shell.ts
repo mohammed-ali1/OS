@@ -116,6 +116,24 @@ module TSOS {
                 "<pid> - Executes the current pid from Memory.");
             this.commandList[this.commandList.length] = sc;
 
+            // clearmem
+            sc = new ShellCommand(this.shellClearMem,
+                "clearmem",
+                "- Clears all the partitions in the memory");
+            this.commandList[this.commandList.length] = sc;
+
+            // quantum
+            sc = new ShellCommand(this.shellQuantum,
+                "quantum",
+                "- <number> - Set the Quantum.");
+            this.commandList[this.commandList.length] = sc;
+
+            // ps
+            sc = new ShellCommand(this.shellPs,
+                "ps",
+                "- Prints all the active Processes.");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -296,7 +314,6 @@ module TSOS {
                 _StdOut.putText("Invalid Input!");
                 return;
             }
-
             for(var i=0; i<x.length;i++){
 
                 var temp = x.charCodeAt(i);
@@ -309,26 +326,30 @@ module TSOS {
                 }
             }
 
-            //Print to Console
-            _StdOut.putText("Loaded Successfully!");
-            _Console.advanceLine();
+            //Get the free block first!
+            var base = _MemoryManager.getFreeBlock();
+
+            if(base == -1)
+                return;
 
             //Create New PCB
-            var size:number = parseInt(_MemoryManager.size()-1,10);
-            var temp:any = size.toString(16);
-            var a = _MemoryManager.size();
-            _Pcb = new Pcb(0,a-1);  //Memory Size is 256...so base and limit works (for now)!
+            _Pcb = new Pcb(base,(base + 256) -1);  //Memory Size is 256...so base and limit works (for now)!
             _Pcb.setLength((x.length/2)); //set the length of the program.
             _Pcb.setState(0);//set state "NEW"
 
             //Create New Resident Queue
-            _ResidentQueue = new Array<Pcb>();
+//          _ResidentQueue = new Array();
             _ResidentQueue[_Pcb.getPid()] = _Pcb;
+            var temp:TSOS.Pcb = _ResidentQueue[_Pcb.getPid()];
+            alert("resident length: " +(_ResidentQueue.length)+", pid: " + temp.getPid());
+
+            //Print to Console
+            _StdOut.putText("Loaded Successfully!");
+            _Console.advanceLine();
             _StdOut.putText("Process ID: " + _Pcb.getPid());
 
             //Finally load into Memory
-            _MemoryManager.clear();
-            _MemoryManager.load(x.toUpperCase().toString());
+            _MemoryManager.load(base,x.toUpperCase().toString());
         }
 
         /**
@@ -346,7 +367,6 @@ module TSOS {
                     s += args[i];
                     s += " " ;
                 }
-
                 document.getElementById("status").innerHTML = "Status: " + s;
             }
         }
@@ -428,14 +448,57 @@ module TSOS {
             }
         }
 
+        /**
+         * Sets the current to the user input
+         * @param args, the quantum to set to
+         */
+        public shellQuantum(args){
+            if(args.length >0){
+                if(args[0] >0){
+                    _Quantum = args[0];
+                    _StdOut.putText("Quantum: " +_Quantum);
+                }else {
+                    _StdOut.putText("WTF?");
+                }
+            }else{
+                _StdOut.putText("???");
+            }
+        }
+
+        /**
+         * Prints the Active Processes to the CLI
+         */
+        public shellPs(){
+            for(var i=0; i<_ResidentQueue.length;i++){
+                var temp  = _ResidentQueue[i];
+                alert("pid: "+temp.getPid()+", state: "+temp.getState());
+                if(temp.getState() != "Terminated"){
+                    _StdOut.putText("Pid: " +temp.getPid());
+                    _Console.advanceLine();
+                }
+            }
+        }
+
+        /**
+         * Clears Memory Partitions
+         */
+        public shellClearMem(){
+            _StdOut.putText("Memory Wiped!");
+            _MemoryManager.clearMemory();
+        }
+
+        /**
+         * Run a single program
+         * @param args
+         */
         public shellRun(args){
 
             if(_StepButton){
-                _Pcb.setState(1);
+//                args[0].setState(1);
                 _StdOut.putText("Single Step is on!");
                 return;
             }
-//            _ReadyQueue = new Queue();
+            _CurrentProcess = _ResidentQueue[args[0]];
             _ReadyQueue.enqueue(_ResidentQueue[args[0]]);
         }
     }

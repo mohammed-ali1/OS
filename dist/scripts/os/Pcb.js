@@ -6,6 +6,7 @@ var TSOS;
     var Pcb = (function () {
         function Pcb(b, l) {
             this.pc = 0;
+            this.ppid = 0;
             this.acc = 0;
             this.ir = "";
             this.x = 0;
@@ -17,6 +18,7 @@ var TSOS;
             this.length = 0;
             this.inuse = false;
             Pcb.PID++; //Increment PID all the time!
+            this.ppid = Pcb.PID;
             this.base = b;
             this.limit = l.toString(16).toUpperCase();
             this.inuse = true;
@@ -38,7 +40,7 @@ var TSOS;
         };
 
         Pcb.prototype.getPid = function () {
-            return Pcb.PID;
+            return this.ppid;
         };
 
         Pcb.prototype.setLength = function (length) {
@@ -48,17 +50,21 @@ var TSOS;
         Pcb.prototype.setState = function (s) {
             switch (s) {
                 case 0:
-                    _Pcb.state = "NEW";
+                    this.state = "NEW";
                     break;
                 case 1:
-                    _Pcb.state = "Running";
+                    this.state = "Running";
                     break;
                 case 2:
-                    _Pcb.state = "Terminated";
+                    this.state = "Terminated";
                     break;
                 default:
-                    _Pcb.state = "???";
+                    this.state = "???";
             }
+        };
+
+        Pcb.prototype.getState = function () {
+            return this.state;
         };
 
         Pcb.prototype.blockFree = function () {

@@ -17,12 +17,12 @@ var TSOS;
             _Memory.store(index, str);
         };
 
-        MemoryManager.prototype.load = function (str) {
-            _Memory.loadProgram(str);
+        MemoryManager.prototype.load = function (base, str) {
+            _Memory.loadProgram(base, str);
         };
 
-        MemoryManager.prototype.clear = function () {
-            _Memory.clear();
+        MemoryManager.prototype.clearMemory = function () {
+            _Memory.clearMemory();
         };
 
         MemoryManager.prototype.update = function () {
@@ -31,6 +31,25 @@ var TSOS;
 
         MemoryManager.prototype.size = function () {
             return _Memory.size();
+        };
+
+        MemoryManager.prototype.getFreeBlock = function () {
+            var block0 = _MemoryManager.read(_Memory.getBlock_0());
+            var block1 = _MemoryManager.read(_Memory.getBlock_1());
+            var block2 = _MemoryManager.read(_Memory.getBlock_2());
+
+            if (block0 == "00") {
+                return _Memory.getBlock_0();
+            } else if (block0 == "00" && block1 != "00" && block2 != "00") {
+                return _Memory.getBlock_0();
+            } else if (block0 != "00" && block1 == "00") {
+                return _Memory.getBlock_1();
+            } else if (block0 != "00" && block1 != "00" && block2 == "00") {
+                return _Memory.getBlock_2();
+            } else {
+                _StdOut.putText("NO ROOM FOR YO BITCH!!!");
+                return -1;
+            }
         };
         return MemoryManager;
     })();

@@ -5,8 +5,7 @@ var TSOS;
 (function (TSOS) {
     var Memory = (function () {
         function Memory() {
-            this.segment = -1;
-            this.str = 0;
+            this.programLength = 0;
             this.createTable();
         }
         /**
@@ -18,11 +17,11 @@ var TSOS;
 
             var temp = _MainMemorySize;
 
-            if (temp == 256)
+            if (temp / _MemoryPartitions == 256 * 1)
                 this.segment = 0;
-            if (temp == 256 * 2)
+            if (temp / _MemoryPartitions == 256 * 2)
                 this.segment = 1;
-            if (temp == 256 * 3)
+            if (temp / _MemoryPartitions == 256 * 3)
                 this.segment = 2;
 
             var table = "<table>";
@@ -55,6 +54,11 @@ var TSOS;
             return _MainMemory[index];
         };
 
+        /**
+        * Store in memory str, at address index
+        * @param index
+        * @param str
+        */
         Memory.prototype.store = function (index, str) {
             _MainMemory[index] = str;
         };
@@ -62,13 +66,13 @@ var TSOS;
         /**
         * Loads the program into the Main Memory
         */
-        Memory.prototype.loadProgram = function (str) {
+        Memory.prototype.loadProgram = function (base, str) {
             var x = str.replace(/^\s+|\s+$/g, '');
             x = str.trim();
-            this.str = x.length / 2;
+            this.programLength = base + (x.length / 2);
             var a = 0, b = 2;
 
-            for (var i = _Pcb.base; i < x.length / 2; i++) {
+            for (var i = base; i < base + (x.length / 2); i++) {
                 var s = x.substring(a, b);
                 _MainMemory[i] = s;
                 a = b;
@@ -92,24 +96,20 @@ var TSOS;
                     table += "<tr><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 for (var j = i; j <= i + 7; j++) {
-                    if (_MainMemory[j] != 0 || j <= this.str - 1) {
-                        table += "<td id='memoryContents'>" + _MainMemory[j] + "</td>";
-                    } else {
-                        table += "<td>" + _MainMemory[j] + "</td>";
-                    }
+                    table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";
             }
             table += "</table>";
             document.getElementById("table").innerHTML = table;
+            this.programLength = -1;
         };
 
-        Memory.prototype.clear = function () {
-            for (var i = 0; i < _MainMemorySize; i += 8) {
-                for (var j = i; j <= i + 7; j++) {
-                    _MainMemory[j] = "00";
-                }
+        Memory.prototype.clearMemory = function () {
+            for (var i = 0; i < _MainMemorySize; i++) {
+                _MainMemory[i] = "00";
             }
+            this.programLength = -1;
             this.updateMemory();
         };
 
@@ -117,7 +117,16 @@ var TSOS;
             return _MainMemorySize;
         };
 
-        Memory.prototype.blah = function () {
+        Memory.prototype.getBlock_0 = function () {
+            return 0;
+        };
+
+        Memory.prototype.getBlock_1 = function () {
+            return 256;
+        };
+
+        Memory.prototype.getBlock_2 = function () {
+            return 512;
         };
         return Memory;
     })();
