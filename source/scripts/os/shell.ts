@@ -134,6 +134,12 @@ module TSOS {
                 "- Prints all the active Processes.");
             this.commandList[this.commandList.length] = sc;
 
+            // kiss
+            sc = new ShellCommand(this.shellKill,
+                "kill",
+                "- <pid> Allows the user to kill an active process");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -303,7 +309,6 @@ module TSOS {
         /**
          * Loads the user input program if any,
          * and validates HEX (at the moment).
-         *
          */
         public shellLoad(){
 
@@ -334,9 +339,9 @@ module TSOS {
                 return;
 
             //Create New PCB
-            _Pcb = new Pcb(base,(base+256)-1);  //Memory Size is 256...so base and limit works (for now)!
+            _Pcb = new Pcb(base,(base+255));  //Memory Size is 256...so base and limit works (for now)!
             _Pcb.setLength((x.length/2)); //set the length of the program.
-            _Pcb.setState(0);//set state "NEW"
+            _Pcb.setState(9999999999999999999999999);//set state "NEW"
 
             //Load in the Resident Queue
             _ResidentQueue[_Pcb.getPid()] = _Pcb;
@@ -350,14 +355,15 @@ module TSOS {
 
             //Finally load into Memory
             _MemoryManager.load(base,x.toUpperCase().toString());
+
             var tableView = "<table>";
             for(var i =0; i<_ResidentQueue.length;i++) {
                 alert("index: "+i);
                 var s:TSOS.Pcb = _ResidentQueue[i];
                 tableView += "<tr>";
                 tableView += "<td>" + s.getPid() + "</td>";
-                tableView += "<td>" + s.getBase().toString() + "</td>";
-                tableView += "<td>" + s.getLimit().toString() + "</td>";
+                tableView += "<td>" + s.getBase() + "</td>";
+                tableView += "<td>" + s.getLimit() + "</td>";
 //                tableView += "<td>" +0+ temp.getState()+ "</td>";
 //                tableView += "<td>" +0+ temp.getPc()+ "</td>";
 //                tableView += "<td>" +0+ temp.getIr()+ "</td>";
@@ -484,7 +490,7 @@ module TSOS {
             for(var i=0; i<_ResidentQueue.length;i++){
                 var temp : TSOS.Pcb = _ResidentQueue[i];
                 alert("pid: "+temp.getPid()+", state: "+temp.getState());
-                if(temp.getState() != "Terminated"){
+                if(temp.getState() == "Running"){
                     _StdOut.putText("Pid: " +temp.getPid());
                     _Console.advanceLine();
                 }
@@ -497,6 +503,32 @@ module TSOS {
         public shellClearMem(){
             _StdOut.putText("Memory Wiped!");
             _MemoryManager.clearMemory();
+        }
+
+        /**
+         *
+         * @param args
+         */
+        public shellKill(args){
+
+            var killThisBitch:TSOS.Pcb;
+
+            for(var i=0; i<_ResidentQueue.length;i++){
+                if(_ResidentQueue[i].getPid() == args && _ResidentQueue[i].getState() !="Running"){
+                    _StdOut.putText("I'm not even Running...WTF!");
+                }
+                if(_ResidentQueue[i].getPid() == args && _ResidentQueue[i].getState() == "Running") {
+                    killThisBitch = _ResidentQueue[i];
+                    killThisBitch.setState(4);
+                    _StdOut.putText("Process Killed: "+killThisBitch.getPid());
+                    _StdOut.advanceLine();
+                    _CPU.init();
+                    _CPU.displayCPU();
+                    //clear memory block from the base.....???
+                }
+            }
+
+            _StdOut.putText("Give me a PID to KILL....I'm HUNGRY!!!");
         }
 
         /**

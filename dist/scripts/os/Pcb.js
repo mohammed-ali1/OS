@@ -49,17 +49,20 @@ var TSOS;
 
         Pcb.prototype.setState = function (s) {
             switch (s) {
-                case 0:
-                    this.state = "NEW";
-                    break;
                 case 1:
                     this.state = "Running";
                     break;
                 case 2:
+                    this.state = "Waiting";
+                    break;
+                case 3:
+                    this.state = "Ready";
+                    break;
+                case 4:
                     this.state = "Terminated";
                     break;
                 default:
-                    this.state = "???";
+                    this.state = "New";
             }
         };
 
@@ -73,41 +76,6 @@ var TSOS;
 
         Pcb.prototype.getBase = function () {
             return this.base;
-        };
-
-        Pcb.prototype.blockFree = function () {
-            return this.inuse;
-        };
-
-        Pcb.prototype.getLength = function () {
-            return this.length;
-        };
-
-        Pcb.prototype.getPc = function () {
-            return this.pc;
-        };
-
-        Pcb.prototype.getIr = function () {
-            this.ir;
-        };
-
-        Pcb.prototype.getAcc = function () {
-            this.acc;
-        };
-
-        Pcb.prototype.getX = function () {
-            this.x;
-        };
-
-        Pcb.prototype.getY = function () {
-            this.y;
-        };
-
-        Pcb.prototype.getZ = function () {
-            this.z;
-        };
-
-        Pcb.prototype.displayResidentQueue = function (residentQueue) {
         };
         Pcb.PID = -1;
         return Pcb;

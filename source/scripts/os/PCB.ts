@@ -56,17 +56,20 @@ module TSOS{
         public setState(s:number){
 
             switch (s){
-                case 0:
-                    this.state = "NEW";
-                    break;
                 case 1:
                     this.state = "Running";
                     break;
                 case 2:
+                    this.state = "Waiting";
+                    break;
+                case 3:
+                    this.state = "Ready";
+                    break;
+                case 4:
                     this.state = "Terminated";
                     break;
                 default :
-                    this.state = "???";
+                    this.state = "New";
             }
         }
 
@@ -80,43 +83,6 @@ module TSOS{
 
         public getBase(){
             return this.base;
-        }
-
-        public blockFree():boolean{
-            return this.inuse;
-        }
-
-        public getLength():number{
-            return this.length;
-        }
-
-        public getPc(){
-            return this.pc;
-        }
-
-        public getIr(){
-            this.ir;
-        }
-
-        public getAcc(){
-            this.acc;
-        }
-
-        public getX(){
-            this.x;
-        }
-
-        public getY(){
-            this.y;
-        }
-
-        public getZ(){
-            this.z;
-        }
-
-        public displayResidentQueue(residentQueue){
-
-
         }
     }
 }

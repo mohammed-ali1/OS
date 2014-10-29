@@ -43,18 +43,31 @@ module TSOS{
             var block1 = _Memory.read(_Memory.getBlock_1());
             var block2 = _Memory.read(_Memory.getBlock_2());
 
-            if(block0 == "00"){//Block 0
-                return _Memory.getBlock_0();
-            }else if(block0 =="00" && block1 !="00" && block2 !="00"){ //Block 0
-                return _Memory.getBlock_0();
-            }else if(block0 !="00" && block1 =="00"){ //Block 1
-                return _Memory.getBlock_1();
-            }else if(block0 !="00" && block1 !="00" && block2 =="00"){
-                return _Memory.getBlock_2();
-            }else{
-                _StdOut.putText("NO ROOM FOR YO BITCH!!!");
+            if(_ResidentQueue.length == 0){
+                return 0;
+            }else if (_ResidentQueue.length == 1 && _ResidentQueue[0].getState() != "Running" + _ResidentQueue[0].getState() !="Waiting"){
+                var s = parseInt(_ResidentQueue[0].getLimit(),16);
+                return (s+1);
+            }else if (_ResidentQueue.length == 2 && _ResidentQueue[1].getState() != "Running" + _ResidentQueue[1].getState() !="Waiting"){
+                var s = parseInt(_ResidentQueue[1].getLimit(),16);
+                return (s+1);
+            }else {
+                _StdOut.putText("NO ROOM FOR YOo BITCH!!!");
                 return -1;
             }
+
+//            if(block0 == "00"){//Block 0
+//                return _Memory.getBlock_0();
+//            }else if(block0 =="00" && block1 !="00" && block2 !="00"){ //Block 0
+//                return _Memory.getBlock_0();
+//            }else if(block0 !="00" && block1 =="00"){ //Block 1
+//                return _Memory.getBlock_1();
+//            }else if(block0 !="00" && block1 !="00" && block2 =="00"){
+//                return _Memory.getBlock_2();
+//            }else{
+//                _StdOut.putText("NO ROOM FOR YO BITCH!!!");
+//                return -1;
+//            }
         }
     }
 }

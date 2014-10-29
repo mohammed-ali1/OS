@@ -80,7 +80,34 @@ var TSOS;
             }
 
             //            Update the Memory
-            this.updateMemory();
+            this.updateMemory(base.toString());
+        };
+
+        /**
+        * Updates the Memory with the current base and the length. - add borders to the program input
+        */
+        Memory.prototype.updateMemory = function (base) {
+            alert("Base+Limit: " + (base + length));
+
+            var table = "<table>";
+
+            for (var i = 0; i < _MainMemorySize; i += 8) {
+                if (i % 256 == 0) {
+                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                } else {
+                    table += "<tr><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                }
+                for (var j = i; j <= i + 7; j++) {
+                    if (j + base <= base + this.programLength) {
+                        table += "<td style='border: 1px solid;'>" + _MainMemory[j] + "</td>";
+                    } else {
+                        table += "<td>" + _MainMemory[j] + "</td>";
+                    }
+                }
+                table += "</tr>";
+            }
+            table += "</table>";
+            document.getElementById("table").innerHTML = table;
         };
 
         /**

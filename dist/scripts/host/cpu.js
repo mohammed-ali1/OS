@@ -251,9 +251,10 @@ var TSOS;
             if (_CPU.Zflag == 0) {
                 var address = parseInt(_MemoryManager.read(++_CPU.PC), 16);
                 _CPU.PC += address;
-                var size = _MemoryManager.size();
+                var size = _MemoryManager.size() / _MemoryPartitions;
 
-                if (_CPU.PC > size - 1) {
+                if (_CPU.PC > _CurrentProcess.getBase() + (size - 1)) {
+                    alert("Current Process Base: " + _CurrentProcess.getBase() + ", PID: " + _CurrentProcess.getPid());
                     _CPU.PC = _CPU.PC - size;
                 }
                 _CPU.INS = "CPU [D0 $EF]" + "   [" + _CPU.IR + ", " + address + "]";

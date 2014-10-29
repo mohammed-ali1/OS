@@ -139,7 +139,7 @@ var TSOS;
                     _CPU.cycle();
                     if (_CPU.PC > _CurrentProcess.getLength()) {
                         TSOS.Control.hostStopButton_click(this); //helps us exit next button!
-                        _CurrentProcess.setState(2);
+                        _CurrentProcess.setState(4);
                         _CurrentProcess.displayPCB();
                         _CPU.cycle();
                     }
@@ -164,11 +164,9 @@ var TSOS;
                     _OsShell.putPrompt();
                     break;
                 case _Break:
-                    //                    _Pcb.setState(2);   //Pass 2 to mark Process as Terminated!
-                    //                    _Pcb.displayPCB();  //Display the PCB
                     _CPU.init(); //Re-Start the CPU!
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
-                    _CurrentProcess.setState(2);
+                    _CurrentProcess.setState(4);
                     _CurrentProcess.displayPCB();
                     break;
                 case _InvalidOpCode:
