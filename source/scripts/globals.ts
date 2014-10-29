@@ -86,6 +86,8 @@ var _ResidentQueue: any[] =  null;
 var _ReadyQueue : TSOS.Queue;
 var _CurrentProcess:TSOS.Pcb;
 
+var _ResidentDisplay : HTMLTableElement = null;
+
 //history of commands
 var _ConsoleHistory : any[] = null;
 

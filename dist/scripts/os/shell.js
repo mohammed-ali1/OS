@@ -296,7 +296,7 @@ var TSOS;
                 return;
 
             //Create New PCB
-            _Pcb = new TSOS.Pcb(0, (base + 256) - 1); //Memory Size is 256...so base and limit works (for now)!
+            _Pcb = new TSOS.Pcb(base, (base + 256) - 1); //Memory Size is 256...so base and limit works (for now)!
             _Pcb.setLength((x.length / 2)); //set the length of the program.
             _Pcb.setState(0); //set state "NEW"
 
@@ -312,6 +312,26 @@ var TSOS;
 
             //Finally load into Memory
             _MemoryManager.load(base, x.toUpperCase().toString());
+            var tableView = "<table>";
+            for (var i = 0; i < _ResidentQueue.length; i++) {
+                alert("index: " + i);
+                var s = _ResidentQueue[i];
+                tableView += "<tr>";
+                tableView += "<td>" + s.getPid() + "</td>";
+                tableView += "<td>" + s.getBase().toString() + "</td>";
+                tableView += "<td>" + s.getLimit().toString() + "</td>";
+
+                //                tableView += "<td>" +0+ temp.getState()+ "</td>";
+                //                tableView += "<td>" +0+ temp.getPc()+ "</td>";
+                //                tableView += "<td>" +0+ temp.getIr()+ "</td>";
+                //                tableView += "<td>" +0+ temp.getAcc()+ "</td>";
+                //                tableView += "<td>" +0+ temp.getX()+ "</td>";
+                //                tableView += "<td>" +0+ temp.getY()+ "</td>";
+                //                tableView += "<td>" +0+ temp.getZ()+ "</td>";
+                tableView += "</tr>";
+            }
+            tableView += "</table>";
+            document.getElementById("displayResident").innerHTML = tableView;
         };
 
         /**
@@ -452,6 +472,7 @@ var TSOS;
                 return;
             }
             _CurrentProcess = _ResidentQueue[args[0]];
+            alert("current process " + _CurrentProcess.getPid());
             _ReadyQueue.enqueue(_ResidentQueue[args[0]]);
         };
         return Shell;

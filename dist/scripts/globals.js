@@ -84,6 +84,8 @@ var _ResidentQueue = null;
 var _ReadyQueue;
 var _CurrentProcess;
 
+var _ResidentDisplay = null;
+
 //history of commands
 var _ConsoleHistory = null;
 

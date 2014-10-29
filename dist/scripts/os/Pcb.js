@@ -107,27 +107,7 @@ var TSOS;
             this.z;
         };
 
-        Pcb.prototype.displayReadyQueue = function () {
-            var table = "<table>";
-
-            for (var i = 0; i < _ResidentQueue.length; i++) {
-                var temp = _ResidentQueue[i];
-                table += "<tr>";
-                table += "<td>" + temp.getPid().toString() + "</td>";
-                table += "<td>" + temp.getBase().toString() + "</td>";
-                table += "<td>" + temp.getLimit().toString() + "</td>";
-                table += "<td>" + temp.getState().toString() + "</td>";
-                table += "<td>" + temp.getPc().toString() + "</td>";
-                table += "<td>" + temp.getLimit().toString() + "</td>";
-                table += "<td>" + temp.getIr().toString() + "</td>";
-                table += "<td>" + temp.getAcc().toString() + "</td>";
-                table += "<td>" + temp.getX().toString() + "</td>";
-                table += "<td>" + temp.getY().toString() + "</td>";
-                table += "<td>" + temp.getZ().toString() + "</td>";
-                table += "</tr>";
-            }
-            table += "</table>";
-            document.getElementById("readyQueue").innerHTML = table;
+        Pcb.prototype.displayResidentQueue = function (residentQueue) {
         };
         Pcb.PID = -1;
         return Pcb;
