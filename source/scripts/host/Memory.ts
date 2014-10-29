@@ -89,7 +89,7 @@ module TSOS {
                 a = b;
                 b += 2;
             }
-            //Update the Memory
+//            Update the Memory
             this.updateMemory();
         }
 

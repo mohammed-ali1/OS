@@ -155,8 +155,6 @@ module TSOS {
                 case _SystemCall:
                     if(params == 1){
                         _StdOut.putText(_CPU.Yreg.toString());
-                        _Console.advanceLine();
-                        _OsShell.putPrompt();
                     } else if (params == 2){
                         var address :number = _CPU.Yreg;
                         var print = "";
@@ -169,16 +167,15 @@ module TSOS {
                             temp = parseInt(_MemoryManager.read((address+index)),16);
                         }
                         _StdOut.putText(print);
-                        _Console.advanceLine();
-                        _OsShell.putPrompt();
                     }
+                    _Console.advanceLine();
+                    _OsShell.putPrompt();
                     break;
                 case _Break: //-1 Denotes END of a process!
 //                    _Pcb.setState(2);   //Pass 2 to mark Process as Terminated!
 //                    _Pcb.displayPCB();  //Display the PCB
                     _CPU.init();//Re-Start the CPU!
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
-                    alert("current process end pid: "+_CurrentProcess.getPid());
                     _CurrentProcess.setState(2);
                     _CurrentProcess.displayPCB();
                     break;

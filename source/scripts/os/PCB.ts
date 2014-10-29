@@ -6,9 +6,9 @@ module TSOS{
 
     export class Pcb{
 
-        private static PID : number = -1;   //Start at -1 so we can start incrementing from 0!
+        private static PID: number = -1;    //Start at -1 so we can start incrementing from 0!
+        public pid:number = Pcb.PID;
         public pc:number = 0;
-        public ppid:number = 0;
         public acc:number = 0;
         public ir:string = "";
         public x:number = 0;
@@ -22,8 +22,8 @@ module TSOS{
 
         constructor(b:number, l:number){
 
-            Pcb.PID++;  //Increment PID all the time!
-            this.ppid = Pcb.PID;
+            Pcb.PID++;
+            this.pid = Pcb.PID;  //Increment PID all the time!
             this.base = b;
             this.limit = l.toString(16).toUpperCase();
             this.inuse = true;
@@ -46,7 +46,7 @@ module TSOS{
         }
 
         public getPid() : number{
-            return this.ppid;   //return the local data member (NON - STATIC)
+            return this.pid;  //return the local data member (NON - STATIC)
         }
 
         public setLength(length:number){
@@ -74,12 +74,68 @@ module TSOS{
             return this.state;
         }
 
+        public getLimit(){
+            return this.limit;
+        }
+
+        public getBase(){
+            return this.base;
+        }
+
         public blockFree():boolean{
             return this.inuse;
         }
 
         public getLength():number{
             return this.length;
+        }
+
+        public getPc(){
+            return this.pc;
+        }
+
+        public getIr(){
+            this.ir;
+        }
+
+        public getAcc(){
+            this.acc;
+        }
+
+        public getX(){
+            this.x;
+        }
+
+        public getY(){
+            this.y;
+        }
+
+        public getZ(){
+            this.z;
+        }
+
+        public displayReadyQueue(){
+
+            var table = "<table>";
+
+            for(var i = 0; i<_ResidentQueue.length;i++){
+                var temp = _ResidentQueue[i];
+                table += "<tr>";
+                table += "<td>" + temp.getPid().toString() + "</td>";
+                table += "<td>" + temp.getBase().toString()+ "</td>";
+                table += "<td>" + temp.getLimit().toString()+ "</td>";
+                table += "<td>" + temp.getState().toString()+ "</td>";
+                table += "<td>" + temp.getPc().toString()+ "</td>";
+                table += "<td>" + temp.getLimit().toString()+ "</td>";
+                table += "<td>" + temp.getIr().toString()+ "</td>";
+                table += "<td>" + temp.getAcc().toString()+ "</td>";
+                table += "<td>" + temp.getX().toString()+ "</td>";
+                table += "<td>" + temp.getY().toString()+ "</td>";
+                table += "<td>" + temp.getZ().toString()+ "</td>";
+                table +="</tr>"
+            }
+            table += "</table>";
+            document.getElementById("readyQueue").innerHTML = table;
         }
     }
 }

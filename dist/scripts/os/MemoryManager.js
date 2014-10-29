@@ -34,9 +34,9 @@ var TSOS;
         };
 
         MemoryManager.prototype.getFreeBlock = function () {
-            var block0 = _MemoryManager.read(_Memory.getBlock_0());
-            var block1 = _MemoryManager.read(_Memory.getBlock_1());
-            var block2 = _MemoryManager.read(_Memory.getBlock_2());
+            var block0 = _Memory.read(_Memory.getBlock_0());
+            var block1 = _Memory.read(_Memory.getBlock_1());
+            var block2 = _Memory.read(_Memory.getBlock_2());
 
             if (block0 == "00") {
                 return _Memory.getBlock_0();

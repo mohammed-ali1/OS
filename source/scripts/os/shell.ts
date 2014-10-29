@@ -314,6 +314,7 @@ module TSOS {
                 _StdOut.putText("Invalid Input!");
                 return;
             }
+
             for(var i=0; i<x.length;i++){
 
                 var temp = x.charCodeAt(i);
@@ -326,22 +327,21 @@ module TSOS {
                 }
             }
 
-            //Get the free block first!
+//            Get the free block first!
             var base = _MemoryManager.getFreeBlock();
 
             if(base == -1)
                 return;
 
             //Create New PCB
-            _Pcb = new Pcb(base,(base + 256) -1);  //Memory Size is 256...so base and limit works (for now)!
+            _Pcb = new Pcb(0,(base+256)-1);  //Memory Size is 256...so base and limit works (for now)!
             _Pcb.setLength((x.length/2)); //set the length of the program.
             _Pcb.setState(0);//set state "NEW"
 
-            //Create New Resident Queue
-//          _ResidentQueue = new Array();
+            //Load in the Resident Queue
             _ResidentQueue[_Pcb.getPid()] = _Pcb;
             var temp:TSOS.Pcb = _ResidentQueue[_Pcb.getPid()];
-            alert("resident length: " +(_ResidentQueue.length)+", pid: " + temp.getPid());
+            alert("Pid: " +temp.getPid()+", Resident length: " +_ResidentQueue.length);
 
             //Print to Console
             _StdOut.putText("Loaded Successfully!");
@@ -448,10 +448,6 @@ module TSOS {
             }
         }
 
-        /**
-         * Sets the current to the user input
-         * @param args, the quantum to set to
-         */
         public shellQuantum(args){
             if(args.length >0){
                 if(args[0] >0){
@@ -465,12 +461,9 @@ module TSOS {
             }
         }
 
-        /**
-         * Prints the Active Processes to the CLI
-         */
         public shellPs(){
             for(var i=0; i<_ResidentQueue.length;i++){
-                var temp  = _ResidentQueue[i];
+                var temp : TSOS.Pcb = _ResidentQueue[i];
                 alert("pid: "+temp.getPid()+", state: "+temp.getState());
                 if(temp.getState() != "Terminated"){
                     _StdOut.putText("Pid: " +temp.getPid());
