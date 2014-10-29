@@ -80,15 +80,13 @@ var TSOS;
             }
 
             //            Update the Memory
-            this.updateMemory(base.toString());
+            this.updateMemoryWithBase(base);
         };
 
         /**
         * Updates the Memory with the current base and the length. - add borders to the program input
         */
-        Memory.prototype.updateMemory = function (base) {
-            alert("Base+Limit: " + (base + length));
-
+        Memory.prototype.updateMemoryWithBase = function (base) {
             var table = "<table>";
 
             for (var i = 0; i < _MainMemorySize; i += 8) {
@@ -98,8 +96,8 @@ var TSOS;
                     table += "<tr><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 for (var j = i; j <= i + 7; j++) {
-                    if (j + base <= base + this.programLength) {
-                        table += "<td style='border: 1px solid;'>" + _MainMemory[j] + "</td>";
+                    if (j <= (base + this.programLength)) {
+                        table += "<td style='border: 2px solid;'>" + _MainMemory[j] + "</td>";
                     } else {
                         table += "<td>" + _MainMemory[j] + "</td>";
                     }

@@ -486,8 +486,6 @@ var TSOS;
                     //clear memory block from the base.....???
                 }
             }
-
-            _StdOut.putText("Give me a PID to KILL....I'm HUNGRY!!!");
         };
 
         /**
