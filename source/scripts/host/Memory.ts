@@ -111,8 +111,8 @@ module TSOS {
                         this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 for(var j=i; j<=i+7;j++) {
-                    if (j <= (base + this.programLength)) {
-                        table += "<td style='border: 2px solid;'>" + _MainMemory[j] + "</td>";
+                    if (j+base <= this.programLength) {
+                        table += "<td style='border: 1px solid;'>" + _MainMemory[j] + "</td>";
                     } else {
                         table += "<td>" + _MainMemory[j] + "</td>";
                     }
