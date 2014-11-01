@@ -90,7 +90,7 @@ module TSOS {
                 b += 2;
             }
 //            Update the Memory
-            this.updateMemoryWithBase(base);
+            this.updateMemory();
         }
 
         /**
@@ -111,7 +111,7 @@ module TSOS {
                         this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 for(var j=i; j<=i+7;j++) {
-                    if (j+base <= this.programLength) {
+                    if ((j+base) <= (j+this.programLength)) {
                         table += "<td style='border: 1px solid;'>" + _MainMemory[j] + "</td>";
                     } else {
                         table += "<td>" + _MainMemory[j] + "</td>";

@@ -73,6 +73,7 @@ var _MainMemorySize: number = 768;
 var _MainMemoryBase : string[] = null;
 var _Memory : TSOS.Memory;
 var _MemoryPartitions:number = 3;
+var _BlockSize :number = 256;
 var _Inuse:boolean = false;
 
 //Memory Manager

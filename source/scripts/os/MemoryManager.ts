@@ -13,11 +13,11 @@ module TSOS{
         }
 
         public read(index:number){
-                return _Memory.read(index);
+                return _Memory.read((_CurrentProcess.getBase() +index));
         }
 
         public store(index:number, str:string){
-            _Memory.store(index,str);
+            _Memory.store((_CurrentProcess.getBase()+index),str);
         }
 
         public load(base ,str:string){
@@ -26,7 +26,7 @@ module TSOS{
 
         public clearMemory(){
             _Memory.clearMemory();
-
+            _ResidentQueue = new Array(); //Don't know how this works
         }
 
         public update(){
@@ -46,10 +46,10 @@ module TSOS{
             //Need more thinking here!!!
             if(_ResidentQueue.length == 0){
                 return 0;
-            }else if (_ResidentQueue.length == 1 && _ResidentQueue[0].getState() != "Running" + _ResidentQueue[0].getState() !="Waiting"){
+            }else if (_ResidentQueue.length == 1 && _ResidentQueue[0].getState() != "Terminated"){
                 var s = parseInt(_ResidentQueue[0].getLimit(),16);
                 return (s+1);
-            }else if (_ResidentQueue.length == 2 && _ResidentQueue[1].getState() != "Running" + _ResidentQueue[1].getState() !="Waiting"){
+            }else if (_ResidentQueue.length == 2 && _ResidentQueue[1].getState() != "Terminated"){
                 var s = parseInt(_ResidentQueue[1].getLimit(),16);
                 return (s+1);
             }else {

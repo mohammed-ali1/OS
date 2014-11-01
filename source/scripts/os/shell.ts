@@ -339,23 +339,22 @@ module TSOS {
                 return;
 
             //Create New PCB
-            _Pcb = new Pcb(base,(base+255),true);  //Memory Size is 256...so base and limit works (for now)!
-            _Pcb.setLength((x.length/2)); //set the length of the program.
-            _Pcb.setState(9999999999999999999999999);//set state "NEW"
+            var p = new Pcb(base,(base+255),true);  //Memory Size is 256...so base and limit works (for now)!
+            p.setLength((x.length/2)); //set the length of the program.
+            p.setState(9999999999999999999999999);//set state "NEW"
 
             //Load in the Resident Queue
-            _ResidentQueue[_Pcb.getPid()] = _Pcb;
+            _ResidentQueue[p.getPid()] = p;
 
             //Print to Console
             _StdOut.putText("Loaded Successfully!");
             _Console.advanceLine();
-            _StdOut.putText("Process ID: " + _Pcb.getPid());
+            _StdOut.putText("Process ID: " + p.getPid());
 
             //Finally load into Memory
             _MemoryManager.load(base,x.toUpperCase().toString());
 
             Shell.updateResident();
-
         }
 
         public static updateResident(){
@@ -492,7 +491,6 @@ module TSOS {
         public shellPs(){
             for(var i=0; i<_ResidentQueue.length;i++){
                 var temp : TSOS.Pcb = _ResidentQueue[i];
-                alert("pid: "+temp.getPid()+", state: "+temp.getState());
                 if(temp.getState() == "Running"){
                     _StdOut.putText("Pid: " +temp.getPid());
                     _Console.advanceLine();
@@ -555,9 +553,7 @@ module TSOS {
                 _StdOut.putText("Single Step is on!");
                 return;
             }
-            _CurrentProcess = _ResidentQueue[args];
-            _CurrentProcess.setState(1);
-            alert("current process " +_CurrentProcess.getPid());
+//            _CurrentProcess = _ResidentQueue[args];
             _ReadyQueue.enqueue(_ResidentQueue[args]);
 //            this.displayReadyQueue(_CurrentProcess);
         }

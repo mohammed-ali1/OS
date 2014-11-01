@@ -71,6 +71,7 @@ var _MainMemorySize = 768;
 var _MainMemoryBase = null;
 var _Memory;
 var _MemoryPartitions = 3;
+var _BlockSize = 256;
 var _Inuse = false;
 
 //Memory Manager

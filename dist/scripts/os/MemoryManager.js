@@ -10,11 +10,11 @@ var TSOS;
             _Memory = new TSOS.Memory();
         }
         MemoryManager.prototype.read = function (index) {
-            return _Memory.read(index);
+            return _Memory.read((_CurrentProcess.getBase() + index));
         };
 
         MemoryManager.prototype.store = function (index, str) {
-            _Memory.store(index, str);
+            _Memory.store((_CurrentProcess.getBase() + index), str);
         };
 
         MemoryManager.prototype.load = function (base, str) {
@@ -23,6 +23,7 @@ var TSOS;
 
         MemoryManager.prototype.clearMemory = function () {
             _Memory.clearMemory();
+            _ResidentQueue = new Array(); //Don't know how this works
         };
 
         MemoryManager.prototype.update = function () {
@@ -40,10 +41,10 @@ var TSOS;
             //Need more thinking here!!!
             if (_ResidentQueue.length == 0) {
                 return 0;
-            } else if (_ResidentQueue.length == 1 && _ResidentQueue[0].getState() != "Running" + _ResidentQueue[0].getState() != "Waiting") {
+            } else if (_ResidentQueue.length == 1 && _ResidentQueue[0].getState() != "Terminated") {
                 var s = parseInt(_ResidentQueue[0].getLimit(), 16);
                 return (s + 1);
-            } else if (_ResidentQueue.length == 2 && _ResidentQueue[1].getState() != "Running" + _ResidentQueue[1].getState() != "Waiting") {
+            } else if (_ResidentQueue.length == 2 && _ResidentQueue[1].getState() != "Terminated") {
                 var s = parseInt(_ResidentQueue[1].getLimit(), 16);
                 return (s + 1);
             } else {

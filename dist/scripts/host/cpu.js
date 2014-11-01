@@ -57,10 +57,10 @@ var TSOS;
             _CPU.displayCPU();
 
             //Update PCB
-            _CPU.updatePcb(_Pcb);
+            _CPU.updatePcb(_CurrentProcess);
 
             //Display the PCB
-            _Pcb.displayPCB();
+            _CurrentProcess.displayPCB();
         };
 
         Cpu.prototype.displayCPU = function () {
@@ -251,11 +251,10 @@ var TSOS;
             if (_CPU.Zflag == 0) {
                 var address = parseInt(_MemoryManager.read(++_CPU.PC), 16);
                 _CPU.PC += address;
-                var size = _MemoryManager.size() / _MemoryPartitions;
 
-                if (_CPU.PC > _CurrentProcess.getBase() + (size - 1)) {
-                    alert("Current Process Base: " + _CurrentProcess.getBase() + ", PID: " + _CurrentProcess.getPid());
-                    _CPU.PC = _CPU.PC - size;
+                if (_CPU.PC > _CurrentProcess.getBase() + (_BlockSize)) {
+                    alert("PC: " + _CPU.PC + ", Base: " + _CurrentProcess.getBase() + ", Block Size: " + _BlockSize);
+                    _CPU.PC = _CPU.PC - (_CurrentProcess.getBase() + _BlockSize);
                 }
                 _CPU.INS = "CPU [D0 $EF]" + "   [" + _CPU.IR + ", " + address + "]";
             } else {
