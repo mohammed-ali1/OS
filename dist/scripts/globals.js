@@ -83,7 +83,7 @@ var _Pcb;
 //Ready and Resident Queues
 var _ResidentQueue = null;
 var _ReadyQueue;
-var _CurrentProcess = null;
+var _CurrentProcess;
 
 var _ResidentDisplay = null;
 

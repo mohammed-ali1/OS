@@ -108,7 +108,7 @@ var TSOS;
             TSOS.Shell.updateResident();
 
             //            Shell.updateReady(_CurrentProcess);
-            alert("Process ID: " + _CurrentProcess.getPid() + ", Base: " + _CurrentProcess.getBase());
+            alert("Current PID: " + _CurrentProcess.getPid() + ", Base: " + _CurrentProcess.getBase() + ", Limit: " + _CurrentProcess.getLimit());
         };
 
         //

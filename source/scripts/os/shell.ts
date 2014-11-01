@@ -337,7 +337,7 @@ module TSOS {
 
             if(base == -1)
                 return;
-
+            alert("Process Base: "+base+", Process Limit: "+(base+255));
             //Create New PCB
             var p = new Pcb(base,(base+255),true);  //Memory Size is 256...so base and limit works (for now)!
             p.setLength((x.length/2)); //set the length of the program.
@@ -580,6 +580,7 @@ module TSOS {
 //            _CurrentProcess = _ResidentQueue[args];
             if(_ResidentQueue[args].getState() != "Terminated") {
                 _ReadyQueue.enqueue(_ResidentQueue[args]);
+                _CurrentProcess = _ResidentQueue[args];
             }
             else{
                 _StdOut.putText("Load this Bitch again and RUN...!");

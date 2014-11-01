@@ -102,6 +102,7 @@ module TSOS {
          * @param p, the PID to execute.
          */
         public krnExe(p:Pcb){
+
             _CurrentProcess = p;
             this.krnTrace("Processing PID: " +  _CurrentProcess.getPid());
            _CPU.isExecuting = true;
@@ -110,7 +111,7 @@ module TSOS {
             _CurrentProcess.setState(1); //set state "Running"
             Shell.updateResident();
 //            Shell.updateReady(_CurrentProcess);
-            alert("Process ID: "+_CurrentProcess.getPid()+", Base: "+_CurrentProcess.getBase());
+            alert("Current PID: "+_CurrentProcess.getPid()+", Base: "+_CurrentProcess.getBase()+", Limit: "+_CurrentProcess.getLimit());
         }
 
         //

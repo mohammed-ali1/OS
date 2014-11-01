@@ -252,9 +252,9 @@ var TSOS;
                 var address = parseInt(_MemoryManager.read(++_CPU.PC), 16);
                 _CPU.PC += address;
 
-                if (_CPU.PC > (_CurrentProcess.getBase() + _BlockSize) - 1) {
-                    alert("PC: " + _CPU.PC + ", Base: " + _CurrentProcess.getBase() + ", Block Size: " + _BlockSize);
-                    _CPU.PC = _CPU.PC - (_CurrentProcess.getBase() + _BlockSize);
+                if (_CPU.PC >= (_CurrentProcess.getLimit())) {
+                    alert("PC: " + _CPU.PC + ", Base: " + _CurrentProcess.getBase() + ", Limit: " + _CurrentProcess.getLimit());
+                    _CPU.PC = _CPU.PC - (_CurrentProcess.getLimit() + 1);
                 }
                 _CPU.INS = "CPU [D0 $EF]" + "   [" + _CPU.IR + ", " + address + "]";
             } else {

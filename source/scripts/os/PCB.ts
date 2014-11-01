@@ -15,7 +15,7 @@ module TSOS{
         public y:number = 0;
         public z:number = 0;
         public base: number = 0;
-        public limit:string = "0";
+        public limit:number = 0;
         public state:string = "?";
         public length:number = 0; //Length of the program
         public block : number = 0;
@@ -26,7 +26,7 @@ module TSOS{
             Pcb.PID++;
             this.pid = Pcb.PID;  //Increment PID all the time!
             this.base = b;
-            this.limit = l.toString(16).toUpperCase();
+            this.limit = l;
             if(location == true)
                 this.inMemory = true;
         }

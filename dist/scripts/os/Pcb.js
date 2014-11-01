@@ -13,7 +13,7 @@ var TSOS;
             this.y = 0;
             this.z = 0;
             this.base = 0;
-            this.limit = "0";
+            this.limit = 0;
             this.state = "?";
             this.length = 0;
             this.block = 0;
@@ -21,7 +21,7 @@ var TSOS;
             Pcb.PID++;
             this.pid = Pcb.PID; //Increment PID all the time!
             this.base = b;
-            this.limit = l.toString(16).toUpperCase();
+            this.limit = l;
             if (location == true)
                 this.inMemory = true;
         }
