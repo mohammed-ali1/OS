@@ -16,6 +16,7 @@ var TSOS;
             this.limit = "0";
             this.state = "?";
             this.length = 0;
+            this.block = 0;
             this.inMemory = false;
             Pcb.PID++;
             this.pid = Pcb.PID; //Increment PID all the time!

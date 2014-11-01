@@ -106,6 +106,9 @@ var TSOS;
             _CPU.displayCPU();
             _CurrentProcess.setState(1); //set state "Running"
             TSOS.Shell.updateResident();
+
+            //            Shell.updateReady(_CurrentProcess);
+            alert("Process ID: " + _CurrentProcess.getPid() + ", Base: " + _CurrentProcess.getBase());
         };
 
         //

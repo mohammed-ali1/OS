@@ -288,9 +288,9 @@ module TSOS {
                 var address:number = parseInt(_MemoryManager.read(++_CPU.PC),16);
                 _CPU.PC += address;
 
-                if(_CPU.PC > _CurrentProcess.getBase() + (_BlockSize)){
+                if(_CPU.PC > (_CurrentProcess.getBase() + _BlockSize) - 1){
                     alert("PC: "+_CPU.PC +", Base: "+_CurrentProcess.getBase()+", Block Size: "+_BlockSize);
-                    _CPU.PC = _CPU.PC - ( _CurrentProcess.getBase()+_BlockSize );
+                    _CPU.PC = _CPU.PC - (_CurrentProcess.getBase()+_BlockSize);
                 }
                 _CPU.INS = "CPU [D0 $EF]" +
                     "   ["+_CPU.IR+", "+address+"]";

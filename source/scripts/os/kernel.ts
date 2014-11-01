@@ -109,6 +109,8 @@ module TSOS {
             _CPU.displayCPU();
             _CurrentProcess.setState(1); //set state "Running"
             Shell.updateResident();
+//            Shell.updateReady(_CurrentProcess);
+            alert("Process ID: "+_CurrentProcess.getPid()+", Base: "+_CurrentProcess.getBase());
         }
 
         //

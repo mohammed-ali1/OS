@@ -18,6 +18,7 @@ module TSOS{
         public limit:string = "0";
         public state:string = "?";
         public length:number = 0; //Length of the program
+        public block : number = 0;
         public inMemory:boolean = false;
 
         constructor(b:number, l:number, location:boolean){

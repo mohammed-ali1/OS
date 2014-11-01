@@ -339,6 +339,29 @@ var TSOS;
             document.getElementById("displayResident").innerHTML = tableView;
         };
 
+        //        public static updateReady(p:Pcb){
+        //
+        //            var tableView = "<table>";
+        //            tableView +="<th>PID</th>";
+        //            tableView +="<th>Base</th>";
+        //            tableView +="<th>Limit</th>";
+        //            tableView +="<th>State</th>";
+        //            tableView +="<th>Memory Location</th>";
+        //
+        //            var s:TSOS.Pcb = _ResidentQueue[p.getPid()];
+        //            if(s.getState() =="Running") {
+        //                tableView += "<tr>";
+        //                tableView += "<td>" + s.getPid().toString() + "</td>";
+        //                tableView += "<td>" + s.getBase().toString() + "</td>";
+        //                tableView += "<td>" + s.getLimit().toString() + "</td>";
+        //                tableView += "<td>" + s.getState().toString() + "</td>";
+        ////                   tableView += "<td>" + s.inMemory().toString()+"</td>";
+        //                tableView += "</tr>";
+        //            }
+        //
+        //            tableView += "</table>";
+        //            document.getElementById("readyQueue").innerHTML = tableView;
+        //        }
         /**
         * Changes the status of the system.
         *
@@ -508,7 +531,11 @@ var TSOS;
             }
 
             //            _CurrentProcess = _ResidentQueue[args];
-            _ReadyQueue.enqueue(_ResidentQueue[args]);
+            if (_ResidentQueue[args].getState() != "Terminated") {
+                _ReadyQueue.enqueue(_ResidentQueue[args]);
+            } else {
+                _StdOut.putText("Load this Bitch again and RUN...!");
+            }
             //            this.displayReadyQueue(_CurrentProcess);
         };
 
