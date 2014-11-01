@@ -18,15 +18,16 @@ module TSOS{
         public limit:string = "0";
         public state:string = "?";
         public length:number = 0; //Length of the program
-        public inuse:boolean = false;
+        public inMemory:boolean = false;
 
-        constructor(b:number, l:number){
+        constructor(b:number, l:number, location:boolean){
 
             Pcb.PID++;
             this.pid = Pcb.PID;  //Increment PID all the time!
             this.base = b;
             this.limit = l.toString(16).toUpperCase();
-            this.inuse = true;
+            if(location == true)
+                this.inMemory = true;
         }
 
         /**
@@ -68,6 +69,9 @@ module TSOS{
                 case 4:
                     this.state = "Terminated";
                     break;
+                case 5:
+                    this.state = "Killed";
+                    break;
                 default :
                     this.state = "New";
             }
@@ -83,6 +87,17 @@ module TSOS{
 
         public getBase(){
             return this.base;
+        }
+
+        public getLength(){
+            return this.length;
+        }
+
+        public inMemory(){
+            if(this.inMemory)
+                return "True";
+            else
+                return "False";
         }
     }
 }

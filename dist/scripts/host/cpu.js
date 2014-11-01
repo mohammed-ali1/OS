@@ -16,7 +16,7 @@ var TSOS;
         function Cpu(PC, Acc, IR, INS, Xreg, Yreg, Zflag, isExecuting) {
             if (typeof PC === "undefined") { PC = 0; }
             if (typeof Acc === "undefined") { Acc = 0; }
-            if (typeof IR === "undefined") { IR = ""; }
+            if (typeof IR === "undefined") { IR = "?"; }
             if (typeof INS === "undefined") { INS = ""; }
             if (typeof Xreg === "undefined") { Xreg = 0; }
             if (typeof Yreg === "undefined") { Yreg = 0; }

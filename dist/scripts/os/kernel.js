@@ -168,6 +168,7 @@ var TSOS;
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
                     _CurrentProcess.setState(4);
                     _CurrentProcess.displayPCB();
+                    TSOS.Shell.updateResident();
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this?");

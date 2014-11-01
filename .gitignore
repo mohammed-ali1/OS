@@ -8,3 +8,5 @@
 .idea/workspace.xml
 
 *.xml
+
+dist/scripts/os/List.js

@@ -4,7 +4,7 @@
 var TSOS;
 (function (TSOS) {
     var Pcb = (function () {
-        function Pcb(b, l) {
+        function Pcb(b, l, location) {
             this.pid = Pcb.PID;
             this.pc = 0;
             this.acc = 0;
@@ -16,12 +16,13 @@ var TSOS;
             this.limit = "0";
             this.state = "?";
             this.length = 0;
-            this.inuse = false;
+            this.inMemory = false;
             Pcb.PID++;
             this.pid = Pcb.PID; //Increment PID all the time!
             this.base = b;
             this.limit = l.toString(16).toUpperCase();
-            this.inuse = true;
+            if (location == true)
+                this.inMemory = true;
         }
         /**
         * Displays the the status of the current PCB.
@@ -61,6 +62,9 @@ var TSOS;
                 case 4:
                     this.state = "Terminated";
                     break;
+                case 5:
+                    this.state = "Killed";
+                    break;
                 default:
                     this.state = "New";
             }
@@ -76,6 +80,17 @@ var TSOS;
 
         Pcb.prototype.getBase = function () {
             return this.base;
+        };
+
+        Pcb.prototype.getLength = function () {
+            return this.length;
+        };
+
+        Pcb.prototype.inMemory = function () {
+            if (this.inMemory)
+                return "True";
+            else
+                return "False";
         };
         Pcb.PID = -1;
         return Pcb;

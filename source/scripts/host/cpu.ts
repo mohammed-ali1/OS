@@ -21,7 +21,7 @@ module TSOS {
 
         constructor(public PC: number = 0,
                     public Acc: number = 0,
-                    public IR: string = "",
+                    public IR: string = "?",
                     public INS: string = "",
                     public Xreg: number = 0,
                     public Yreg: number = 0,

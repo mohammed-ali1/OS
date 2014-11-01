@@ -34,10 +34,10 @@ var TSOS;
         };
 
         MemoryManager.prototype.getFreeBlock = function () {
-            var block0 = _Memory.read(_Memory.getBlock_0());
-            var block1 = _Memory.read(_Memory.getBlock_1());
-            var block2 = _Memory.read(_Memory.getBlock_2());
-
+            //            var block0 = _Memory.read(_Memory.getBlock_0());
+            //            var block1 = _Memory.read(_Memory.getBlock_1());
+            //            var block2 = _Memory.read(_Memory.getBlock_2());
+            //Need more thinking here!!!
             if (_ResidentQueue.length == 0) {
                 return 0;
             } else if (_ResidentQueue.length == 1 && _ResidentQueue[0].getState() != "Running" + _ResidentQueue[0].getState() != "Waiting") {
@@ -47,21 +47,9 @@ var TSOS;
                 var s = parseInt(_ResidentQueue[1].getLimit(), 16);
                 return (s + 1);
             } else {
-                _StdOut.putText("NO ROOM FOR YOo BITCH!!!");
+                _StdOut.putText("NO ROOM FOR Y0o BITCH!!!");
                 return -1;
             }
-            //            if(block0 == "00"){//Block 0
-            //                return _Memory.getBlock_0();
-            //            }else if(block0 =="00" && block1 !="00" && block2 !="00"){ //Block 0
-            //                return _Memory.getBlock_0();
-            //            }else if(block0 !="00" && block1 =="00"){ //Block 1
-            //                return _Memory.getBlock_1();
-            //            }else if(block0 !="00" && block1 !="00" && block2 =="00"){
-            //                return _Memory.getBlock_2();
-            //            }else{
-            //                _StdOut.putText("NO ROOM FOR YO BITCH!!!");
-            //                return -1;
-            //            }
         };
         return MemoryManager;
     })();
