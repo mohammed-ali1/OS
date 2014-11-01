@@ -53,6 +53,9 @@ module TSOS {
         }
 
         public static hostLog(msg: string, source: string = "?"): void {
+
+            _FancyColor++;
+
             // Note the OS CLOCK.
             var clock: number = _OSclock;
 
@@ -65,7 +68,21 @@ module TSOS {
             // Update the log console.
             var taLog = <HTMLInputElement> document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
+
+            if(_FancyColor % 2 == 0){
+                document.getElementById("taHostLog").style.color = "#FFD801";
+                document.getElementById("taHostLog").style.border = "3px solid #E66C2C";
+            }else{
+                document.getElementById("taHostLog").style.color = "#E66C2C";
+                document.getElementById("taHostLog").style.border = "3px solid #FFD801";
+            }
+
+            //IF YOU LIKE COLORS UN-COMMENT THIS!
+//            taLog.style.color = "#" + Math.floor(Math.random()*16777215).toString(16); //YOU LIKE COLORS?
+
             // Optionally update a log database or some streaming service.
+
+//            _CPU.init(); // THIS ONE GOT ME IN TROUBLE....CPU WAS GOING FOR ONLY 1 CYCLE!
         }
 
 
@@ -94,12 +111,14 @@ module TSOS {
             _Kernel = new Kernel();
             _Kernel.krnBootstrap();
 
-            /*
-             DISPLAY THE CLOCK @ THE TOP AND STATUS!
-             */
+            //Display System Status...
+            document.getElementById("status").innerHTML = "Status: Running...";
 
+            //Initialize the Memory Manager
+            _MemoryManager = new MemoryManager();
+
+            //Display clock here!
             _Console.renderDate();
-
         }
 
         public static hostBtnHaltOS_click(btn): void {
@@ -118,6 +137,36 @@ module TSOS {
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        }
+
+        /**
+         * Handles the step button
+         * @param btn, the button to handle.
+         */
+        public static hostStepButton_click(btn){
+            document.getElementById("stepButton").style.visibility = "hidden";
+            document.getElementById("nextButton").style.visibility = "visible";
+            document.getElementById("stopButton").style.visibility = "visible";
+            _StepButton = true;
+        }
+
+        /**
+         * Handles the next button as an interrupt
+         * @param btn, the button to handle.
+         */
+        public static hostNextButton_click(btn){
+            _KernelInterruptQueue.enqueue(new Interrupt(_NextButton,0));
+        }
+
+        /**
+         * Handles the stop button
+         * @param btn, the button to handle.
+         */
+        public  static hostStopButton_click(btn){
+            _StepButton = false;
+            document.getElementById("stepButton").style.visibility = "visible";
+            document.getElementById("nextButton").style.visibility = "hidden";
+            document.getElementById("stopButton").style.visibility = "hidden";
         }
     }
 }

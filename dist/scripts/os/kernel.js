@@ -29,6 +29,12 @@ var TSOS;
             _StdIn = _Console;
             _StdOut = _Console;
 
+            //Initialize Ready Queue for the Processes to be loaded
+            _ReadyQueue = new TSOS.Queue();
+
+            //Initialize Resident Queue
+            _ResidentQueue = new Array();
+
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
@@ -81,9 +87,23 @@ var TSOS;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) {
                 _CPU.cycle();
+            } else if (_ReadyQueue.getSize() > 0) {
+                this.krnExe(_ReadyQueue.dequeue());
             } else {
                 this.krnTrace("Idle");
             }
+        };
+
+        /**
+        * Execute the PID from the Ready Queue!
+        * @param p, the PID to execute.
+        */
+        Kernel.prototype.krnExe = function (p) {
+            this.krnTrace("Processing PID: " + p.getPid());
+            _CPU.isExecuting = true;
+            _CPU.PC = p.base;
+            _CPU.displayCPU();
+            p.setState(1); //set state "Running"
         };
 
         //
@@ -113,6 +133,45 @@ var TSOS;
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver
                     _StdIn.handleInput();
+                    break;
+                case _NextButton:
+                    _CurrentProcess.setState(1);
+                    _CPU.cycle();
+                    if (_CPU.PC > _CurrentProcess.getLength()) {
+                        TSOS.Control.hostStopButton_click(this); //helps us exit next button!
+                        _CurrentProcess.setState(4);
+                        _CurrentProcess.displayPCB();
+                        _CPU.cycle();
+                    }
+                    break;
+                case _SystemCall:
+                    if (params == 1) {
+                        _StdOut.putText(_CPU.Yreg.toString());
+                    } else if (params == 2) {
+                        var address = _CPU.Yreg;
+                        var print = "";
+                        var temp = parseInt(_MemoryManager.read(address), 16);
+                        var index = 0;
+
+                        while (temp != 0) {
+                            print += String.fromCharCode(temp);
+                            index++;
+                            temp = parseInt(_MemoryManager.read((address + index)), 16);
+                        }
+                        _StdOut.putText(print);
+                    }
+                    _Console.advanceLine();
+                    _OsShell.putPrompt();
+                    break;
+                case _Break:
+                    _CPU.init(); //Re-Start the CPU!
+                    _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
+                    _CurrentProcess.setState(4);
+                    _CurrentProcess.displayPCB();
+                    TSOS.Shell.updateResident();
+                    break;
+                case _InvalidOpCode:
+                    _StdOut.putText("WTF is this?");
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

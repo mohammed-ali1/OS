@@ -1,12 +1,39 @@
 /* TSOS.css */
 
+/* Heading */
+#top{
+    margin-bottom: 1%;
+    width: 100%;
+    height: 70px;
+    border-radius: 10px;
+}
+
+#status{
+    float: left;
+    color: firebrick;
+    font-size: 24px;
+}
+
+#clock{
+    float: right;
+    font-size: 25px;
+    color:firebrick;
+}
+
 body {
     /*background: #909193 url(../images/linen.png) repeat;*/
-    background-color: darkgray;
+    background-color: rgba(122, 122, 122, 0.40);
     font-family: Helvetica, Verdana, Arial, sans-serif;
     font-size: 12pt;
     font-weight: normal;
     font-style: normal;
+    width:100%;
+}
+
+#divMain{
+    width:100%;
+    float: left;
+    height: auto;
 }
 
 h1 {
@@ -14,7 +41,6 @@ h1 {
     font-size: 24pt;
     font-weight: normal;
     font-style: normal;
-    border-bottom: 1px solid black;
 }
 
 h2 {
@@ -22,6 +48,7 @@ h2 {
     font-size: 20pt;
     font-weight: normal;
     font-style: normal;
+    color: firebrick;
 }
 
 h3 {
@@ -29,12 +56,16 @@ h3 {
     font-size: 16pt;
     font-weight: normal;
     font-style: normal;
+    color: firebrick;
+    text-align: center;
 }
 
 #display {
-    background-color:#DFDBC3;
+    /*background-color: cornflowerblue;*/
+    background-color: #E78A61;
     /*border: 2px solid red;*/
     cursor: default;
+    border-radius: 5px;
 }
 
 .normal_button {
@@ -46,6 +77,10 @@ h3 {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 8pt;
     text-align: center;
+}
+
+#divButtonBar{
+    padding-top: 10px;
 }
 
 #btnStartOS{
@@ -72,6 +107,122 @@ h3 {
     width: 150px;
 }
 
-#display, #taHostLog, #taProgramInput{
+#taHostLog, #taProgramInput{
+    border: transparent;
+    background-color: transparent;
+}
+
+#taProgramInput{
+    resize: none;
+    border-radius: 10px;
+    width: 350px;
+    height: 70px;
+    color: firebrick;
+    border: 2px solid;
+    font-size: 14px;
+}
+
+#taHostLog{
+    color:#E66C2C;
+    resize:none;
+    width:350px;
+    height:200px;
+    overflow: scroll;
+    font-family: Helvetica, Verdana, Arial, sans-serif;
+    font-size: 9pt;
+    font-weight: bold;
+    font-style: normal;
+    border-radius: 10px;
+}
+
+#tableID{
+    width:370px;
+    resize: none;
+    float: left;
+    height:290px;
+    overflow: scroll;
+    background-color: transparent;
+    font-size:9px;
+    font-weight: normal;
+    margin-right: 1%;
     border-radius: 5px;
+    margin-bottom: 10px;
+    margin-top:-6%;
+}
+
+#table{
+    font-weight: normal;
+    font-size: 9px;
+}
+
+#memoryContents{
+    border: 2px solid #000000;
+    color: firebrick;
+    font-weight: bold;
+}
+
+#stepButton, #stopButton, #nextButton{
+    background-color: ghostwhite;
+    width: 100px;
+    height: 30px;
+    border-radius: 10px;
+    float: left;
+    font-size: 15px;
+    background-color: floralwhite;
+}
+
+#nextButton{
+    background-color: lawngreen;
+    color: #000000;
+}
+
+#stopButton{
+    background-color: red;
+    color: #ffffff;
+}
+
+/* Halloween Colors...WHY NOT?*/
+#tableID tr:nth-child(odd) {
+    background-color: #FFD801;
+}
+#tableID tr:nth-child(even) {
+    background-color:  #E66C2C;
+}
+#tableID tr:hover{
+    /*background-color: #F87217;*/
+}
+
+#tableID td:hover{
+    background-color:  #ffffff;
+}
+
+#tableID td{
+    padding: 10px;
+}
+
+#cpu, #readyQueue{
+    border: 4px solid firebrick;
+    width:350px;
+    border-radius: 10px;
+    table-layout: auto;
+}
+
+#cpu, #readyQueue{
+    margin-top:-6%;
+}
+
+#cpu th, #readyQueue th{
+    text-align: center;
+    color: firebrick;
+    background-color: #FFD801;
+    width: auto;
+}
+
+#cpu td, #readyQueue td{
+    /*padding: 5px;*/
+    width: auto;
+    text-align: center;
+    border-radius: 5px;
+    color: #ffffff;
+    background-color: #E66C2C;
 }

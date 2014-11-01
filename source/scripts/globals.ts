@@ -1,4 +1,4 @@
-/* ------------
+ /* ------------
    Globals.ts
 
    Global CONSTANTS and _Variables.
@@ -19,8 +19,10 @@ var CPU_CLOCK_INTERVAL: number = 100;   // This is in ms, or milliseconds, so 10
 
 var TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
                             // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
-var KEYBOARD_IRQ: number = 1;
+var KEYBOARD_IRQ: number = 100;
 
+//Color for the Logger!
+var _FancyColor:number = 0;
 
 //
 // Global Variables
@@ -36,7 +38,6 @@ var _DrawingContext = null;             // Initialized in hostInit().
 var _DefaultFontFamily = "sans";        // Ignored, I think. The was just a place-holder in 2008, but the HTML canvas may have use for it.
 var _DefaultFontSize = 13;
 var _FontHeightMargin = 4;              // Additional space added to font size when advancing a line.
-
 
 var _Trace: boolean = true;  // Default the OS trace to be on.
 
@@ -65,6 +66,44 @@ var _hardwareClockID: number = null;
 // For testing...
 var _GLaDOS: any = null;
 var Glados: any = null;
+
+// MEMORY INFO
+var _MainMemory: string[] = null;
+var _MainMemorySize: number = 768;
+var _MainMemoryBase : string[] = null;
+var _Memory : TSOS.Memory;
+var _MemoryPartitions:number = 3;
+var _Inuse:boolean = false;
+
+//Memory Manager
+var _MemoryManager : TSOS.MemoryManager;
+
+//PCB
+var _Pcb:TSOS.Pcb;
+
+//Ready and Resident Queues
+var _ResidentQueue: any[] =  null;
+var _ReadyQueue : TSOS.Queue;
+var _CurrentProcess = null;
+
+var _ResidentDisplay : HTMLTableElement = null;
+
+//history of commands
+var _ConsoleHistory : any[] = null;
+
+//step button to control the stepping
+var _StepButton: boolean = false;
+var _NextButton : boolean = false;
+
+//Op Code to break
+var _Break : number = -1;
+
+//System Call
+var _SystemCall : number = 9;
+var _InvalidOpCode: number = 999;
+
+// CPU Scheduling
+var _Quantum:number = 6;
 
 var onDocumentLoad = function() {
 	TSOS.Control.hostInit();

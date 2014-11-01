@@ -17,7 +17,10 @@ var CPU_CLOCK_INTERVAL = 100;
 var TIMER_IRQ = 0;
 
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
-var KEYBOARD_IRQ = 1;
+var KEYBOARD_IRQ = 100;
+
+//Color for the Logger!
+var _FancyColor = 0;
 
 //
 // Global Variables
@@ -61,6 +64,44 @@ var _hardwareClockID = null;
 // For testing...
 var _GLaDOS = null;
 var Glados = null;
+
+// MEMORY INFO
+var _MainMemory = null;
+var _MainMemorySize = 768;
+var _MainMemoryBase = null;
+var _Memory;
+var _MemoryPartitions = 3;
+var _Inuse = false;
+
+//Memory Manager
+var _MemoryManager;
+
+//PCB
+var _Pcb;
+
+//Ready and Resident Queues
+var _ResidentQueue = null;
+var _ReadyQueue;
+var _CurrentProcess = null;
+
+var _ResidentDisplay = null;
+
+//history of commands
+var _ConsoleHistory = null;
+
+//step button to control the stepping
+var _StepButton = false;
+var _NextButton = false;
+
+//Op Code to break
+var _Break = -1;
+
+//System Call
+var _SystemCall = 9;
+var _InvalidOpCode = 999;
+
+// CPU Scheduling
+var _Quantum = 6;
 
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();

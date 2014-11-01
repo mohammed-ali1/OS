@@ -18,10 +18,10 @@ module TSOS {
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
                     public buffer = "",
-                    public consoleHistory = new Array(),
-                    public historyIndex = -1
+                    public historyIndex = 0
 
             ) {
+            _ConsoleHistory = new Array();
         }
 
         public init(): void {
@@ -50,9 +50,9 @@ module TSOS {
                     _OsShell.handleInput(this.buffer);
 
                     //Add buffer to the console history
-                    this.consoleHistory.push(this.buffer);
+                    _ConsoleHistory.push(this.buffer);
                     //Last index of the buffer
-                    this.historyIndex = this.consoleHistory.length - 1;
+                    this.historyIndex = _ConsoleHistory.length;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
@@ -75,11 +75,6 @@ module TSOS {
             // decided to write one function and use the term "text" to connote string or char.
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
             if (text !== "") {
-//                // Draw the text at the current X and Y coordinates.
-//                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
-//                // Move the current X position.
-//                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-//                var newx = this.currentXPosition + offset;
 
                 var i = 0;
                 while(i != text.length) {
@@ -106,17 +101,10 @@ module TSOS {
          */
         public renderDate(){
 
-//            setInterval(function(){
-//                document.getElementById("time").innerHTML = new Date().toLocaleTimeString();
-//            },1000);
+//                CLOCK WHICH IS NOT WORKING :(
+//            document.getElementById("clock").innerHTML = "Type status to change me!";
 
-            document.getElementById("status").innerHTML = "Type status to change me!";
-
-            $(document).ready(function () {
-                var clock; clock = $('.clock').FlipClock({
-                    clockFace: 'TwelveHourClock'
-                });
-            });
+            var clock;
         }
 
         public advanceLine(): void {

@@ -61,47 +61,48 @@ module TSOS {
                 _KernelInputQueue.enqueue(this.specialNumber(keyCode, isShifted));
             } else if (keyCode == 38 || keyCode == 40){ //UP or DOWN key
 
-
                  _Console.deleteCurrentLine();
                  _Console.deleteCurrentBuffer();
 
                 if(keyCode == 38) { //UP Arrow Key
 
                     if (_Console.historyIndex < 0) {
-                        _Console.historyIndex = _Console.consoleHistory.length - 1;
+                        _Console.historyIndex = _ConsoleHistory.length - 1;
                     }
 
+<<<<<<< HEAD
                     if (_Console.consoleHistory[_Console.historyIndex]) {
                         this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
                     }
                     _Console.historyIndex--;
                 }else{
+=======
+                    this.pullHistory(_ConsoleHistory[_Console.historyIndex]);
+
+                }else{  //Down Arrow Key
+>>>>>>> gh-pages
 
                     _Console.historyIndex++;
 
-                    if (_Console.historyIndex >= _Console.consoleHistory.length) {
+                    if (_Console.historyIndex >= _ConsoleHistory.length) {
                         _Console.historyIndex = 0;
                     }
 
-                    if (_Console.consoleHistory[_Console.historyIndex]) {
-                        this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
-                    }
+                    this.pullHistory(_ConsoleHistory[_Console.historyIndex]);
                 }
 
             } else if(keyCode == 9){    //Tab key
 
-                var buffer = _Console.buffer;
+                var buffer = _Console.buffer.substring(0,2);
 
-                    var input = buffer.charAt(0);
-
-                    for(var i=0; i<_OsShell.commandList.length;i++){
-                        if(input == _OsShell.commandList[i].charAt(i)){
-                            _StdOut.deleteCurrentLine();
-                            _StdOut.putText("Match: " + _OsShell.commandList[i].command);
-                            return;
-                        }
+                for(var i=0; i<_OsShell.commandList.length;i++){
+                    if(buffer ==_OsShell.commandList[i].command.substring(0,2)){
+                        _Console.deleteCurrentLine();
+                        _StdOut.putText(_OsShell.commandList[i].command);
+                        return;
                     }
                 }
+            }
         }
 
         /**

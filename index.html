@@ -4,15 +4,19 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <meta name="author"             content="Alan G. Labouseur" />
     <link rel="stylesheet" href="dist/styles/tsos.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="dist/styles/flipclock.css" />
+    <script type="text/javascript" src="dist/styles/flipclock.js"></script>
     <title>BAD ASS OS -- 9.1.5</title>
 
     <!-- Globals CONSTANTS and _Variables. Must included be first. -->
     <script type="text/javascript" src="dist/scripts/globals.js"></script>
 
+
     <!-- Host (Hardware Simulation) Routines -->
     <script type="text/javascript" src="dist/scripts/host/control.js"></script>
     <script type="text/javascript" src="dist/scripts/host/devices.js"></script>
     <script type="text/javascript" src="dist/scripts/host/cpu.js"></script>
+    <script type="text/javascript" src="dist/scripts/host/Memory.js"></script>
 
     <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
     <script type="text/javascript" src="dist/scripts/os/interrupt.js"></script>
@@ -24,6 +28,8 @@
     <script type="text/javascript" src="dist/scripts/os/shell.js"></script>
     <script type="text/javascript" src="dist/scripts/os/shellCommand.js"></script>
     <script type="text/javascript" src="dist/scripts/os/userCommand.js"></script>
+    <script type="text/javascript" src="dist/scripts/os/Pcb.js"></script>
+    <script type="text/javascript" src="dist/scripts/os/MemoryManager.js"></script>
     <script type="text/javascript" src="dist/scripts/os/kernel.js"></script>
 
     <!-- Other Routines -->
@@ -31,23 +37,40 @@
     <!-- Uncomment this line below to enable Glados testing -->
     <!-- <script type="text/javascript" src="http://www.labouseur.com/courses/os/projects/glados.js"></script> -->
 
-    <center><h1 id="status" style="color: firebrick">Status: off</h1></center>
+<div id="top">
 
-    <center><h1 id="clock"></h1></center>
+    <!--<h1 class="clock2" style="float:right;">clock</h1>-->
+    <!--<script>-->
+        <!--$(document).ready(function () {-->
+            <!--var clock; clock = $('.clock2').FlipClock({-->
+                <!--clockFace: 'TwelveHourClock',-->
+                <!--countdown: true,-->
+                <!--autoStart: true-->
+            <!--});-->
+        <!--});-->
+    <!--</script>-->
 
-   <script>
-       setInterval(function(){
-           document.getElementById("clock").innerHTML = new Date().toLocaleString();
-       },100);
-   </script>
+    <p id="status">
+        Status: off
+    </p>
 
+    <p id="clock">
+        <script>
+            setInterval(function(){
+                document.getElementById("clock").innerHTML = "[" + new Date().toLocaleDateString() +
+                        "] [" +    new Date().toLocaleTimeString() + "]";
+            },100);
+        </script>
+        <br> <br> <br> <br>
+    </p>
+</div>
 </head>
 
 <body onload="onDocumentLoad();">
 
-<div id="divMain" style="width:100%;">
+<div id="divMain" style="float: left; width:auto; white-space: nowrap;">
 
-    <div id="divButtonBar" style="margin:4px;">
+    <div id="divButtonBar" style="margin:4px; width: auto;">
         <input type="button"
                id = "btnStartOS"
                name="brnStartOS"
@@ -75,47 +98,172 @@
                onclick="TSOS.Control.hostBtnReset_click(this);">
     </div>
 
-    <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
+    <div id="divConsole" style="margin:4px; float:left;">
         <canvas id="display"
                 width="500px"
                 height="500px"
                 tabindex="3">
         </canvas>
     </div>
-
-    <div id="divLog" style="margin-left:520px;">
-        <label>
-            Host Log
-            <br>
-            <textarea name="taHostLog"
-                      id  ="taHostLog"
-                      rows="26"
-                      cols="48"
-                    ></textarea>
-        </label>
-    </div>
-
-    <div id="divUserProgramInput" style="margin-left:520px;">
-        <label>
-            User Program Input
-            <br>
-            <textarea name="taProgramInput"
-                      id  ="taProgramInput"
-                      rows="8"
-                      cols="48"
-                    ></textarea>
-        </label>
-    </div>
-
 </div>
 
-<p class="footerText" style="clear:both;">
+<div id="divLog" style="margin-left:2px; float: left; width: auto; height: auto;">
+
+
+    <div>
+        <center><h3 style="color: firebrick; margin-top:3%;">Host Logger</h3></center>
+        <textarea name="taHostLog"
+                  id  ="taHostLog"
+                  rows="26"
+                  cols="20"
+                ></textarea>
+    </div>
+
+    <div>
+        <center><h3 style="color: firebrick;">User Program</h3></center>
+        <textarea name="taProgramInput"
+                  id  ="taProgramInput"
+                  rows="8"
+                  cols="40"
+                  placeholder="Enter Program to RUN"
+                ></textarea>
+    </div>
+
+    <div>
+        <h4 style="color: firebrick;">Ready Queue</h4>
+        <table id="readyQueue">
+            <tr>
+                <th>PID</th>
+                <th>Base</th>
+                <th>Limit</th>
+                <th>State</th>
+                <th>PC</th>
+                <th>IR</th>
+                <th>ACC</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Z</th>
+            </tr>
+
+            <tr>
+                <td id="pcbPid">0</td>
+                <td id="pcbBase">0</td>
+                <td id="pcbLimit">0</td>
+                <td id="pcbStatus">007</td>
+                <td id="pcbPc">0</td>
+                <td id="pcbIr">0</td>
+                <td id="pcbAcc">0</td>
+                <td id="pcbX">0</td>
+                <td id="pcbY">0</td>
+                <td id="pcbZ">0</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div id="memoryTable" style="margin-left:5px; height: auto;float:left;">
+
+    <div style="margin:2%;">
+        <p>
+            <center>
+                <input id="stepButton" type="button" value="Single Step"
+                        onclick="TSOS.Control.hostStepButton_click(this);"/>
+
+            <input id="stopButton" type="button" value="Stop"
+                   onclick="TSOS.Control.hostStopButton_click(this);"
+                    style="visibility: hidden;"/>
+
+                <input id="nextButton" type="button" value="Next"
+                       onclick="TSOS.Control.hostNextButton_click(this);"
+                        style="float:right; visibility: hidden; "/>
+            </center>
+        </p>
+
+        <p>
+            <br/>
+            <center>
+                 <h3 style="margin-top:5%;">Main Memory</h3>
+            </center>
+        </p>
+    </div>
+
+    <div id="tableID">
+        <table id="table"></table>
+    </div>
+
+    <div>
+        <div>
+            <p>
+                <h4 id="instruction" style="color: firebrick; margin-bottom: 7%;">CPU</h4>
+            </p>
+
+            <table id="cpu">
+                <tr>
+                    <th>PC</th>
+                    <th>IR</th>
+                    <th>ACC</th>
+                    <th>X</th>
+                    <th>Y</th>
+                    <th>Z</th>
+                </tr>
+
+                <tr>
+                    <td id="pc">007</td>
+                    <td id="ir">007</td>
+                    <td id="acc">007</td>
+                    <td id="x">007</td>
+                    <td id="y">007</td>
+                    <td id="z">007</td>
+                </tr>
+            </table>
+
+            <p>Resident Queue</p>
+            <table id="displayResident">
+                <tr>
+                    <th>Pid</th>
+                    <th>Base</th>
+                    <th>Limit</th>
+                    <th>State</th>
+                    <th>Memory Location</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer class="footerText" style="clear:both;">
     <br>
     Copyright &copy; 2008 - 2014 No Rights Reserved.
     <br>
     Reproduction is prohibited without the express written consent of
     Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
-</p>
+
+    <!--<script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization',-->
+       <!--'version':'1','packages':['timeline']}]}"></script>-->
+    <!--<script type="text/javascript">-->
+        <!--google.setOnLoadCallback(drawChart);-->
+
+        <!--function drawChart() {-->
+            <!--var container = document.getElementById('example1');-->
+
+            <!--var chart = new google.visualization.Timeline(container);-->
+
+            <!--var dataTable = new google.visualization.DataTable();-->
+
+            <!--dataTable.addColumn({ type: 'string', id: 'President' });-->
+            <!--dataTable.addColumn({ type: 'date', number: 'Start' });-->
+            <!--dataTable.addColumn({ type: 'date', number: 'End' });-->
+
+            <!--dataTable.addRows([-->
+                <!--[ 'Pid', new Date(1789, 3, 29), new Date(1797, 2, 3) ]]);-->
+
+            <!--chart.draw(dataTable);-->
+        <!--}-->
+    <!--</script>-->
+    <!--<div id="example1" style="width: 900px; height: 180px;"></div>-->
+
+
+</footer>
 
 </body>
 </html>

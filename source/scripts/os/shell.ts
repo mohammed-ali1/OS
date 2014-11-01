@@ -110,6 +110,36 @@ module TSOS {
                                   "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
 
+            // run
+            sc = new ShellCommand(this.shellRun,
+                "run",
+                "<pid> - Executes the current pid from Memory.");
+            this.commandList[this.commandList.length] = sc;
+
+            // clearmem
+            sc = new ShellCommand(this.shellClearMem,
+                "clearmem",
+                "- Clears all the partitions in the memory");
+            this.commandList[this.commandList.length] = sc;
+
+            // quantum
+            sc = new ShellCommand(this.shellQuantum,
+                "quantum",
+                "- <number> - Set the Quantum.");
+            this.commandList[this.commandList.length] = sc;
+
+            // ps
+            sc = new ShellCommand(this.shellPs,
+                "ps",
+                "- Prints all the active Processes.");
+            this.commandList[this.commandList.length] = sc;
+
+            // kiss
+            sc = new ShellCommand(this.shellKill,
+                "kill",
+                "- <pid> Allows the user to kill an active process");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -279,14 +309,14 @@ module TSOS {
         /**
          * Loads the user input program if any,
          * and validates HEX (at the moment).
-         *
          */
         public shellLoad(){
 
-            var x = document.getElementById("taProgramInput").value;
+            var f =  document.getElementById("taProgramInput").value;
+            var x = f.replace(/\s/g,'');
 
-            if(x.length == 0){
-                _StdOut.putText("There's NOTHING to load!");
+            if(x.length == 0 || x.length % 2 !=0){
+                _StdOut.putText("Invalid Input!");
                 return;
             }
 
@@ -302,7 +332,52 @@ module TSOS {
                 }
             }
 
-            _StdOut.putText("ALL HEX CHARACTERS!");
+//            Get the free block first!
+            var base = _MemoryManager.getFreeBlock();
+
+            if(base == -1)
+                return;
+
+            //Create New PCB
+            _Pcb = new Pcb(base,(base+255),true);  //Memory Size is 256...so base and limit works (for now)!
+            _Pcb.setLength((x.length/2)); //set the length of the program.
+            _Pcb.setState(9999999999999999999999999);//set state "NEW"
+
+            //Load in the Resident Queue
+            _ResidentQueue[_Pcb.getPid()] = _Pcb;
+
+            //Print to Console
+            _StdOut.putText("Loaded Successfully!");
+            _Console.advanceLine();
+            _StdOut.putText("Process ID: " + _Pcb.getPid());
+
+            //Finally load into Memory
+            _MemoryManager.load(base,x.toUpperCase().toString());
+
+            Shell.updateResident();
+
+        }
+
+        public static updateResident(){
+            var tableView = "<table>";
+            tableView +="<th>PID</th>";
+            tableView +="<th>Base</th>";
+            tableView +="<th>Limit</th>";
+            tableView +="<th>State</th>";
+            tableView +="<th>Memory Location</th>";
+            for(var i =0; i<_ResidentQueue.length;i++) {
+
+                var s:TSOS.Pcb = _ResidentQueue[i];
+                tableView += "<tr>";
+                tableView += "<td>" + s.getPid().toString() + "</td>";
+                tableView += "<td>" + s.getBase().toString() + "</td>";
+                tableView += "<td>" + s.getLimit().toString() + "</td>";
+                tableView += "<td>" + s.getState().toString()+ "</td>";
+//                tableView += "<td>" + s.inMemory().toString()+"</td>";
+                tableView += "</tr>";
+            }
+            tableView += "</table>";
+            document.getElementById("displayResident").innerHTML = tableView;
         }
 
         /**
@@ -320,7 +395,6 @@ module TSOS {
                     s += args[i];
                     s += " " ;
                 }
-
                 document.getElementById("status").innerHTML = "Status: " + s;
             }
         }
@@ -400,6 +474,101 @@ module TSOS {
             } else {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
+        }
+
+        public shellQuantum(args){
+            if(args.length >0){
+                if(args[0] >0){
+                    _Quantum = args[0];
+                    _StdOut.putText("Quantum: " +_Quantum);
+                }else {
+                    _StdOut.putText("WTF?");
+                }
+            }else{
+                _StdOut.putText("???");
+            }
+        }
+
+        public shellPs(){
+            for(var i=0; i<_ResidentQueue.length;i++){
+                var temp : TSOS.Pcb = _ResidentQueue[i];
+                alert("pid: "+temp.getPid()+", state: "+temp.getState());
+                if(temp.getState() == "Running"){
+                    _StdOut.putText("Pid: " +temp.getPid());
+                    _Console.advanceLine();
+                }
+            }
+        }
+
+        /**
+         * Clears Memory Partitions
+         */
+        public shellClearMem(){
+            _StdOut.putText("Memory Wiped!");
+            _MemoryManager.clearMemory();
+        }
+
+        /**
+         *
+         * @param args
+         */
+        public shellKill(args){
+
+            var killThisBitch:TSOS.Pcb;
+
+            if(_CurrentProcess.getPid() == args){
+                _CurrentProcess.setState(5);
+                _CurrentProcess.displayPCB();
+                _StdOut.putText("Killed Current Process: "+_CurrentProcess.getPid());
+                return;
+            }
+
+            for(var i=0; i<_ResidentQueue.length;i++){
+                if(_ResidentQueue[i].getPid() == args &&
+                    _ResidentQueue[i].getState() !="Running" &&
+                    _ResidentQueue[i].inMemory()){
+                    _StdOut.putText("I'm not even Running...WTF!");
+                }
+                if(_ResidentQueue[i].getPid() == args &&
+                    _ResidentQueue[i].getState() == "Running" &&
+                    _ResidentQueue[i].inMemory()) {     //Kill the process
+                    killThisBitch = _ResidentQueue[i];
+                    killThisBitch.setState(5);
+                    killThisBitch.displayPCB();
+                    _StdOut.putText("Process Killed: "+killThisBitch.getPid());
+                    _StdOut.advanceLine();
+                    _CPU.init();
+                    _CPU.displayCPU();
+                    //clear memory block from the base.....???
+                }
+            }
+        }
+
+        /**
+         * Run a single program
+         * @param args
+         */
+        public shellRun(args){
+
+            if(_StepButton){
+//                args[0].setState(1);
+                _StdOut.putText("Single Step is on!");
+                return;
+            }
+            _CurrentProcess = _ResidentQueue[args];
+            _CurrentProcess.setState(1);
+            alert("current process " +_CurrentProcess.getPid());
+            _ReadyQueue.enqueue(_ResidentQueue[args]);
+//            this.displayReadyQueue(_CurrentProcess);
+        }
+
+        public displayReadyQueue(p:Pcb){
+
+            var table = "<table>";
+                table += "<tr>";
+                table += "<td>" + p.getPid() + p.getBase() + p.getLimit() +"</td>";
+                table += "</tr>";
+            document.getElementById("readyQueue").innerHTML = table + "</table>";
         }
     }
 }
