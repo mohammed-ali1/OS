@@ -10,3 +10,5 @@
 *.xml
 
 dist/scripts/os/List.js
+
+source/scripts/.gulp-tsc-tmp-114102-17023-10a62t5.ts

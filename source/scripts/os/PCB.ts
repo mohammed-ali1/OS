@@ -48,7 +48,7 @@ module TSOS{
         }
 
         public getPid() : number{
-            return this.pid;  //return the local data member (NON - STATIC)
+            return this.pid;  //return the loc al data member (NON - STATIC)
         }
 
         public setLength(length:number){

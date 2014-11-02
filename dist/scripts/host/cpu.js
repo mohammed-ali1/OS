@@ -250,9 +250,12 @@ var TSOS;
             if (_CPU.Zflag == 0) {
                 var address = parseInt(_MemoryManager.read(++_CPU.PC), 16);
                 _CPU.PC += address;
-
                 if (_CPU.PC > _CurrentProcess.getLimit()) {
                     _CPU.PC -= _BlockSize;
+                }
+
+                if (_CPU.PC > _CurrentProcess.getLimit()) {
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_MemoryErrr, 0)); //Out of Memory Bounds!!!
                 }
 
                 _CPU.INS = "CPU [D0 $EF]" + "   [" + _CPU.IR + ", " + address + "]";

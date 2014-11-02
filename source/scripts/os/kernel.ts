@@ -162,16 +162,17 @@ module TSOS {
                 case _SystemCall:
                     if(params == 1){
                         _StdOut.putText(_CPU.Yreg.toString());
-                    } else if (params == 2){
+                    }
+                    if (params == 2){
                         var address  = _CPU.Yreg;
                         var print = "";
                         var temp = parseInt(_MemoryManager.read(address),16);
                         var index = 0;
 
-                        while (temp != 0){
+                        while (temp != "00"){
                             print += String.fromCharCode(temp).toString();
                             index++;
-                            temp = parseInt(_MemoryManager.read(index+address),16);
+                            temp = parseInt(_MemoryManager.read(parseInt(index+address)),16);
                         }
                         _StdOut.putText(print);
                     }

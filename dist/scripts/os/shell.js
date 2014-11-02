@@ -463,14 +463,15 @@ var TSOS;
 
         Shell.prototype.shellQuantum = function (args) {
             if (args.length > 0) {
-                if (args[0] > 0) {
-                    _Quantum = args[0];
-                    _StdOut.putText("Quantum: " + _Quantum);
+                if (args > 0) {
+                    _Quantum = args;
+                    _StdOut.putText("Quantum set to: " + _Quantum);
                 } else {
-                    _StdOut.putText("WTF?");
+                    _Quantum = 6;
+                    _StdOut.putText("Quantum set to: " + _Quantum);
                 }
             } else {
-                _StdOut.putText("???");
+                _StdOut.putText("pasarme la perra quamtum");
             }
         };
 
@@ -534,7 +535,7 @@ var TSOS;
                 return;
             }
 
-            if (_ResidentQueue[args].getState() != "Terminated") {
+            if (_ResidentQueue[args].getState() == "New") {
                 _ReadyQueue.enqueue(_ResidentQueue[args]);
             } else {
                 _StdOut.putText("Load this Bitch again and RUN...!");
