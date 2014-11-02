@@ -106,7 +106,6 @@ var TSOS;
                 _CPU._FF_Instruction(str);
             } else {
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_InvalidOpCode, 0));
-                _StdOut.putText("Instruction Not VALID!");
             }
             _CPU.PC++;
         };
@@ -252,9 +251,10 @@ var TSOS;
                 var address = parseInt(_MemoryManager.read(++_CPU.PC), 16);
                 _CPU.PC += address;
 
-                if (_CPU.PC >= (_CurrentProcess.getLimit())) {
-                    _CPU.PC = _CPU.PC - (_CurrentProcess.getLimit() + 1);
+                if (_CPU.PC >= _CurrentProcess.getLimit()) {
+                    _CPU.PC -= _BlockSize;
                 }
+
                 _CPU.INS = "CPU [D0 $EF]" + "   [" + _CPU.IR + ", " + address + "]";
             } else {
                 _CPU.PC++;

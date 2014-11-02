@@ -121,7 +121,6 @@ module TSOS {
             }
             else{
                 _KernelInterruptQueue.enqueue(new Interrupt(_InvalidOpCode,0));
-                _StdOut.putText("Instruction Not VALID!");
             }
             _CPU.PC++;
         }
@@ -288,9 +287,11 @@ module TSOS {
                 var address:number = parseInt(_MemoryManager.read(++_CPU.PC),16);
                 _CPU.PC += address;
 
-                if(_CPU.PC >= (_CurrentProcess.getLimit())){
-                    _CPU.PC = _CPU.PC - (_CurrentProcess.getLimit()+1);
+                if(_CPU.PC >= _CurrentProcess.getLimit()){
+                    _CPU.PC -= _BlockSize;
                 }
+
+
                 _CPU.INS = "CPU [D0 $EF]" +
                     "   ["+_CPU.IR+", "+address+"]";
             }

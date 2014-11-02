@@ -163,15 +163,15 @@ module TSOS {
                     if(params == 1){
                         _StdOut.putText(_CPU.Yreg.toString());
                     } else if (params == 2){
-                        var address :number = _CPU.Yreg;
+                        var address  = _CPU.Yreg;
                         var print = "";
                         var temp = parseInt(_MemoryManager.read(address),16);
-                        var index : number = 0;
+                        var index = 0;
 
                         while (temp != 0){
-                            print += String.fromCharCode(temp);
+                            print += String.fromCharCode(temp).toString();
                             index++;
-                            temp = parseInt(_MemoryManager.read((address+index)),16);
+                            temp = parseInt(_MemoryManager.read(index+address),16);
                         }
                         _StdOut.putText(print);
                     }

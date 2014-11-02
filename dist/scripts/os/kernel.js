@@ -161,9 +161,9 @@ var TSOS;
                         var index = 0;
 
                         while (temp != 0) {
-                            print += String.fromCharCode(temp);
+                            print += String.fromCharCode(temp).toString();
                             index++;
-                            temp = parseInt(_MemoryManager.read((address + index)), 16);
+                            temp = parseInt(_MemoryManager.read(index + address), 16);
                         }
                         _StdOut.putText(print);
                     }
