@@ -251,7 +251,7 @@ var TSOS;
                 var address = parseInt(_MemoryManager.read(++_CPU.PC), 16);
                 _CPU.PC += address;
 
-                if (_CPU.PC >= _CurrentProcess.getLimit()) {
+                if (_CPU.PC > _CurrentProcess.getLimit()) {
                     _CPU.PC -= _BlockSize;
                 }
 
