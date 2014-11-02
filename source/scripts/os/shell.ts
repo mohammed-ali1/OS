@@ -134,10 +134,16 @@ module TSOS {
                 "- Prints all the active Processes.");
             this.commandList[this.commandList.length] = sc;
 
-            // kiss
+            // kill
             sc = new ShellCommand(this.shellKill,
                 "kill",
                 "- <pid> Allows the user to kill an active process");
+            this.commandList[this.commandList.length] = sc;
+
+            // runall
+            sc = new ShellCommand(this.shellRunAll,
+                "runall",
+                "- Runs all the Processes in the Resident Queue.");
             this.commandList[this.commandList.length] = sc;
 
             // processes - list the running processes and their IDs
@@ -337,7 +343,6 @@ module TSOS {
 
             if(base == -1)
                 return;
-            alert("Process Base: "+base+", Process Limit: "+(base+255));
             //Create New PCB
             var p = new Pcb(base,(base+255),true);  //Memory Size is 256...so base and limit works (for now)!
             p.setLength((x.length/2)); //set the length of the program.
@@ -577,10 +582,9 @@ module TSOS {
                 _StdOut.putText("Single Step is on!");
                 return;
             }
-//            _CurrentProcess = _ResidentQueue[args];
+
             if(_ResidentQueue[args].getState() != "Terminated") {
                 _ReadyQueue.enqueue(_ResidentQueue[args]);
-                _CurrentProcess = _ResidentQueue[args];
             }
             else{
                 _StdOut.putText("Load this Bitch again and RUN...!");
@@ -595,6 +599,13 @@ module TSOS {
                 table += "<td>" + p.getPid() + p.getBase() + p.getLimit() +"</td>";
                 table += "</tr>";
             document.getElementById("readyQueue").innerHTML = table + "</table>";
+        }
+
+        public shellRunAll(){
+
+            for(var i=0; i<_ResidentQueue.length;i++){
+                _ReadyQueue.enqueue(_ResidentQueue[i]);
+            }
         }
     }
 }

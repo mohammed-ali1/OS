@@ -93,8 +93,12 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellPs, "ps", "- Prints all the active Processes.");
             this.commandList[this.commandList.length] = sc;
 
-            // kiss
+            // kill
             sc = new TSOS.ShellCommand(this.shellKill, "kill", "- <pid> Allows the user to kill an active process");
+            this.commandList[this.commandList.length] = sc;
+
+            // runall
+            sc = new TSOS.ShellCommand(this.shellRunAll, "runall", "- Runs all the Processes in the Resident Queue.");
             this.commandList[this.commandList.length] = sc;
 
             // processes - list the running processes and their IDs
@@ -297,7 +301,6 @@ var TSOS;
 
             if (base == -1)
                 return;
-            alert("Process Base: " + base + ", Process Limit: " + (base + 255));
 
             //Create New PCB
             var p = new TSOS.Pcb(base, (base + 255), true);
@@ -531,10 +534,8 @@ var TSOS;
                 return;
             }
 
-            //            _CurrentProcess = _ResidentQueue[args];
             if (_ResidentQueue[args].getState() != "Terminated") {
                 _ReadyQueue.enqueue(_ResidentQueue[args]);
-                _CurrentProcess = _ResidentQueue[args];
             } else {
                 _StdOut.putText("Load this Bitch again and RUN...!");
             }
@@ -547,6 +548,12 @@ var TSOS;
             table += "<td>" + p.getPid() + p.getBase() + p.getLimit() + "</td>";
             table += "</tr>";
             document.getElementById("readyQueue").innerHTML = table + "</table>";
+        };
+
+        Shell.prototype.shellRunAll = function () {
+            for (var i = 0; i < _ResidentQueue.length; i++) {
+                _ReadyQueue.enqueue(_ResidentQueue[i]);
+            }
         };
         return Shell;
     })();

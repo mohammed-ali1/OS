@@ -253,7 +253,6 @@ var TSOS;
                 _CPU.PC += address;
 
                 if (_CPU.PC >= (_CurrentProcess.getLimit())) {
-                    alert("PC: " + _CPU.PC + ", Base: " + _CurrentProcess.getBase() + ", Limit: " + _CurrentProcess.getLimit());
                     _CPU.PC = _CPU.PC - (_CurrentProcess.getLimit() + 1);
                 }
                 _CPU.INS = "CPU [D0 $EF]" + "   [" + _CPU.IR + ", " + address + "]";

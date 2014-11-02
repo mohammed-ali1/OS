@@ -105,13 +105,15 @@ module TSOS {
 
             _CurrentProcess = p;
             this.krnTrace("Processing PID: " +  _CurrentProcess.getPid());
+            _StdOut.putText("Processing PID: "+_CurrentProcess.getPid());
+            _Console.advanceLine();
+            _OsShell.putPrompt();
            _CPU.isExecuting = true;
             _CPU.PC = _CurrentProcess.getBase();
             _CPU.displayCPU();
             _CurrentProcess.setState(1); //set state "Running"
             Shell.updateResident();
 //            Shell.updateReady(_CurrentProcess);
-            alert("Current PID: "+_CurrentProcess.getPid()+", Base: "+_CurrentProcess.getBase()+", Limit: "+_CurrentProcess.getLimit());
         }
 
         //
