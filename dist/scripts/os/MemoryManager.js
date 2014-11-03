@@ -23,7 +23,9 @@ var TSOS;
 
         MemoryManager.prototype.clearMemory = function () {
             _Memory.clearMemory();
+            _ResidentQueue = null;
             _ResidentQueue = new Array(); //Don't know how this works
+            TSOS.Shell.updateResident();
         };
 
         MemoryManager.prototype.update = function () {
@@ -38,17 +40,21 @@ var TSOS;
             //            var block0 = _Memory.read(_Memory.getBlock_0());
             //            var block1 = _Memory.read(_Memory.getBlock_1());
             //            var block2 = _Memory.read(_Memory.getBlock_2());
+            //            if(_ResidentQueue.length == 0){
+            //                return 0;
+            //            }else if(_ResidentQueue[_ResidentQueue.length-1].getState() !="Running") {
+            //                return _ResidentQueue[_ResidentQueue.length - 1].getBlock();
+            //            }else{
+            //                return -1;
+            //            }
             //Need more thinking here!!!
             if (_ResidentQueue.length == 0) {
-                alert("Return Block " + 0);
                 return 0;
             } else if (_ResidentQueue.length == 1 && _ResidentQueue[0].getState() != "Running") {
                 var s = parseInt(_ResidentQueue[0].getLimit(), 10);
-                alert("Return Block: " + (s + 1));
                 return (s + 1);
             } else if (_ResidentQueue.length == 2 && _ResidentQueue[1].getState() != "Running") {
                 var s = parseInt(_ResidentQueue[1].getLimit(), 10);
-                alert("Return Block: " + (s + 1));
                 return (s + 1);
             } else {
                 _StdOut.putText("NO ROOM FOR Y0o BITCH!!!");

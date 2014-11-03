@@ -31,15 +31,25 @@ var TSOS;
             this.Zflag = Zflag;
             this.isExecuting = isExecuting;
         }
-        Cpu.prototype.init = function () {
+        Cpu.prototype.reset = function () {
             this.PC = 0;
             this.Acc = 0;
-            this.IR = "";
+            this.IR = "?";
             this.INS = "";
             this.Xreg = 0;
             this.Yreg = 0;
             this.Zflag = 0;
             this.isExecuting = false;
+        };
+
+        Cpu.prototype.setCPU = function (process) {
+            this.PC = process.getBase();
+            this.Acc = process.getAcc();
+            this.IR = process.getIR();
+            this.INS = "";
+            this.Xreg = process.getX();
+            this.Yreg = process.getY();
+            this.Zflag = process.getZ();
         };
 
         Cpu.prototype.cycle = function () {
@@ -61,6 +71,8 @@ var TSOS;
 
             //Display the PCB
             _CurrentProcess.displayPCB();
+
+            _ClockCycle++;
         };
 
         Cpu.prototype.displayCPU = function () {

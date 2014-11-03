@@ -37,7 +37,7 @@ module TSOS {
             //Initialize Resident Queue
             _ResidentQueue = new Array();
 
-            _CurrentScheduler = new Scheduler();
+            _CurrentScheduler = new Scheduler(0);
 
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
@@ -80,9 +80,9 @@ module TSOS {
 
         public krnOnCPUClockPulse() {
             /* This gets called from the host hardware sim every time there is a hardware clock pulse.
-               This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
-               This, on the other hand, is the clock pulse from the hardware (or host) that tells the kernel
-               that it has to look for interrupts and process them if it finds any.                           */
+             This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
+             This, on the other hand, is the clock pulse from the hardware (or host) that tells the kernel
+             that it has to look for interrupts and process them if it finds any.                           */
 
             // Check for an interrupt, are any. Page 560
             if (_KernelInterruptQueue.getSize() > 0) {
@@ -91,8 +91,14 @@ module TSOS {
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
-               //dont call cpu cycle
+                //dont call cpu cycle
                 //call the scheduler instead
+                if(_CurrentScheduler.needContextSwitch()){
+                    _CurrentScheduler.contextSwitch();
+                }
+                _CPU.cycle();
+                _CurrentProcess.displayPCB();
+                Shell.updateResident();
             }
 //            else if(_ReadyQueue.getSize() > 0){
 ////                _CurrentScheduler = new Scheduler();
@@ -101,12 +107,6 @@ module TSOS {
             else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
             }
-        }
-
-        public clockPulse(){
-
-            //we dont know what CPU algo
-
         }
 
         /**
@@ -167,7 +167,7 @@ module TSOS {
                         Control.hostStopButton_click(this); //helps us exit next button!
                         _CurrentProcess.setState(4);
                         _CurrentProcess.displayPCB();
-                        _CPU.cycle();
+                        _CPU.reset();
                         _CPU.displayCPU();
                     }
                     break;
@@ -192,7 +192,7 @@ module TSOS {
                     _OsShell.putPrompt();
                     break;
                 case _Break: //-1 Denotes END of a process!
-                    _CPU.init();//Re-Start the CPU!
+                    _CPU.reset();//Re-Start the CPU!
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
                     _CurrentProcess.setState(4);
                     _CurrentProcess.displayPCB();
@@ -200,6 +200,15 @@ module TSOS {
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this?");
+                    break;
+                case _RUN:
+                    if(_CPU.isExecuting){
+                        if(_CurrentScheduler.needContextSwitch()){
+                            _CurrentScheduler.contextSwitch();
+                        }
+                    }else{
+                        _CurrentScheduler.setCurrentProcess();
+                    }
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

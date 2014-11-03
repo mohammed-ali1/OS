@@ -85,6 +85,8 @@ var _Pcb;
 var _ResidentQueue = null;
 var _ReadyQueue;
 var _CurrentProcess;
+var _RUN = -5;
+var _ClockCycle = 0;
 
 var _ResidentDisplay = null;
 

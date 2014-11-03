@@ -6,76 +6,65 @@ module TSOS{
    export class Scheduler{
 
        public scheduler : string[] = ["RR", "FCFS","Priority"];
-       public timer;
-       public switch:boolean = false;
-       public current = "";
+       public currentScheduler = "";
 
-        constructor(){
-            alert("Constructor Called");
-            this.current = this.scheduler[0].toString();
-            this.timer = 0;
-            this.switch = false;
-            this.RR();
+        constructor(index:number){
+            this.currentScheduler = this.scheduler[index];
         }
 
-        public needContextSwitch(){
+       public setCurrentProcess(){
 
-            if((_CurrentProcess.getState() == "Terminated")&& (this.timer == _Quantum)) {
-                this.timer = 0;
-                this.switch = true;
-            }
+           if(_ReadyQueue.getSize() > 0) {
+               _CurrentProcess = this.getNextProcess();
+               _CurrentProcess.setState(1);//set state to "Running"
+               _CPU.setCPU(_CurrentProcess);
+               _CPU.isExecuting = true;
+           }
+       }
 
-            if(this.timer == _Quantum && _CurrentProcess.getState() == "Running"){
-                _CurrentProcess.setState(2);    //Save the state of the Process
-                this.switch = true;//set context switch to true
-                this.timer = 0;
-            }
-
-            if(this.timer < _Quantum){
-                this.switch = false;
-            }
-
-            alert("Timer is: "+this.timer.toString()+", Switch is: "+this.switch.toString()+", Process: "+_CurrentProcess.getPid());
+        public needContextSwitch():boolean{
+            return _ClockCycle >= _Quantum;
         }
 
-        public RR(){
+       public contextSwitch(){
 
-            alert("RR Called");
+           var newProcess = this.getNextProcess();
 
-            while(this.timer != _Quantum){
+          if(newProcess != null || newProcess != undefined){
 
-                this.timer++;
-                alert("Timer is: "+this.timer);
-                this.needContextSwitch();
+              this.performSwitch(newProcess);
 
-                if(this.switch){
-                    _ReadyQueue.enqueue(_CurrentProcess);
-                }else{ // no context switching...just get the next process off of the Ready Queue....?
+              _CurrentProcess = newProcess;
+              _CurrentProcess.setState(1);
+              _CPU.setCPU(_CurrentProcess);
+          }else if(_CurrentProcess.getState() == "Terminated"){
+              this.reset();
+          }
+       }
 
-                    for(var i=0; i<_ResidentQueue.length;i++){
-                        if(_ResidentQueue[i].getState() == "New"){
-                            _ReadyQueue.enqueue(_ResidentQueue[i]); //Get the next new process
-                            break;
-                        }
-                    }
-                }
-            }
+       public getNextProcess(){
+           if(_ReadyQueue.getSize() > 0)
+               return _ReadyQueue.dequeue();
+       }
 
-        }
+       public reset(){
+           _ClockCycle = 0;
+           _CPU.isExecuting = false;
+           _CurrentProcess.displayPCB();
+           _CurrentProcess = null;
+       }
 
+       public performSwitch(process){
 
-       public schedulerExe(p:TSOS.Pcb){
+           if(process.getState() != "Terminated"){
+               process.setState(2); //set state to waiting
+               _ReadyQueue.enqueue(process);//push back to ready queue
+               process.displayPCB();//update display
+           }
 
-           _CurrentProcess = p;
-           _Kernel.krnTrace("Processing PID: " +  _CurrentProcess.getPid());
-           _StdOut.putText("Processing PID: "+_CurrentProcess.getPid());
-           _Console.advanceLine();
-           _OsShell.putPrompt();
-           _CPU.isExecuting = true;
-           _CPU.PC = _CurrentProcess.getBase();
-           _CPU.displayCPU();
-           _CurrentProcess.setState(1); //set state "Running"
-           Shell.updateResident();
-        }
+           if (process.getState() == "Terminated"){
+               process.displayPCB();
+           }
+       }
     }
 }

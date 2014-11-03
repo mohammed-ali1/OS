@@ -349,7 +349,7 @@ module TSOS {
             p.setState(9999999999999999999999999);//set state "NEW"
 
             //Load in the Resident Queue
-            _ResidentQueue[p.getPid()] = p;
+            _ResidentQueue.push(p);
 
             //Print to Console
             _StdOut.putText("Loaded Successfully!");
@@ -508,10 +508,12 @@ module TSOS {
             if(args.length >0){
                 if(args >0){
                     _Quantum = args;
-                    _StdOut.putText("Quantum set to: " +_Quantum);
+                    _StdOut.putText("CurrentQuantum: " +_Quantum);
                 }else {
                     _Quantum = 6;
-                    _StdOut.putText("Quantum set to: "+ _Quantum);
+                    _StdOut.putText("Bitch Please....Quantum can't be <=0: ");
+                    _Console.advanceLine();
+                    _StdOut.putText("Current Quantum: "+_Quantum);
                 }
             }else{
                 _StdOut.putText("pasarme la perra quamtum");
@@ -565,7 +567,7 @@ module TSOS {
                     killThisBitch.displayPCB();
                     _StdOut.putText("Process Killed: "+killThisBitch.getPid());
                     _StdOut.advanceLine();
-                    _CPU.init();
+                    _CPU.reset();
                     _CPU.displayCPU();
                     //clear memory block from the base.....???
                 }
@@ -578,17 +580,19 @@ module TSOS {
          */
         public shellRun(args){
 
+            if(args.length == 0 || args < 0){
+                _StdOut.putText("Load this Bitch again and RUN...!");
+                return;
+            }
+
             if(_StepButton){
-//                args[0].setState(1);
                 _StdOut.putText("Single Step is on!");
                 return;
             }
 
             if(_ResidentQueue[args].getState() == "New") {
-                _ReadyQueue.enqueue(_ResidentQueue[args]);
-            }
-            else{
-                _StdOut.putText("Load this Bitch again and RUN...!");
+                _ReadyQueue.enqueue(_ResidentQueue[args]); //only put what's NEW!
+                _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
             }
 //            this.displayReadyQueue(_CurrentProcess);
         }
@@ -605,9 +609,10 @@ module TSOS {
         public shellRunAll(){
 
             for(var i=0; i<_ResidentQueue.length;i++){
-                if(_ResidentQueue[i].getState() == "New")
+                if(_ResidentQueue[i].getState() != "Terminated")
                 _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
+            _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
         }
     }
 }

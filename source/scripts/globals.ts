@@ -87,6 +87,8 @@ var _Pcb:TSOS.Pcb;
 var _ResidentQueue: any[] =  null;
 var _ReadyQueue : TSOS.Queue;
 var _CurrentProcess : TSOS.Pcb;
+var _RUN = -5;
+var _ClockCycle:number = 0;
 
 var _ResidentDisplay : HTMLTableElement = null;
 

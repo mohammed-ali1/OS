@@ -35,7 +35,7 @@ var TSOS;
             //Initialize Resident Queue
             _ResidentQueue = new Array();
 
-            _CurrentScheduler = new TSOS.Scheduler();
+            _CurrentScheduler = new TSOS.Scheduler(0);
 
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
@@ -90,13 +90,15 @@ var TSOS;
             } else if (_CPU.isExecuting) {
                 //dont call cpu cycle
                 //call the scheduler instead
+                if (_CurrentScheduler.needContextSwitch()) {
+                    _CurrentScheduler.contextSwitch();
+                }
+                _CPU.cycle();
+                _CurrentProcess.displayPCB();
+                TSOS.Shell.updateResident();
             } else {
                 this.krnTrace("Idle");
             }
-        };
-
-        Kernel.prototype.clockPulse = function () {
-            //we dont know what CPU algo
         };
 
         /**
@@ -152,7 +154,7 @@ var TSOS;
                         TSOS.Control.hostStopButton_click(this); //helps us exit next button!
                         _CurrentProcess.setState(4);
                         _CurrentProcess.displayPCB();
-                        _CPU.cycle();
+                        _CPU.reset();
                         _CPU.displayCPU();
                     }
                     break;
@@ -177,7 +179,7 @@ var TSOS;
                     _OsShell.putPrompt();
                     break;
                 case _Break:
-                    _CPU.init(); //Re-Start the CPU!
+                    _CPU.reset(); //Re-Start the CPU!
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
                     _CurrentProcess.setState(4);
                     _CurrentProcess.displayPCB();
@@ -185,6 +187,15 @@ var TSOS;
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this?");
+                    break;
+                case _RUN:
+                    if (_CPU.isExecuting) {
+                        if (_CurrentScheduler.needContextSwitch()) {
+                            _CurrentScheduler.contextSwitch();
+                        }
+                    } else {
+                        _CurrentScheduler.setCurrentProcess();
+                    }
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

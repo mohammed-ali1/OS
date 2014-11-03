@@ -18,10 +18,12 @@ var TSOS;
             this.length = 0;
             this.block = 0;
             this.inMemory = false;
+            this.block = 0;
             Pcb.PID++;
             this.pid = Pcb.PID; //Increment PID all the time!
             this.base = b;
             this.limit = l;
+            this.block = (this.base / _BlockSize);
             if (location == true)
                 this.inMemory = true;
         }
@@ -85,6 +87,30 @@ var TSOS;
 
         Pcb.prototype.getLength = function () {
             return this.length;
+        };
+
+        Pcb.prototype.getX = function () {
+            return this.x;
+        };
+
+        Pcb.prototype.getY = function () {
+            return this.y;
+        };
+
+        Pcb.prototype.getZ = function () {
+            return this.z;
+        };
+
+        Pcb.prototype.getIR = function () {
+            return this.ir;
+        };
+
+        Pcb.prototype.getAcc = function () {
+            return this.acc;
+        };
+
+        Pcb.prototype.getBlock = function () {
+            return this.block;
         };
 
         Pcb.prototype.inMemory = function () {

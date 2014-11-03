@@ -20,6 +20,7 @@ module TSOS{
         public length:number = 0; //Length of the program
         public block : number = 0;
         public inMemory:boolean = false;
+        public block:number = 0;
 
         constructor(b:number, l:number, location:boolean){
 
@@ -27,6 +28,7 @@ module TSOS{
             this.pid = Pcb.PID;  //Increment PID all the time!
             this.base = b;
             this.limit = l;
+            this.block = (this.base / _BlockSize);
             if(location == true)
                 this.inMemory = true;
         }
@@ -92,6 +94,30 @@ module TSOS{
 
         public getLength(){
             return this.length;
+        }
+
+        public getX(){
+            return this.x;
+        }
+
+        public getY(){
+            return this.y;
+        }
+
+        public getZ(){
+            return this.z;
+        }
+
+        public getIR(){
+            return this.ir;
+        }
+
+        public getAcc(){
+            return this.acc;
+        }
+
+        public getBlock(){
+            return this.block;
         }
 
         public inMemory(){

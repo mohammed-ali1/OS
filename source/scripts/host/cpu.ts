@@ -30,15 +30,25 @@ module TSOS {
 
         }
 
-        public init(): void {
+        public reset(){
             this.PC = 0;
             this.Acc = 0;
-            this.IR = "";
+            this.IR = "?";
             this.INS = "";
             this.Xreg = 0;
             this.Yreg = 0;
             this.Zflag = 0;
             this.isExecuting = false;
+        }
+
+        public setCPU(process:TSOS.Pcb): void {
+            this.PC = process.getBase();
+            this.Acc = process.getAcc();
+            this.IR = process.getIR();
+            this.INS = "";
+            this.Xreg = process.getX();
+            this.Yreg = process.getY();
+            this.Zflag = process.getZ();
         }
         
         public cycle(): void {
@@ -60,6 +70,8 @@ module TSOS {
 
             //Display the PCB
             _CurrentProcess.displayPCB();
+
+            _ClockCycle++;
         }
 
         public displayCPU(){
