@@ -553,7 +553,8 @@ var TSOS;
 
         Shell.prototype.shellRunAll = function () {
             for (var i = 0; i < _ResidentQueue.length; i++) {
-                _ReadyQueue.enqueue(_ResidentQueue[i]);
+                if (_ResidentQueue[i].getState() == "New")
+                    _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
         };
         return Shell;

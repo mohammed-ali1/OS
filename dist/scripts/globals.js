@@ -104,6 +104,7 @@ var _InvalidOpCode = 999;
 
 // CPU Scheduling
 var _Quantum = 6;
+var _CurrentScheduler;
 
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();

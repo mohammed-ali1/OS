@@ -605,6 +605,7 @@ module TSOS {
         public shellRunAll(){
 
             for(var i=0; i<_ResidentQueue.length;i++){
+                if(_ResidentQueue[i].getState() == "New")
                 _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
         }

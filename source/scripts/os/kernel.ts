@@ -37,6 +37,8 @@ module TSOS {
             //Initialize Resident Queue
             _ResidentQueue = new Array();
 
+            _CurrentScheduler = new Scheduler();
+
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new DeviceDriverKeyboard();     // Construct it.
@@ -89,12 +91,22 @@ module TSOS {
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
-                _CPU.cycle();
-            } else if(_ReadyQueue.getSize() > 0){
-                this.krnExe(_ReadyQueue.dequeue());
-            } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
+               //dont call cpu cycle
+                //call the scheduler instead
+            }
+//            else if(_ReadyQueue.getSize() > 0){
+////                _CurrentScheduler = new Scheduler();
+//                this.krnExe(_ReadyQueue.dequeue());
+//            }
+            else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
             }
+        }
+
+        public clockPulse(){
+
+            //we dont know what CPU algo
+
         }
 
         /**

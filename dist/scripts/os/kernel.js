@@ -35,6 +35,8 @@ var TSOS;
             //Initialize Resident Queue
             _ResidentQueue = new Array();
 
+            _CurrentScheduler = new TSOS.Scheduler();
+
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
@@ -86,12 +88,15 @@ var TSOS;
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) {
-                _CPU.cycle();
-            } else if (_ReadyQueue.getSize() > 0) {
-                this.krnExe(_ReadyQueue.dequeue());
+                //dont call cpu cycle
+                //call the scheduler instead
             } else {
                 this.krnTrace("Idle");
             }
+        };
+
+        Kernel.prototype.clockPulse = function () {
+            //we dont know what CPU algo
         };
 
         /**
