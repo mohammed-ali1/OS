@@ -26,8 +26,9 @@ module TSOS{
 
         public clearMemory(){
             _Memory.clearMemory();
-            _ResidentQueue = null;
-            _ResidentQueue = new Array(); //Don't know how this works
+//            _ResidentQueue = new Array(); //Don't know how this works
+            _ResidentQueue.splice(0,_ResidentQueue.length);
+            alert("clearmem - Resident Length: "+_ResidentQueue.length);
             Shell.updateResident();
         }
 

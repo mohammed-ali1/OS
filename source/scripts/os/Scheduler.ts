@@ -33,10 +33,10 @@ module TSOS{
           if(newProcess != null || newProcess != undefined){
 
               this.performSwitch(newProcess);
-
               _CurrentProcess = newProcess;
               _CurrentProcess.setState(1);
               _CPU.setCPU(_CurrentProcess);
+              _CPU.isExecuting = true;
           }else if(_CurrentProcess.getState() == "Terminated"){
               this.reset();
           }
@@ -45,6 +45,7 @@ module TSOS{
        public getNextProcess(){
            if(_ReadyQueue.getSize() > 0)
                return _ReadyQueue.dequeue();
+           return null;
        }
 
        public reset(){
@@ -64,6 +65,7 @@ module TSOS{
 
            if (process.getState() == "Terminated"){
                process.displayPCB();
+               this.reset();
            }
        }
     }

@@ -199,7 +199,7 @@ module TSOS {
                     Shell.updateResident();
                     break;
                 case _InvalidOpCode:
-                    _StdOut.putText("WTF is this?");
+                    _StdOut.putText("WTF is this Instruction?");
                     break;
                 case _RUN:
                     if(_CPU.isExecuting){

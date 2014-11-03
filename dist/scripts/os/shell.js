@@ -309,6 +309,7 @@ var TSOS;
 
             //Load in the Resident Queue
             _ResidentQueue.push(p);
+            alert("Resident Length: " + _ResidentQueue.length);
 
             //Print to Console
             _StdOut.putText("Loaded Successfully!");
@@ -558,7 +559,7 @@ var TSOS;
 
         Shell.prototype.shellRunAll = function () {
             for (var i = 0; i < _ResidentQueue.length; i++) {
-                if (_ResidentQueue[i].getState() != "Terminated")
+                if (_ResidentQueue[i].getState() == "New")
                     _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_RUN, 0));
