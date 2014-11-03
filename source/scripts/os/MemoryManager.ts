@@ -26,7 +26,6 @@ module TSOS{
 
         public clearMemory(){
             _Memory.clearMemory();
-//            _ResidentQueue = new Array(); //Don't know how this works
             _ResidentQueue.splice(0,_ResidentQueue.length);
             alert("clearmem - Resident Length: "+_ResidentQueue.length);
             Shell.updateResident();
@@ -40,7 +39,7 @@ module TSOS{
            return _Memory.size();
         }
 
-        public getFreeBlock():number{
+        public getFreeBlock():number {
 
 //            var block0 = _Memory.read(_Memory.getBlock_0());
 //            var block1 = _Memory.read(_Memory.getBlock_1());
@@ -54,14 +53,14 @@ module TSOS{
 //            }
 
             //Need more thinking here!!!
-            if(_ResidentQueue.length == 0){
+            if (_ResidentQueue.length == 0) {
                 return 0;
-            }else if (_ResidentQueue.length == 1 && _ResidentQueue[0].getState() != "Running"){
-                var s = parseInt(_ResidentQueue[0].getLimit(),10);
-                return (s+1);
-            }else if (_ResidentQueue.length == 2 && _ResidentQueue[1].getState() != "Running"){
-                var s = parseInt(_ResidentQueue[1].getLimit(),10);
-                return (s+1);
+            } else if (_ResidentQueue.length == 1 && _ResidentQueue[0].getState() != "Terminated") {
+                var s = parseInt(_ResidentQueue[0].getLimit(), 10);
+                return (s + 1);
+            } else if (_ResidentQueue.length == 2 && _ResidentQueue[1].getState() != "Terminated") {
+                var s = parseInt(_ResidentQueue[1].getLimit(), 10);
+                return (s + 1);
             } else {
                 _StdOut.putText("NO ROOM FOR Y0o BITCH!!!");
                 return -1;

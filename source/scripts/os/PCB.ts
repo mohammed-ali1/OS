@@ -120,6 +120,13 @@ module TSOS{
             return this.block;
         }
 
+        public getPc(){
+            return this.pc;
+        }
+
+        public setPc(pc:number){
+            this.pc = pc;
+        }
         public inMemory(){
             if(this.inMemory)
                 return "True";

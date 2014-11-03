@@ -93,18 +93,15 @@ module TSOS {
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 //dont call cpu cycle
                 //call the scheduler instead
-                if(_CurrentScheduler.needContextSwitch()){
+                if(_ClockCycle >= _Quantum){
                     _CurrentScheduler.contextSwitch();
                 }
                 _CPU.cycle();
+                _ClockCycle++;
                 _CurrentProcess.displayPCB();
                 Shell.updateResident();
             }
-//            else if(_ReadyQueue.getSize() > 0){
-////                _CurrentScheduler = new Scheduler();
-//                this.krnExe(_ReadyQueue.dequeue());
-//            }
-            else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
+            else { // If there are no interrupts and there is nothing being executed then just be idle.
                 this.krnTrace("Idle");
             }
         }
@@ -203,7 +200,7 @@ module TSOS {
                     break;
                 case _RUN:
                     if(_CPU.isExecuting){
-                        if(_CurrentScheduler.needContextSwitch()){
+                        if(_ClockCycle >= _Quantum){
                             _CurrentScheduler.contextSwitch();
                         }
                     }else{

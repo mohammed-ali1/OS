@@ -90,10 +90,11 @@ var TSOS;
             } else if (_CPU.isExecuting) {
                 //dont call cpu cycle
                 //call the scheduler instead
-                if (_CurrentScheduler.needContextSwitch()) {
+                if (_ClockCycle >= _Quantum) {
                     _CurrentScheduler.contextSwitch();
                 }
                 _CPU.cycle();
+                _ClockCycle++;
                 _CurrentProcess.displayPCB();
                 TSOS.Shell.updateResident();
             } else {
@@ -190,7 +191,7 @@ var TSOS;
                     break;
                 case _RUN:
                     if (_CPU.isExecuting) {
-                        if (_CurrentScheduler.needContextSwitch()) {
+                        if (_ClockCycle >= _Quantum) {
                             _CurrentScheduler.contextSwitch();
                         }
                     } else {

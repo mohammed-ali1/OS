@@ -63,14 +63,13 @@ var TSOS;
             // Update the log console.
             var taLog = document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
-
-            if (_FancyColor % 2 == 0) {
-                document.getElementById("taHostLog").style.color = "#FFD801";
-                document.getElementById("taHostLog").style.border = "3px solid #E66C2C";
-            } else {
-                document.getElementById("taHostLog").style.color = "#E66C2C";
-                document.getElementById("taHostLog").style.border = "3px solid #FFD801";
-            }
+            //            if(_FancyColor % 2 == 0){
+            //                document.getElementById("taHostLog").style.color = "#FFD801";
+            //                document.getElementById("taHostLog").style.border = "3px solid #E66C2C";
+            //            }else{
+            //                document.getElementById("taHostLog").style.color = "#E66C2C";
+            //                document.getElementById("taHostLog").style.border = "3px solid #FFD801";
+            //            }
             //IF YOU LIKE COLORS UN-COMMENT THIS!
             //            taLog.style.color = "#" + Math.floor(Math.random()*16777215).toString(16); //YOU LIKE COLORS?
             // Optionally update a log database or some streaming service.

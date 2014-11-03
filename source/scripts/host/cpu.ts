@@ -42,7 +42,7 @@ module TSOS {
         }
 
         public setCPU(process:TSOS.Pcb): void {
-            this.PC = process.getBase();
+            this.PC = process.getPc();
             this.Acc = process.getAcc();
             this.IR = process.getIR();
             this.INS = "";
@@ -70,8 +70,6 @@ module TSOS {
 
             //Display the PCB
             _CurrentProcess.displayPCB();
-
-            _ClockCycle++;
         }
 
         public displayCPU(){

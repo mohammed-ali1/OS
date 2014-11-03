@@ -19,45 +19,51 @@ module TSOS{
                _CurrentProcess.setState(1);//set state to "Running"
                _CPU.setCPU(_CurrentProcess);
                _CPU.isExecuting = true;
+               _Kernel.krnTrace("PROCESSING PID: "+_CurrentProcess.getPid()+"\n");
            }
        }
 
-        public needContextSwitch():boolean{
-            return _ClockCycle >= _Quantum;
-        }
-
        public contextSwitch(){
+
+           this.reset();
+
+           if(_CurrentProcess.getState() == "Terminated"){
+               this.reset();
+           }
 
            var newProcess = this.getNextProcess();
 
-          if(newProcess != null || newProcess != undefined){
-
-              this.performSwitch(newProcess);
-              _CurrentProcess = newProcess;
-              _CurrentProcess.setState(1);
-              _CPU.setCPU(_CurrentProcess);
-              _CPU.isExecuting = true;
-          }else if(_CurrentProcess.getState() == "Terminated"){
-              this.reset();
-          }
+           if(newProcess == -1){
+               this.reset();
+               _CPU.reset();
+               _CPU.isExecuting = false;
+               _CPU.displayCPU();
+           }else {
+               this.performSwitch(_CurrentProcess);
+               _CurrentProcess = newProcess;
+               _Kernel.krnTrace("CONTEXT SWITCH TO PID: "+_CurrentProcess.getPid());
+               _CurrentProcess.setState(1);
+               _CPU.setCPU(_CurrentProcess);
+               _CPU.isExecuting = true;
+           }
        }
 
        public getNextProcess(){
            if(_ReadyQueue.getSize() > 0)
                return _ReadyQueue.dequeue();
-           return null;
+           return -1;
        }
 
        public reset(){
            _ClockCycle = 0;
-           _CPU.isExecuting = false;
            _CurrentProcess.displayPCB();
-           _CurrentProcess = null;
+           _CPU.displayCPU();
        }
 
        public performSwitch(process){
 
            if(process.getState() != "Terminated"){
+               _CurrentProcess.setPc(_CPU.PC);
                process.setState(2); //set state to waiting
                _ReadyQueue.enqueue(process);//push back to ready queue
                process.displayPCB();//update display

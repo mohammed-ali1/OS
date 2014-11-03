@@ -43,7 +43,7 @@ var TSOS;
         };
 
         Cpu.prototype.setCPU = function (process) {
-            this.PC = process.getBase();
+            this.PC = process.getPc();
             this.Acc = process.getAcc();
             this.IR = process.getIR();
             this.INS = "";
@@ -71,8 +71,6 @@ var TSOS;
 
             //Display the PCB
             _CurrentProcess.displayPCB();
-
-            _ClockCycle++;
         };
 
         Cpu.prototype.displayCPU = function () {

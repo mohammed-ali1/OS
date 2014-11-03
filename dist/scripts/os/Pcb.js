@@ -113,6 +113,13 @@ var TSOS;
             return this.block;
         };
 
+        Pcb.prototype.getPc = function () {
+            return this.pc;
+        };
+
+        Pcb.prototype.setPc = function (pc) {
+            this.pc = pc;
+        };
         Pcb.prototype.inMemory = function () {
             if (this.inMemory)
                 return "True";

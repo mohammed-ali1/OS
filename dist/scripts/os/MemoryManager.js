@@ -23,8 +23,6 @@ var TSOS;
 
         MemoryManager.prototype.clearMemory = function () {
             _Memory.clearMemory();
-
-            //            _ResidentQueue = new Array(); //Don't know how this works
             _ResidentQueue.splice(0, _ResidentQueue.length);
             alert("clearmem - Resident Length: " + _ResidentQueue.length);
             TSOS.Shell.updateResident();
@@ -52,10 +50,10 @@ var TSOS;
             //Need more thinking here!!!
             if (_ResidentQueue.length == 0) {
                 return 0;
-            } else if (_ResidentQueue.length == 1 && _ResidentQueue[0].getState() != "Running") {
+            } else if (_ResidentQueue.length == 1 && _ResidentQueue[0].getState() != "Terminated") {
                 var s = parseInt(_ResidentQueue[0].getLimit(), 10);
                 return (s + 1);
-            } else if (_ResidentQueue.length == 2 && _ResidentQueue[1].getState() != "Running") {
+            } else if (_ResidentQueue.length == 2 && _ResidentQueue[1].getState() != "Terminated") {
                 var s = parseInt(_ResidentQueue[1].getLimit(), 10);
                 return (s + 1);
             } else {
