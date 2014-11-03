@@ -95,6 +95,7 @@ var TSOS;
                 }
                 _CPU.cycle();
                 _ClockCycle++;
+                _Time += new Date().getMilliseconds();
                 _CurrentProcess.displayPCB();
                 TSOS.Shell.updateResident();
             } else {
@@ -190,13 +191,7 @@ var TSOS;
                     _StdOut.putText("WTF is this Instruction?");
                     break;
                 case _RUN:
-                    if (_CPU.isExecuting) {
-                        if (_ClockCycle >= _Quantum) {
-                            _CurrentScheduler.contextSwitch();
-                        }
-                    } else {
-                        _CurrentScheduler.setCurrentProcess();
-                    }
+                    _CurrentScheduler.startNewProcess();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

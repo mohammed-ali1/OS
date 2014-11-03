@@ -350,7 +350,6 @@ module TSOS {
 
             //Load in the Resident Queue
             _ResidentQueue.push(p);
-            alert("Resident Length: "+_ResidentQueue.length);
 
             //Print to Console
             _StdOut.putText("Loaded Successfully!");
@@ -509,10 +508,10 @@ module TSOS {
             if(args.length >0){
                 if(args >0){
                     _Quantum = args;
-                    _StdOut.putText("CurrentQuantum: " +_Quantum);
+                    _StdOut.putText("Current Quantum: " +_Quantum);
                 }else {
                     _Quantum = 6;
-                    _StdOut.putText("Bitch Please....Quantum can't be <=0: ");
+                    _StdOut.putText("Bitch Please....give me Quantum >0");
                     _Console.advanceLine();
                     _StdOut.putText("Current Quantum: "+_Quantum);
                 }
@@ -610,7 +609,7 @@ module TSOS {
         public shellRunAll(){
 
             for(var i=0; i<_ResidentQueue.length;i++){
-                if(_ResidentQueue[i].getState() == "New")
+                if(_ResidentQueue[i].getState() != "Terminated")
                 _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
             _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));

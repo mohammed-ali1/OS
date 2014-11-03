@@ -9,44 +9,40 @@ var TSOS;
             this.currentScheduler = "";
             this.currentScheduler = this.scheduler[index];
         }
-        Scheduler.prototype.setCurrentProcess = function () {
+        Scheduler.prototype.startNewProcess = function () {
             if (_ReadyQueue.getSize() > 0) {
                 _CurrentProcess = this.getNextProcess();
                 _CurrentProcess.setState(1); //set state to "Running"
-                _CPU.setCPU(_CurrentProcess);
-                _CPU.isExecuting = true;
+                _CPU.startProcessing(_CurrentProcess);
                 _Kernel.krnTrace("PROCESSING PID: " + _CurrentProcess.getPid() + "\n");
             }
         };
 
         Scheduler.prototype.contextSwitch = function () {
-            this.reset();
-
-            if (_CurrentProcess.getState() == "Terminated") {
-                this.reset();
-            }
-
             var newProcess = this.getNextProcess();
 
             if (newProcess == -1) {
-                this.reset();
+                _CurrentProcess.displayPCB();
                 _CPU.reset();
-                _CPU.isExecuting = false;
                 _CPU.displayCPU();
             } else {
                 this.performSwitch(_CurrentProcess);
                 _CurrentProcess = newProcess;
-                _Kernel.krnTrace("CONTEXT SWITCH TO PID: " + _CurrentProcess.getPid());
+                _Kernel.krnTrace("\n\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n\n");
                 _CurrentProcess.setState(1);
-                _CPU.setCPU(_CurrentProcess);
+                _CPU.startProcessing(_CurrentProcess);
                 _CPU.isExecuting = true;
             }
         };
 
         Scheduler.prototype.getNextProcess = function () {
-            if (_ReadyQueue.getSize() > 0)
+            if (_ReadyQueue.getSize() > 0) {
                 return _ReadyQueue.dequeue();
-            return -1;
+            } else if (_ReadyQueue.getSize() == 0 && _CurrentProcess.getState() != "Terminated") {
+                return _CurrentProcess;
+            } else {
+                return -1;
+            }
         };
 
         Scheduler.prototype.reset = function () {
@@ -57,7 +53,12 @@ var TSOS;
 
         Scheduler.prototype.performSwitch = function (process) {
             if (process.getState() != "Terminated") {
-                _CurrentProcess.setPc(_CPU.PC);
+                process.setPc(_CPU.PC);
+                process.setAcc(_CPU.Acc);
+                process.setX(_CPU.Xreg);
+                process.setY(_CPU.Yreg);
+                process.setZ(_CPU.Zflag);
+                process.setIr(_CPU.IR);
                 process.setState(2); //set state to waiting
                 _ReadyQueue.enqueue(process); //push back to ready queue
                 process.displayPCB(); //update display
@@ -65,7 +66,6 @@ var TSOS;
 
             if (process.getState() == "Terminated") {
                 process.displayPCB();
-                this.reset();
             }
         };
         return Scheduler;

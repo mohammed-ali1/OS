@@ -127,6 +127,27 @@ module TSOS{
         public setPc(pc:number){
             this.pc = pc;
         }
+
+        public setX(x:number){
+            this.x = x;
+        }
+
+        public setY(y:number){
+            this.y = y;
+        }
+
+        public setZ(z:number){
+            this.z = z;
+        }
+
+        public setAcc(acc:number){
+            this.acc = acc;
+        }
+
+        public setIr(ir:string){
+            this.ir = ir;
+        }
+
         public inMemory(){
             if(this.inMemory)
                 return "True";

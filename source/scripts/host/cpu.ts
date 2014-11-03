@@ -41,7 +41,7 @@ module TSOS {
             this.isExecuting = false;
         }
 
-        public setCPU(process:TSOS.Pcb): void {
+        public startProcessing(process:TSOS.Pcb): void {
             this.PC = process.getPc();
             this.Acc = process.getAcc();
             this.IR = process.getIR();
@@ -49,6 +49,7 @@ module TSOS {
             this.Xreg = process.getX();
             this.Yreg = process.getY();
             this.Zflag = process.getZ();
+            this.isExecuting = true;
         }
         
         public cycle(): void {
@@ -67,9 +68,6 @@ module TSOS {
 
             //Update PCB
             _CPU.updatePcb(_CurrentProcess);
-
-            //Display the PCB
-            _CurrentProcess.displayPCB();
         }
 
         public displayCPU(){
@@ -333,7 +331,6 @@ module TSOS {
          * @private
          */
         public _FF_Instruction(str:string){
-
             _CPU.IR = str;
             _KernelInterruptQueue.enqueue(new Interrupt(_SystemCall,_CPU.Xreg));
             _CPU.INS = "CPU [SYS]" +

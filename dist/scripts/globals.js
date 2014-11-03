@@ -108,6 +108,8 @@ var _InvalidOpCode = 999;
 var _Quantum = 6;
 var _CurrentScheduler;
 
+var _Time = new Date().getMilliseconds();
+
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();
 };

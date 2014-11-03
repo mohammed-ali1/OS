@@ -42,7 +42,7 @@ var TSOS;
             this.isExecuting = false;
         };
 
-        Cpu.prototype.setCPU = function (process) {
+        Cpu.prototype.startProcessing = function (process) {
             this.PC = process.getPc();
             this.Acc = process.getAcc();
             this.IR = process.getIR();
@@ -50,6 +50,7 @@ var TSOS;
             this.Xreg = process.getX();
             this.Yreg = process.getY();
             this.Zflag = process.getZ();
+            this.isExecuting = true;
         };
 
         Cpu.prototype.cycle = function () {
@@ -68,9 +69,6 @@ var TSOS;
 
             //Update PCB
             _CPU.updatePcb(_CurrentProcess);
-
-            //Display the PCB
-            _CurrentProcess.displayPCB();
         };
 
         Cpu.prototype.displayCPU = function () {

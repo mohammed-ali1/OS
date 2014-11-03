@@ -120,6 +120,27 @@ var TSOS;
         Pcb.prototype.setPc = function (pc) {
             this.pc = pc;
         };
+
+        Pcb.prototype.setX = function (x) {
+            this.x = x;
+        };
+
+        Pcb.prototype.setY = function (y) {
+            this.y = y;
+        };
+
+        Pcb.prototype.setZ = function (z) {
+            this.z = z;
+        };
+
+        Pcb.prototype.setAcc = function (acc) {
+            this.acc = acc;
+        };
+
+        Pcb.prototype.setIr = function (ir) {
+            this.ir = ir;
+        };
+
         Pcb.prototype.inMemory = function () {
             if (this.inMemory)
                 return "True";
