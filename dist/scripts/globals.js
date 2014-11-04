@@ -84,7 +84,7 @@ var _Pcb;
 //Ready and Resident Queues
 var _ResidentQueue = null;
 var _ReadyQueue;
-var _CurrentProcess;
+var _CurrentProcess = null;
 var _RUN = -5;
 var _ClockCycle = 0;
 

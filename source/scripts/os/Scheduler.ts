@@ -13,44 +13,50 @@ module TSOS{
         }
 
        public startNewProcess(){
-
            if(_ReadyQueue.getSize() > 0) {
                _CurrentProcess = this.getNextProcess();
-               _CurrentProcess.setState(1);//set state to "Running"
-               _CPU.startProcessing(_CurrentProcess);
-               _Kernel.krnTrace("PROCESSING PID: "+_CurrentProcess.getPid()+"\n");
+               if(_CurrentProcess != null) {
+                   _CurrentProcess.setState(1);//set state to "Running"
+                   _CPU.startProcessing(_CurrentProcess);
+                   _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
+               }
+           }else{
+               this.reset();
+               _CPU.reset();
            }
        }
 
        public contextSwitch(){
 
+//           alert("in switch pid:"+_CurrentProcess.getPid());
+
            this.reset();
+
+           if(_CurrentProcess.getState() !="Terminated"){
+               this.performSwitch();
+           }
 
            var newProcess = this.getNextProcess();
 
-           if(newProcess == -1){
+           if(newProcess == null){
                _CurrentProcess.displayPCB();
                _CPU.reset();
                _CPU.displayCPU();
-           }else {
-               this.performSwitch(_CurrentProcess);
+               return;
+           }else{
                _CurrentProcess = newProcess;
-               _Kernel.krnTrace("\n\nCONTEXT SWITCH TO PID: "+_CurrentProcess.getPid()+"\n\n");
-               _CurrentProcess.setState(1);
+               _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: "+_CurrentProcess.getPid()+"\n");
+               _CurrentProcess.setState(1); //set state to running
                _CPU.startProcessing(_CurrentProcess);
-               _CPU.isExecuting = true;
            }
        }
 
        public getNextProcess(){
-
-             if (_ReadyQueue.getSize() > 0){
+           if (_ReadyQueue.getSize() > 0) {
                return _ReadyQueue.dequeue();
-           }else if(_ReadyQueue.getSize() == 0 && _CurrentProcess.getState() != "Terminated"){
-               return _CurrentProcess;
            }else{
-               return -1;
-             }
+               return null;
+           }
        }
 
        public reset(){
@@ -59,23 +65,28 @@ module TSOS{
            _CPU.displayCPU();
        }
 
-       public performSwitch(process:TSOS.Pcb){
+       public performSwitch(){
 
-           if(process.getState() != "Terminated"){
-               process.setPc(_CPU.PC);
-               process.setAcc(_CPU.Acc);
-               process.setX(_CPU.Xreg);
-               process.setY(_CPU.Yreg);
-               process.setZ(_CPU.Zflag);
-               process.setIr(_CPU.IR);
-               process.setState(2); //set state to waiting
-               _ReadyQueue.enqueue(process);//push back to ready queue
-               process.displayPCB();//update display
+           if(_CurrentProcess.getState() != "Terminated"){
+//               alert("state before: "+_CurrentProcess.getState());
+               _CurrentProcess.setPc(_CPU.PC);
+               _CurrentProcess.setAcc(_CPU.Acc);
+               _CurrentProcess.setX(_CPU.Xreg);
+               _CurrentProcess.setY(_CPU.Yreg);
+               _CurrentProcess.setZ(_CPU.Zflag);
+               _CurrentProcess.setIr(_CPU.IR);
+               _CurrentProcess.setState(2); //set state to waiting
+//               alert("state after: "+_CurrentProcess.getState());
+               _ReadyQueue.enqueue(_CurrentProcess);//push back to ready queue
+               _CurrentProcess.displayPCB();//update display
+               _CPU.displayCPU();
            }
 
-           if (process.getState() == "Terminated"){
-               process.displayPCB();
-           }
+//           if (_CurrentProcess.getState() == "Terminated" && _ReadyQueue.getSize()> 0){
+//               _CurrentProcess.displayPCB();
+//               _CPU.displayCPU();
+//               _KernelInterruptQueue.enqueue(new Interrupt(_Break,0));
+//           }
        }
     }
 }

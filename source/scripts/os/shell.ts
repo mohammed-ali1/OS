@@ -609,7 +609,7 @@ module TSOS {
         public shellRunAll(){
 
             for(var i=0; i<_ResidentQueue.length;i++){
-                if(_ResidentQueue[i].getState() != "Terminated")
+                if(_ResidentQueue[i].getState() == "New")
                 _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
             _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));

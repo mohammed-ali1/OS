@@ -86,7 +86,7 @@ var _Pcb:TSOS.Pcb;
 //Ready and Resident Queues
 var _ResidentQueue: any[] =  null;
 var _ReadyQueue : TSOS.Queue;
-var _CurrentProcess : TSOS.Pcb;
+var _CurrentProcess :any = null;
 var _RUN = -5;
 var _ClockCycle:number = 0;
 

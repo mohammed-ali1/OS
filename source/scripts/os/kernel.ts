@@ -94,6 +94,7 @@ module TSOS {
                 //dont call cpu cycle
                 //call the scheduler instead
                 if(_ClockCycle >= _Quantum){
+//                    alert("need switch");
                     _CurrentScheduler.contextSwitch();
                 }
                 _CPU.cycle();
@@ -194,7 +195,9 @@ module TSOS {
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
                     _CurrentProcess.setState(4);
                     _CurrentProcess.displayPCB();
+                    _Kernel.krnTrace("\n\n\tTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateResident();
+                    _CurrentScheduler.contextSwitch();
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
