@@ -13,11 +13,13 @@ module TSOS{
         }
 
         public read(index:number){
-                return _Memory.read(index);
+//                alert("read at: "+parseInt(_CurrentProcess.getBase()+index)+", OP: "+_CPU.IR);
+                return _Memory.read(parseInt(_CurrentProcess.getBase()+index));
         }
 
         public store(index:number, str:string){
-            _Memory.store(index,str);
+//            alert("store at: "+parseInt(_CurrentProcess.getBase()+index)+", str: "+str);
+            _Memory.store(parseInt(_CurrentProcess.getBase()+index),str);
         }
 
         public load(base ,str:string){

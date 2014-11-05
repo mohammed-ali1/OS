@@ -6,7 +6,7 @@
      Requires global.ts.
 
      Routines for the host CPU simulation, NOT for the OS itself.
-     In this manner, it's A LITTLE BIT like a hypervisor,
+     In _CPU manner, it's A LITTLE BIT like a hypervisor,
      in that the Document environment inside a browser is the "bare metal" (so to speak) for which we write code
      that hosts our client OS. But that analogy only goes so far, and the lines are blurred, because we are using
      TypeScript/JavaScript in both the host and client environments.
@@ -31,31 +31,31 @@ module TSOS {
         }
 
         public reset(){
-            this.PC = 0;
-            this.Acc = 0;
-            this.IR = "?";
-            this.INS = "";
-            this.Xreg = 0;
-            this.Yreg = 0;
-            this.Zflag = 0;
-            this.isExecuting = false;
+            _CPU.PC = 0;
+            _CPU.Acc = 0;
+            _CPU.IR = "?";
+            _CPU.INS = "";
+            _CPU.Xreg = 0;
+            _CPU.Yreg = 0;
+            _CPU.Zflag = 0;
+            _CPU.isExecuting = false;
         }
 
         public startProcessing(process:TSOS.Pcb): void {
-            this.PC = process.getPc();
-            this.Acc = process.getAcc();
-            this.IR = process.getIR();
-            this.INS = "";
-            this.Xreg = process.getX();
-            this.Yreg = process.getY();
-            this.Zflag = process.getZ();
-            this.isExecuting = true;
+            _CPU.PC = process.getPc();
+            _CPU.Acc = process.getAcc();
+            _CPU.IR = process.getIR();
+            _CPU.INS = "";
+            _CPU.Xreg = process.getX();
+            _CPU.Yreg = process.getY();
+            _CPU.Zflag = process.getZ();
+            _CPU.isExecuting = true;
         }
-        
+
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
-            // Do the real work here. Be sure to set this.isExecuting appropriately.
+            // Do the real work here. Be sure to set _CPU.isExecuting appropriately.
 
             //Read Stuff from Memory @ Program Counter
             _CPU.manageOpCodes(_MemoryManager.read(_CPU.PC));
@@ -72,12 +72,12 @@ module TSOS {
 
         public displayCPU(){
 
-            document.getElementById("pc").innerHTML = this.PC.toString(); //Off by one IDK why!
-            document.getElementById("acc").innerHTML = this.Acc.toString();
-            document.getElementById("ir").innerHTML = this.IR;
-            document.getElementById("x").innerHTML = this.Xreg.toString();
-            document.getElementById("y").innerHTML = this.Yreg.toString();
-            document.getElementById("z").innerHTML = this.Zflag.toString();
+            document.getElementById("pc").innerHTML = _CPU.PC.toString(); //Off by one IDK why!
+            document.getElementById("acc").innerHTML = _CPU.Acc.toString();
+            document.getElementById("ir").innerHTML = _CPU.IR;
+            document.getElementById("x").innerHTML = _CPU.Xreg.toString();
+            document.getElementById("y").innerHTML = _CPU.Yreg.toString();
+            document.getElementById("z").innerHTML = _CPU.Zflag.toString();
             document.getElementById("instruction").innerHTML = _CPU.INS;
         }
 
@@ -153,7 +153,7 @@ module TSOS {
         public _AD_Instruction(str:string){
 
             _CPU.IR = str;
-            var address = this.loadTwoBytes();  //load 2 bytes
+            var address = _CPU.loadTwoBytes();  //load 2 bytes
             _CPU.Acc = (parseInt(_MemoryManager.read(address),16)); //store in the Acc from memory
             _CPU.INS = "CPU   [LDA $00" + address.toString(16) + "]   " +
                 "[" +_CPU.IR+", "+address.toString(16)+", 00]";
@@ -166,7 +166,7 @@ module TSOS {
         public _8D_Instruction(str:string){
 
             _CPU.IR = str;
-            var address = this.loadTwoBytes(); //load 2 bytes
+            var address = _CPU.loadTwoBytes(); //load 2 bytes
             _MemoryManager.store(address,_CPU.Acc.toString(16)); //store in hex
             _CPU.INS = "CPU   [STA $00" +address.toString(16) + "]   " +
                 "["+_CPU.IR+", "+address.toString(16)+", 00]";
@@ -179,7 +179,7 @@ module TSOS {
         public _6D_Instruction(str:string){
 
             _CPU.IR = str;
-            var address = this.loadTwoBytes(); // load 2 bytes
+            var address = _CPU.loadTwoBytes(); // load 2 bytes
             var value = parseInt(_MemoryManager.read(address),16);
             _CPU.Acc += value;
             _CPU.INS = "CPU   [ADC   $00" + address.toString(16) + "]" +
@@ -207,7 +207,7 @@ module TSOS {
         public _AE_Instruction(str:string){
 
             _CPU.IR = str;
-            var address = this.loadTwoBytes(); // load 2 bytes
+            var address = _CPU.loadTwoBytes(); // load 2 bytes
             _CPU.Xreg = parseInt(_MemoryManager.read(address),16);
             _CPU.INS = "CPU   [LDX   $00" + address.toString(16) + "]" +
                 "   ["+_CPU.IR+", "+address.toString(16)+", 00]";
@@ -234,7 +234,7 @@ module TSOS {
         public _AC_Instruction(str:string){
 
             _CPU.IR = str;
-            var address = this.loadTwoBytes(); // load 2 bytes
+            var address = _CPU.loadTwoBytes(); // load 2 bytes
             _CPU.Yreg = parseInt(_MemoryManager.read(address),16);
             _CPU.INS = "CPU   [LDY   $00" + address.toString(16)+ "]" +
                 "   ["+_CPU.IR+", "+address.toString(16)+", 00]";
@@ -245,7 +245,7 @@ module TSOS {
          * @private
          */
         public _EA_Instruction(str:string){
-            _CPU.INS = "CPU   [EA]";  //Ha Ha this was easy!
+            _CPU.INS = "CPU   [EA]";  //Ha Ha _CPU was easy!
             return;
         }
 
@@ -269,7 +269,7 @@ module TSOS {
         public _EC_Instruction(str:string){
 
             _CPU.IR = str;
-            var address = this.loadTwoBytes(); // load 2 bytes
+            var address = _CPU.loadTwoBytes(); // load 2 bytes
             var value = parseInt(_MemoryManager.read(address),16); // get the contents of the address.
 
             if(value == _CPU.Xreg){
@@ -294,13 +294,15 @@ module TSOS {
 
                 var address:number = parseInt(_MemoryManager.read(++_CPU.PC),16);
                 _CPU.PC += address;
-                if(_CPU.PC > _CurrentProcess.getLimit()){
+                alert("PC Before: "+_CPU.PC+", Limit: "+_BlockSize);
+                if(_CPU.PC > _BlockSize){
                     _CPU.PC -= _BlockSize;
                 }
+                alert("PC After: "+_CPU.PC+", Limit: "+_BlockSize);
 
-                if(_CPU.PC > _CurrentProcess.getLimit()){
-                    _KernelInterruptQueue.enqueue(new Interrupt(_MemoryErrr,0)); //Out of Memory Bounds!!!
-                }
+//                if(_CPU.PC > _CurrentProcess.getLimit()){
+//                    _KernelInterruptQueue.enqueue(new Interrupt(_MemoryErrr,0)); //Out of Memory Bounds!!!
+//                }
 
                 _CPU.INS = "CPU [D0 $EF]" +
                     "   ["+_CPU.IR+", "+address+"]";
@@ -318,7 +320,7 @@ module TSOS {
          */
         public _EE_Instruction(str:string){
             _CPU.IR = str;
-            var address = this.loadTwoBytes(); // load 2 bytes
+            var address = _CPU.loadTwoBytes(); // load 2 bytes
             var value = parseInt(_MemoryManager.read(address),16); //get the address contents
             value++; // increment
             _MemoryManager.store(address,value.toString(16)); //store value at the address
@@ -345,12 +347,12 @@ module TSOS {
 
         public updatePcb(p:Pcb){
 
-            p.pc = _CPU.PC;
-            p.acc = _CPU.Acc;
-            p.ir = _CPU.IR;
-            p.x = _CPU.Xreg;
-            p.y = _CPU.Yreg;
-            p.z = _CPU.Zflag;
+            _CurrentProcess.pc = _CPU.PC;
+            _CurrentProcess.acc = _CPU.Acc;
+            _CurrentProcess.ir = _CPU.IR;
+            _CurrentProcess.x = _CPU.Xreg;
+            _CurrentProcess.y = _CPU.Yreg;
+            _CurrentProcess.z = _CPU.Zflag;
         }
     }
 }

@@ -22,6 +22,7 @@ var TSOS;
             Pcb.PID++;
             this.pid = Pcb.PID; //Increment PID all the time!
             this.base = b;
+            this.pc = this.base;
             this.limit = l;
             this.block = (this.base / _BlockSize);
             if (location == true)
@@ -139,6 +140,10 @@ var TSOS;
 
         Pcb.prototype.setIr = function (ir) {
             this.ir = ir;
+        };
+
+        Pcb.prototype.getBlock = function () {
+            return this.block;
         };
 
         Pcb.prototype.inMemory = function () {

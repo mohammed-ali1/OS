@@ -591,8 +591,8 @@ module TSOS {
             }
 
             if(_ResidentQueue[args].getState() == "New") {
-                _ReadyQueue.enqueue(_ResidentQueue[args]); //only put what's NEW!
-                _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
+                _ReadyQueue.enqueue(_ResidentQueue[args[0]]); //only put what's NEW!
+//                _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
             }
 //            this.displayReadyQueue(_CurrentProcess);
         }
@@ -612,7 +612,7 @@ module TSOS {
                 if(_ResidentQueue[i].getState() == "New")
                 _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
-            _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
+//            _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
         }
     }
 }

@@ -10,11 +10,13 @@ var TSOS;
             _Memory = new TSOS.Memory();
         }
         MemoryManager.prototype.read = function (index) {
-            return _Memory.read(index);
+            //                alert("read at: "+parseInt(_CurrentProcess.getBase()+index)+", OP: "+_CPU.IR);
+            return _Memory.read(parseInt(_CurrentProcess.getBase() + index));
         };
 
         MemoryManager.prototype.store = function (index, str) {
-            _Memory.store(index, str);
+            //            alert("store at: "+parseInt(_CurrentProcess.getBase()+index)+", str: "+str);
+            _Memory.store(parseInt(_CurrentProcess.getBase() + index), str);
         };
 
         MemoryManager.prototype.load = function (base, str) {

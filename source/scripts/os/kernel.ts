@@ -93,15 +93,17 @@ module TSOS {
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 //dont call cpu cycle
                 //call the scheduler instead
-                if(_ClockCycle >= _Quantum){
-//                    alert("need switch");
-                    _CurrentScheduler.contextSwitch();
-                }
+//                if(_ClockCycle >= _Quantum){
+////                    alert("need switch");
+//                    _CurrentScheduler.contextSwitch();
+//                }
                 _CPU.cycle();
-                _ClockCycle++;
-                _Time += new Date().getMilliseconds();
-                _CurrentProcess.displayPCB();
-                Shell.updateResident();
+//                _ClockCycle++;
+//                _Time += new Date().getMilliseconds();
+//                _CurrentProcess.displayPCB();
+//                Shell.updateResident();
+            }else if (_ReadyQueue.getSize()>0){
+                this.krnExe(_ReadyQueue.dequeue());
             }
             else { // If there are no interrupts and there is nothing being executed then just be idle.
                 this.krnTrace("Idle");
@@ -117,10 +119,11 @@ module TSOS {
             _CurrentProcess = p;
             this.krnTrace("Processing PID: " +  _CurrentProcess.getPid());
             _StdOut.putText("Processing PID: "+_CurrentProcess.getPid());
+            alert("pid: "+_CurrentProcess.getPid()+", Base: "+_CurrentProcess.getBase()+", Limit: "+_CurrentProcess.getLimit());
             _Console.advanceLine();
             _OsShell.putPrompt();
            _CPU.isExecuting = true;
-            _CPU.PC = _CurrentProcess.getBase();
+            _CPU.PC = 0;
             _CPU.displayCPU();
             _CurrentProcess.setState(1); //set state "Running"
             Shell.updateResident();
@@ -179,7 +182,7 @@ module TSOS {
                         var print = "";
                         var temp = parseInt(_MemoryManager.read(address),16);
                         var index = 0;
-
+                        alert("Address in FF is: "+(temp));
                         while (temp != "00"){
                             print += String.fromCharCode(temp).toString();
                             index++;
@@ -195,16 +198,17 @@ module TSOS {
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
                     _CurrentProcess.setState(4);
                     _CurrentProcess.displayPCB();
-                    _Kernel.krnTrace("\n\n\tTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
+                    _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateResident();
-                    _CurrentScheduler.contextSwitch();
+//                    _CurrentScheduler.startNewProcess();
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
                     break;
-                case _RUN:
-                        _CurrentScheduler.startNewProcess();
-                    break;
+//                case _RUN:
+//                        alert("RUn called");
+//                        _CurrentScheduler.startNewProcess();
+//                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }

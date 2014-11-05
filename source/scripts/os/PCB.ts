@@ -27,6 +27,7 @@ module TSOS{
             Pcb.PID++;
             this.pid = Pcb.PID;  //Increment PID all the time!
             this.base = b;
+            this.pc = this.base;
             this.limit = l;
             this.block = (this.base / _BlockSize);
             if(location == true)
@@ -147,6 +148,11 @@ module TSOS{
         public setIr(ir:string){
             this.ir = ir;
         }
+
+        public getBlock(){
+            return this.block;
+        }
+
 
         public inMemory(){
             if(this.inMemory)

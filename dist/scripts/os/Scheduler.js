@@ -10,25 +10,40 @@ var TSOS;
             this.currentScheduler = this.scheduler[index];
         }
         Scheduler.prototype.startNewProcess = function () {
-            if (_ReadyQueue.getSize() > 0) {
-                _CurrentProcess = this.getNextProcess();
-                if (_CurrentProcess != null) {
-                    _CurrentProcess.setState(1); //set state to "Running"
-                    _CPU.startProcessing(_CurrentProcess);
-                    _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
-                }
+            _CurrentProcess = this.getNextProcess();
+            if (_CurrentProcess != null) {
+                _CurrentProcess.setState(1);
+                _CPU.startProcessing(_CurrentProcess);
+                _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
             } else {
-                this.reset();
                 _CPU.reset();
+                this.reset();
             }
+            //           if(_ReadyQueue.getSize() > 0) {
+            //               _CurrentProcess = this.getNextProcess();
+            //               if(_CurrentProcess != null) {
+            //                   _CurrentProcess.setState(1);//set state to "Running"
+            //                   _CPU.startProcessing(_CurrentProcess);
+            //               }
+            //           }else if (_ReadyQueue.isEmpty() && _CurrentProcess.getState() == "Running"){
+            //               this.reset();
+            //               _CPU.startProcessing(_CurrentProcess);
+            //           }
+            //           else{
+            //               this.reset();
+            //               _CPU.reset();
+            //           }
         };
 
         Scheduler.prototype.contextSwitch = function () {
-            //           alert("in switch pid:"+_CurrentProcess.getPid());
             this.reset();
 
-            if (_CurrentProcess.getState() != "Terminated") {
-                this.performSwitch();
+            //if nothing on ready queue
+            //just reset and move on!
+            if (_CurrentProcess.getState() == "Terminated") {
+                _CPU.displayCPU();
+                _CurrentProcess.displayPCB();
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_Break, 0));
             }
 
             var newProcess = this.getNextProcess();
@@ -61,26 +76,16 @@ var TSOS;
         };
 
         Scheduler.prototype.performSwitch = function () {
-            if (_CurrentProcess.getState() != "Terminated") {
-                //               alert("state before: "+_CurrentProcess.getState());
-                _CurrentProcess.setPc(_CPU.PC);
-                _CurrentProcess.setAcc(_CPU.Acc);
-                _CurrentProcess.setX(_CPU.Xreg);
-                _CurrentProcess.setY(_CPU.Yreg);
-                _CurrentProcess.setZ(_CPU.Zflag);
-                _CurrentProcess.setIr(_CPU.IR);
-                _CurrentProcess.setState(2); //set state to waiting
-
-                //               alert("state after: "+_CurrentProcess.getState());
-                _ReadyQueue.enqueue(_CurrentProcess); //push back to ready queue
-                _CurrentProcess.displayPCB(); //update display
-                _CPU.displayCPU();
-            }
-            //           if (_CurrentProcess.getState() == "Terminated" && _ReadyQueue.getSize()> 0){
-            //               _CurrentProcess.displayPCB();
-            //               _CPU.displayCPU();
-            //               _KernelInterruptQueue.enqueue(new Interrupt(_Break,0));
-            //           }
+            _CurrentProcess.setPc(_CPU.PC);
+            _CurrentProcess.setAcc(_CPU.Acc);
+            _CurrentProcess.setX(_CPU.Xreg);
+            _CurrentProcess.setY(_CPU.Yreg);
+            _CurrentProcess.setZ(_CPU.Zflag);
+            _CurrentProcess.setIr(_CPU.IR);
+            _CurrentProcess.setState(2); //set state to waiting
+            _ReadyQueue.enqueue(_CurrentProcess); //push back to ready queue
+            _CurrentProcess.displayPCB(); //update display
+            _CPU.displayCPU();
         };
         return Scheduler;
     })();
