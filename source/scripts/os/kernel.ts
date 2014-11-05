@@ -123,7 +123,7 @@ module TSOS {
             _Console.advanceLine();
             _OsShell.putPrompt();
            _CPU.isExecuting = true;
-            _CPU.PC = 0;
+            _CPU.PC = _CurrentProcess.getBase();
             _CPU.displayCPU();
             _CurrentProcess.setState(1); //set state "Running"
             Shell.updateResident();
@@ -206,7 +206,7 @@ module TSOS {
                     _StdOut.putText("WTF is this Instruction?");
                     break;
 //                case _RUN:
-//                        alert("RUn called");
+////                        alert("RUn called");
 //                        _CurrentScheduler.startNewProcess();
 //                    break;
                 default:

@@ -118,7 +118,7 @@ var TSOS;
             _Console.advanceLine();
             _OsShell.putPrompt();
             _CPU.isExecuting = true;
-            _CPU.PC = 0;
+            _CPU.PC = _CurrentProcess.getBase();
             _CPU.displayCPU();
             _CurrentProcess.setState(1); //set state "Running"
             TSOS.Shell.updateResident();

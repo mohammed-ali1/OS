@@ -258,12 +258,13 @@ var TSOS;
             if (_CPU.Zflag == 0) {
                 var address = parseInt(_MemoryManager.read(++_CPU.PC), 16);
                 _CPU.PC += address;
-                alert("PC Before: " + _CPU.PC + ", Limit: " + _BlockSize);
-                if (_CPU.PC > _BlockSize) {
+
+                //                alert("PC Before: "+_CPU.PC+", Limit: "+_BlockSize);
+                if (_CPU.PC > (_CurrentProcess.getLimit() + 1)) {
                     _CPU.PC -= _BlockSize;
                 }
-                alert("PC After: " + _CPU.PC + ", Limit: " + _BlockSize);
 
+                //                alert("PC After: "+_CPU.PC+", Limit: "+_BlockSize);
                 //                if(_CPU.PC > _CurrentProcess.getLimit()){
                 //                    _KernelInterruptQueue.enqueue(new Interrupt(_MemoryErrr,0)); //Out of Memory Bounds!!!
                 //                }
