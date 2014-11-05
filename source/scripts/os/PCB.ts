@@ -6,7 +6,7 @@ module TSOS{
 
     export class Pcb{
 
-        private static PID: number = -1;    //Start at -1 so we can start incrementing from 0!
+        public static PID: number = -1;    //Start at -1 so we can start incrementing from 0!
         public pid:number = Pcb.PID;
         public pc:number = 0;
         public acc:number = 0;
@@ -27,7 +27,7 @@ module TSOS{
             Pcb.PID++;
             this.pid = Pcb.PID;  //Increment PID all the time!
             this.base = b;
-            this.pc = this.base;
+            this.pc = 0;
             this.limit = l;
             this.block = (this.base / _BlockSize);
             if(location == true)

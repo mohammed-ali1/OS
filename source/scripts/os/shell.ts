@@ -612,7 +612,7 @@ module TSOS {
                 if(_ResidentQueue[i].getState() == "New")
                 _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
-//            _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
+            _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
         }
     }
 }

@@ -22,7 +22,7 @@ var TSOS;
             Pcb.PID++;
             this.pid = Pcb.PID; //Increment PID all the time!
             this.base = b;
-            this.pc = this.base;
+            this.pc = 0;
             this.limit = l;
             this.block = (this.base / _BlockSize);
             if (location == true)

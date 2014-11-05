@@ -14,14 +14,16 @@ module TSOS{
 
        public startNewProcess(){
 
-           _CurrentProcess = this.getNextProcess();
-           if(_CurrentProcess != null){
+           if(_ReadyQueue.getSize()>0) {
+               _CurrentProcess = _ReadyQueue.dequeue();
                _CurrentProcess.setState(1);
                _CPU.startProcessing(_CurrentProcess);
-               _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
-           }else{
-               _CPU.reset();
+               _CPU.isExecuting = true;
+               _Kernel.krnTrace("\nPROCESSING PID: "+_CurrentProcess.getPid()+"\n");
+               Shell.updateResident();
+           }else if (_CurrentProcess.getState() != "Terminated" && _ReadyQueue.isEmpty()){
                this.reset();
+               return;
            }
 
 //           if(_ReadyQueue.getSize() > 0) {
@@ -45,33 +47,25 @@ module TSOS{
            //if nothing on ready queue
            //just reset and move on!
 
-           if(_CurrentProcess.getState() == "Terminated"){
-               _CPU.displayCPU();
-               _CurrentProcess.displayPCB();
-               _KernelInterruptQueue.enqueue(new Interrupt(_Break,0));
-           }
-
-           var newProcess = this.getNextProcess();
-
-           if(newProcess == null){
-               _CurrentProcess.displayPCB();
+           if(_ReadyQueue.isEmpty() && _CurrentProcess.getState() == "Terminated"){
                _CPU.reset();
-               _CPU.displayCPU();
                return;
-           }else{
-               _CurrentProcess = newProcess;
-               _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: "+_CurrentProcess.getPid()+"\n");
-               _CurrentProcess.setState(1); //set state to running
-               _CPU.startProcessing(_CurrentProcess);
            }
-       }
 
-       public getNextProcess(){
-           if (_ReadyQueue.getSize() > 0) {
-               return _ReadyQueue.dequeue();
-           }else{
-               return null;
-           }
+//           if(_CurrentProcess.getState() == "Terminated"){
+//               _CPU.displayCPU();
+//               _CurrentProcess.displayPCB();
+//               _KernelInterruptQueue.enqueue(new Interrupt(_Break,0));
+//           }
+           this.performSwitch();
+
+           _CurrentProcess = _ReadyQueue.dequeue();
+
+           _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: "+_CurrentProcess.getPid()+"\n");
+           _CurrentProcess.setState(1); //set state to running
+           _CPU.startProcessing(_CurrentProcess);
+           _Kernel.krnTrace("\nPROCESSING PID: "+_CurrentProcess.getPid()+"\n");
+           Shell.updateResident();
        }
 
        public reset(){

@@ -90,21 +90,27 @@ module TSOS {
                 // TODO: Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
-            } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
+            } else if (_ClockCycle >= _Quantum) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 //dont call cpu cycle
                 //call the scheduler instead
 //                if(_ClockCycle >= _Quantum){
 ////                    alert("need switch");
 //                    _CurrentScheduler.contextSwitch();
+                _CurrentScheduler.contextSwitch();
+
 //                }
-                _CPU.cycle();
+//                _CPU.cycle();
 //                _ClockCycle++;
 //                _Time += new Date().getMilliseconds();
 //                _CurrentProcess.displayPCB();
 //                Shell.updateResident();
-            }else if (_ReadyQueue.getSize()>0){
-                this.krnExe(_ReadyQueue.dequeue());
+            }else if(_CPU.isExecuting){
+                _CPU.cycle();
+                _ClockCycle++;
             }
+//            else if (_ReadyQueue.getSize()>0){
+//                this.krnExe(_ReadyQueue.dequeue());
+//            }
             else { // If there are no interrupts and there is nothing being executed then just be idle.
                 this.krnTrace("Idle");
             }
@@ -123,7 +129,7 @@ module TSOS {
             _Console.advanceLine();
             _OsShell.putPrompt();
            _CPU.isExecuting = true;
-            _CPU.PC = _CurrentProcess.getBase();
+            _CPU.PC = 0;
             _CPU.displayCPU();
             _CurrentProcess.setState(1); //set state "Running"
             Shell.updateResident();
@@ -200,15 +206,15 @@ module TSOS {
                     _CurrentProcess.displayPCB();
                     _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateResident();
-//                    _CurrentScheduler.startNewProcess();
+                    _CurrentScheduler.startNewProcess();
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
                     break;
-//                case _RUN:
-////                        alert("RUn called");
-//                        _CurrentScheduler.startNewProcess();
-//                    break;
+                case _RUN:
+//                        alert("RUn called");
+                        _CurrentScheduler.startNewProcess();
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }

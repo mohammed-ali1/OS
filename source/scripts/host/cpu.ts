@@ -72,7 +72,7 @@ module TSOS {
 
         public displayCPU(){
 
-            document.getElementById("pc").innerHTML = _CPU.PC.toString(); //Off by one IDK why!
+            document.getElementById("pc").innerHTML = parseInt(_CPU.PC+_CurrentProcess.getBase()).toString(); //Off by one IDK why!
             document.getElementById("acc").innerHTML = _CPU.Acc.toString();
             document.getElementById("ir").innerHTML = _CPU.IR;
             document.getElementById("x").innerHTML = _CPU.Xreg.toString();
@@ -295,7 +295,7 @@ module TSOS {
                 var address:number = parseInt(_MemoryManager.read(++_CPU.PC),16);
                 _CPU.PC += address;
 //                alert("PC Before: "+_CPU.PC+", Limit: "+_BlockSize);
-                if(_CPU.PC > (_CurrentProcess.getLimit()+1)){
+                if(_CPU.PC > _BlockSize){
                     _CPU.PC -= _BlockSize;
                 }
 //                alert("PC After: "+_CPU.PC+", Limit: "+_BlockSize);
