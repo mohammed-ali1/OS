@@ -6,21 +6,23 @@ module TSOS{
 
     export class Pcb{
 
-        public static PID: number = -1;    //Start at -1 so we can start incrementing from 0!
-        public pid:number = Pcb.PID;
-        public pc:number = 0;
-        public acc:number = 0;
-        public ir:string = "";
-        public x:number = 0;
-        public y:number = 0;
-        public z:number = 0;
-        public base: number = 0;
-        public limit:number = 0;
-        public state:string = "?";
-        public length:number = 0; //Length of the program
-        public block : number = 0;
-        public inMemory:boolean = false;
-        public block:number = 0;
+        private static PID: number = -1;    //Start at -1 so we can start incrementing from 0!
+        private pid:number = Pcb.PID;
+        private pc:number = 0;
+        private acc:number = 0;
+        private ir:string = "";
+        private x:number = 0;
+        private y:number = 0;
+        private z:number = 0;
+        private base: number = 0;
+        private limit:number = 0;
+        private state:string = "?";
+        private length:number = 0; //Length of the program
+        private block : number = 0;
+        private inMemory:boolean = false;
+        private block:number = 0;
+        private timeArrived : number = 0;
+        private timeFinished: number = 0;
 
         constructor(b:number, l:number, location:boolean){
 
@@ -38,7 +40,7 @@ module TSOS{
          * Displays the the status of the current PCB.
          */
         public displayPCB(){
-            document.getElementById("pcbPid").innerHTML = "" + this.getPid();
+            document.getElementById("pcbPid").innerHTML = "" + this.pid;
             document.getElementById("pcbBase").innerHTML = "" + this.base;
             document.getElementById("pcbLimit").innerHTML =  "" + this.limit;
             document.getElementById("pcbStatus").innerHTML = this.state.toString();
@@ -149,8 +151,24 @@ module TSOS{
             this.ir = ir;
         }
 
+        public setTimeArrived(time: number){
+            this.timeArrived = time;
+        }
+
+        public setTimeFinished(time:number){
+            this.timeFinished = time;
+        }
+
         public getBlock(){
             return this.block;
+        }
+
+        public getTimeArrived(){
+            return this.timeArrived;
+        }
+
+        public getTimeFinished(){
+            return this.timeFinished;
         }
 
 
@@ -159,6 +177,32 @@ module TSOS{
                 return "True";
             else
                 return "False";
+        }
+
+        public displayTimeMonitor(){
+
+            var table = "<table>";
+
+            table += "<th>PID</th>";
+            table += "<th>A-Time</th>";
+            table += "<th>T-Time</th>";
+            table += "<th>TA-Time</th>";
+
+            for(var i=0; i<_ResidentQueue.length;i++){
+                var p:TSOS.Pcb = _ResidentQueue[i];
+                if(p.getState() == "Terminated"){
+                    table += "<tr>";
+                    table += "<td>" + p.getPid() + "</td>";
+                    table += "<td>" + p.getTimeArrived() + "</td>";
+                    table += "<td>" + p.getTimeFinished() + "</td>";
+                    table += "<td>" + parseInt(p.getTimeFinished() - p.getTimeArrived()) + "</td>";
+                    table += "</tr>";
+                }
+            }
+
+            table += "</table>";
+            document.getElementById("monitor").innerHTML = table;
+
         }
     }
 }

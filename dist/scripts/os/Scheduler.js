@@ -12,52 +12,50 @@ var TSOS;
         Scheduler.prototype.startNewProcess = function () {
             if (_ReadyQueue.getSize() > 0) {
                 _CurrentProcess = _ReadyQueue.dequeue();
+                alert("start new process ready size; " + _ReadyQueue.getSize() + ", PID: " + _CurrentProcess.getPid());
+
+                //               if(_CurrentProcess.getState() == "Killed"){
+                //                   ///do something...
+                //                   alert("killed caught");
+                //                   _KernelInterruptQueue.enqueue(new Interrupt(_Killed,0));
+                //                   return;
+                //               }
                 _CurrentProcess.setState(1);
                 _CPU.startProcessing(_CurrentProcess);
-                _CPU.isExecuting = true;
+
+                //               _CPU.isExecuting = true;
                 _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
                 TSOS.Shell.updateResident();
             } else if (_CurrentProcess.getState() != "Terminated" && _ReadyQueue.isEmpty()) {
                 this.reset();
                 return;
             }
-            //           if(_ReadyQueue.getSize() > 0) {
-            //               _CurrentProcess = this.getNextProcess();
-            //               if(_CurrentProcess != null) {
-            //                   _CurrentProcess.setState(1);//set state to "Running"
-            //                   _CPU.startProcessing(_CurrentProcess);
-            //               }
-            //           }else if (_ReadyQueue.isEmpty() && _CurrentProcess.getState() == "Running"){
-            //               this.reset();
-            //               _CPU.startProcessing(_CurrentProcess);
-            //           }
-            //           else{
-            //               this.reset();
-            //               _CPU.reset();
-            //           }
         };
 
         Scheduler.prototype.contextSwitch = function () {
             this.reset();
 
             //if nothing on ready queue
-            //just reset and move on!
+            //just reset and go back to Idle!
             if (_ReadyQueue.isEmpty() && _CurrentProcess.getState() == "Terminated") {
                 _CPU.reset();
                 return;
             }
 
-            //           if(_CurrentProcess.getState() == "Terminated"){
-            //               _CPU.displayCPU();
-            //               _CurrentProcess.displayPCB();
-            //               _KernelInterruptQueue.enqueue(new Interrupt(_Break,0));
-            //           }
             this.performSwitch();
 
             _CurrentProcess = _ReadyQueue.dequeue();
-
+            if (_CurrentProcess.getState() == "Killed") {
+                ///do something...
+                alert("killed caught");
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_Killed, 0));
+                return;
+            }
             _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
+
             _CurrentProcess.setState(1); //set state to running
+
+            //           _CurrentProcess.setTimeArrived(_OSclock);
             _CPU.startProcessing(_CurrentProcess);
             _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
             TSOS.Shell.updateResident();
@@ -66,10 +64,18 @@ var TSOS;
         Scheduler.prototype.reset = function () {
             _ClockCycle = 0;
             _CurrentProcess.displayPCB();
-            _CPU.displayCPU();
+            //           _CPU.displayCPU();
         };
 
         Scheduler.prototype.performSwitch = function () {
+            //
+            //           if(_CurrentProcess.getState() == "Terminated"){
+            //               ///do something...
+            //               alert("Terminated caught ready size; "+_ReadyQueue.getSize());
+            ////               _ReadyQueue.dequeue();
+            //               this.startNewProcess();
+            ////               return;
+            //           }
             _CurrentProcess.setPc(_CPU.PC);
             _CurrentProcess.setAcc(_CPU.Acc);
             _CurrentProcess.setX(_CPU.Xreg);

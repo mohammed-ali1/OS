@@ -31,11 +31,16 @@ var TSOS;
 
             //Initialize Ready Queue for the Processes to be loaded
             _ReadyQueue = new TSOS.Queue();
+            _FakeQueue = new Array();
 
+            //            _FakeQueue = _ReadyQueue;
             //Initialize Resident Queue
             _ResidentQueue = new Array();
 
             _CurrentScheduler = new TSOS.Scheduler(0);
+
+            //
+            _Time = new Date();
 
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
@@ -90,16 +95,10 @@ var TSOS;
             } else if (_ClockCycle >= _Quantum) {
                 //dont call cpu cycle
                 //call the scheduler instead
-                //                if(_ClockCycle >= _Quantum){
-                ////                    alert("need switch");
-                //                    _CurrentScheduler.contextSwitch();
-                _CurrentScheduler.contextSwitch();
-                //                }
-                //                _CPU.cycle();
-                //                _ClockCycle++;
-                //                _Time += new Date().getMilliseconds();
-                //                _CurrentProcess.displayPCB();
-                //                Shell.updateResident();
+                //                _CPU.isExecuting = false;
+                //                _KernelInterruptQueue.enqueue(new Interrupt(_ContextSwitch,0));
+                //                return;
+                this.krnInterruptHandler(_ContextSwitch, 0);
             } else if (_CPU.isExecuting) {
                 _CPU.cycle();
                 _ClockCycle++;
@@ -112,21 +111,21 @@ var TSOS;
         * Execute the PID from the Ready Queue!
         * @param p, the PID to execute.
         */
-        Kernel.prototype.krnExe = function (p) {
-            _CurrentProcess = p;
-            this.krnTrace("Processing PID: " + _CurrentProcess.getPid());
-            _StdOut.putText("Processing PID: " + _CurrentProcess.getPid());
-            alert("pid: " + _CurrentProcess.getPid() + ", Base: " + _CurrentProcess.getBase() + ", Limit: " + _CurrentProcess.getLimit());
-            _Console.advanceLine();
-            _OsShell.putPrompt();
-            _CPU.isExecuting = true;
-            _CPU.PC = 0;
-            _CPU.displayCPU();
-            _CurrentProcess.setState(1); //set state "Running"
-            TSOS.Shell.updateResident();
-            //            Shell.updateReady(_CurrentProcess);
-        };
-
+        //        public krnExe(p:Pcb){
+        //
+        //            _CurrentProcess = p;
+        //            this.krnTrace("Processing PID: " +  _CurrentProcess.getPid());
+        //            _StdOut.putText("Processing PID: "+_CurrentProcess.getPid());
+        //            alert("pid: "+_CurrentProcess.getPid()+", Base: "+_CurrentProcess.getBase()+", Limit: "+_CurrentProcess.getLimit());
+        //            _Console.advanceLine();
+        //            _OsShell.putPrompt();
+        //           _CPU.isExecuting = true;
+        //            _CPU.PC = 0;
+        //            _CPU.displayCPU();
+        //            _CurrentProcess.setState(1); //set state "Running"
+        //            Shell.updateResident();
+        //            Shell.updateReady(_CurrentProcess);
+        //        }
         //
         // Interrupt Handling
         //
@@ -175,7 +174,7 @@ var TSOS;
                         var print = "";
                         var temp = parseInt(_MemoryManager.read(address), 16);
                         var index = 0;
-                        alert("Address in FF is: " + (temp));
+                        alert("Address in FF is: " + (temp) + " PID: " + _CurrentProcess.getPid() + " PC: " + parseInt(_CurrentProcess.getBase() + _CPU.PC));
                         while (temp != "00") {
                             print += String.fromCharCode(temp).toString();
                             index++;
@@ -191,6 +190,7 @@ var TSOS;
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
                     _CurrentProcess.setState(4);
                     _CurrentProcess.displayPCB();
+                    _CurrentProcess.displayTimeMonitor();
                     _Kernel.krnTrace("\n\nTERMINATING PID: " + _CurrentProcess.getPid() + "\n");
                     TSOS.Shell.updateResident();
                     _CurrentScheduler.startNewProcess();
@@ -199,7 +199,13 @@ var TSOS;
                     _StdOut.putText("WTF is this Instruction?");
                     break;
                 case _RUN:
-                    //                        alert("RUn called");
+                    _CurrentScheduler.startNewProcess();
+                    break;
+                case _ContextSwitch:
+                    _CurrentScheduler.contextSwitch();
+                    break;
+                case _Killed:
+                    _ReadyQueue.dequeue();
                     _CurrentScheduler.startNewProcess();
                     break;
                 default:

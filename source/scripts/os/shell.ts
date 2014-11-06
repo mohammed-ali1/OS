@@ -369,7 +369,7 @@ module TSOS {
             tableView +="<th>Limit</th>";
             tableView +="<th>State</th>";
             tableView +="<th>Memory Location</th>";
-            for(var i =0; i<_ResidentQueue.length;i++) {
+            for(var i = _ResidentQueue.length-1; i>=0;i--) {
 
                 var s:TSOS.Pcb = _ResidentQueue[i];
                 tableView += "<tr>";
@@ -384,29 +384,29 @@ module TSOS {
             document.getElementById("displayResident").innerHTML = tableView;
         }
 
-//        public static updateReady(p:Pcb){
-//
-//            var tableView = "<table>";
-//            tableView +="<th>PID</th>";
-//            tableView +="<th>Base</th>";
-//            tableView +="<th>Limit</th>";
-//            tableView +="<th>State</th>";
-//            tableView +="<th>Memory Location</th>";
-//
-//            var s:TSOS.Pcb = _ResidentQueue[p.getPid()];
-//            if(s.getState() =="Running") {
-//                tableView += "<tr>";
-//                tableView += "<td>" + s.getPid().toString() + "</td>";
-//                tableView += "<td>" + s.getBase().toString() + "</td>";
-//                tableView += "<td>" + s.getLimit().toString() + "</td>";
-//                tableView += "<td>" + s.getState().toString() + "</td>";
-////                   tableView += "<td>" + s.inMemory().toString()+"</td>";
-//                tableView += "</tr>";
-//            }
-//
-//            tableView += "</table>";
-//            document.getElementById("readyQueue").innerHTML = tableView;
-//        }
+        public static updateReady(p:Pcb){
+
+            var tableView = "<table>";
+            tableView +="<th>PID</th>";
+            tableView +="<th>Base</th>";
+            tableView +="<th>Limit</th>";
+            tableView +="<th>State</th>";
+            tableView +="<th>Memory Location</th>";
+
+            var s:TSOS.Pcb = p;
+            if(s.getState() =="Running") {
+                tableView += "<tr>";
+                tableView += "<td>" + s.getPid().toString() + "</td>";
+                tableView += "<td>" + s.getBase().toString() + "</td>";
+                tableView += "<td>" + s.getLimit().toString() + "</td>";
+                tableView += "<td>" + s.getState().toString() + "</td>";
+//                   tableView += "<td>" + s.inMemory().toString()+"</td>";
+                tableView += "</tr>";
+            }
+
+            tableView += "</table>";
+            document.getElementById("readyQueue").innerHTML = tableView;
+        }
 
         /**
          * Changes the status of the system.
@@ -511,7 +511,7 @@ module TSOS {
                     _StdOut.putText("Current Quantum: " +_Quantum);
                 }else {
                     _Quantum = 6;
-                    _StdOut.putText("Bitch Please....give me Quantum >0");
+                    _StdOut.putText("Bitch Please....give me Quantum >"+_Quantum);
                     _Console.advanceLine();
                     _StdOut.putText("Current Quantum: "+_Quantum);
                 }
@@ -521,6 +521,9 @@ module TSOS {
         }
 
         public shellPs(){
+
+            _StdOut.putText("Current Process ID: "+_CurrentProcess.getPid());
+            return;
             for(var i=0; i<_ResidentQueue.length;i++){
                 var temp : TSOS.Pcb = _ResidentQueue[i];
                 if(temp.getState() == "Running"){
@@ -547,9 +550,16 @@ module TSOS {
             var killThisBitch:TSOS.Pcb;
 
             if(_CurrentProcess.getPid() == args){
-                _CurrentProcess.setState(5);
+
+                _CurrentProcess.setState(4);
                 _CurrentProcess.displayPCB();
+                alert("Current state: "+_CurrentProcess.getState());
+                Shell.updateResident();
                 _StdOut.putText("Killed Current Process: "+_CurrentProcess.getPid());
+//                _ReadyQueue.enqueue(_CurrentProcess);
+                _KernelInterruptQueue.enqueue(new Interrupt(_Break,0));
+                return;
+            }else{
                 return;
             }
 

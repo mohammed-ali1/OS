@@ -33,11 +33,16 @@ module TSOS {
 
             //Initialize Ready Queue for the Processes to be loaded
             _ReadyQueue = new Queue();
+            _FakeQueue = new Array();
+//            _FakeQueue = _ReadyQueue;
 
             //Initialize Resident Queue
             _ResidentQueue = new Array();
 
             _CurrentScheduler = new Scheduler(0);
+
+            //
+            _Time = new Date();
 
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
@@ -77,7 +82,6 @@ module TSOS {
             this.krnTrace("end shutdown OS");
         }
 
-
         public krnOnCPUClockPulse() {
             /* This gets called from the host hardware sim every time there is a hardware clock pulse.
              This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
@@ -93,24 +97,16 @@ module TSOS {
             } else if (_ClockCycle >= _Quantum) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 //dont call cpu cycle
                 //call the scheduler instead
-//                if(_ClockCycle >= _Quantum){
-////                    alert("need switch");
-//                    _CurrentScheduler.contextSwitch();
-                _CurrentScheduler.contextSwitch();
 
-//                }
-//                _CPU.cycle();
-//                _ClockCycle++;
-//                _Time += new Date().getMilliseconds();
-//                _CurrentProcess.displayPCB();
-//                Shell.updateResident();
+//                _CPU.isExecuting = false;
+//                _KernelInterruptQueue.enqueue(new Interrupt(_ContextSwitch,0));
+//                return;
+                this.krnInterruptHandler(_ContextSwitch,0);
+
             }else if(_CPU.isExecuting){
                 _CPU.cycle();
                 _ClockCycle++;
             }
-//            else if (_ReadyQueue.getSize()>0){
-//                this.krnExe(_ReadyQueue.dequeue());
-//            }
             else { // If there are no interrupts and there is nothing being executed then just be idle.
                 this.krnTrace("Idle");
             }
@@ -120,21 +116,21 @@ module TSOS {
          * Execute the PID from the Ready Queue!
          * @param p, the PID to execute.
          */
-        public krnExe(p:Pcb){
-
-            _CurrentProcess = p;
-            this.krnTrace("Processing PID: " +  _CurrentProcess.getPid());
-            _StdOut.putText("Processing PID: "+_CurrentProcess.getPid());
-            alert("pid: "+_CurrentProcess.getPid()+", Base: "+_CurrentProcess.getBase()+", Limit: "+_CurrentProcess.getLimit());
-            _Console.advanceLine();
-            _OsShell.putPrompt();
-           _CPU.isExecuting = true;
-            _CPU.PC = 0;
-            _CPU.displayCPU();
-            _CurrentProcess.setState(1); //set state "Running"
-            Shell.updateResident();
+//        public krnExe(p:Pcb){
+//
+//            _CurrentProcess = p;
+//            this.krnTrace("Processing PID: " +  _CurrentProcess.getPid());
+//            _StdOut.putText("Processing PID: "+_CurrentProcess.getPid());
+//            alert("pid: "+_CurrentProcess.getPid()+", Base: "+_CurrentProcess.getBase()+", Limit: "+_CurrentProcess.getLimit());
+//            _Console.advanceLine();
+//            _OsShell.putPrompt();
+//           _CPU.isExecuting = true;
+//            _CPU.PC = 0;
+//            _CPU.displayCPU();
+//            _CurrentProcess.setState(1); //set state "Running"
+//            Shell.updateResident();
 //            Shell.updateReady(_CurrentProcess);
-        }
+//        }
 
         //
         // Interrupt Handling
@@ -188,7 +184,7 @@ module TSOS {
                         var print = "";
                         var temp = parseInt(_MemoryManager.read(address),16);
                         var index = 0;
-                        alert("Address in FF is: "+(temp));
+                        alert("Address in FF is: "+(temp) +" PID: "+ _CurrentProcess.getPid() + " PC: "+parseInt(_CurrentProcess.getBase()+_CPU.PC));
                         while (temp != "00"){
                             print += String.fromCharCode(temp).toString();
                             index++;
@@ -204,6 +200,7 @@ module TSOS {
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
                     _CurrentProcess.setState(4);
                     _CurrentProcess.displayPCB();
+                    _CurrentProcess.displayTimeMonitor();
                     _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateResident();
                     _CurrentScheduler.startNewProcess();
@@ -212,8 +209,14 @@ module TSOS {
                     _StdOut.putText("WTF is this Instruction?");
                     break;
                 case _RUN:
-//                        alert("RUn called");
-                        _CurrentScheduler.startNewProcess();
+                    _CurrentScheduler.startNewProcess();
+                    break;
+                case _ContextSwitch:
+                    _CurrentScheduler.contextSwitch();
+                    break;
+                case _Killed:
+                    _ReadyQueue.dequeue();
+                    _CurrentScheduler.startNewProcess();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

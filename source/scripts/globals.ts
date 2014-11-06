@@ -90,6 +90,9 @@ var _ReadyQueue : TSOS.Queue;
 var _CurrentProcess :any = null;
 var _RUN = -5;
 var _ClockCycle:number = 0;
+var _ContextSwitch : number = 915;
+var _FakeQueue: any[] = null;
+var _Killed : number = 89;
 
 var _ResidentDisplay : HTMLTableElement = null;
 
@@ -106,6 +109,9 @@ var _Break : number = -1;
 //System Call
 var _SystemCall : number = 9;
 var _InvalidOpCode: number = 999;
+
+//Time
+var _Time :any = null;
 
 // CPU Scheduling
 var _Quantum:number = 6;

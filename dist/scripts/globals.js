@@ -88,6 +88,9 @@ var _ReadyQueue;
 var _CurrentProcess = null;
 var _RUN = -5;
 var _ClockCycle = 0;
+var _ContextSwitch = 915;
+var _FakeQueue = null;
+var _Killed = 89;
 
 var _ResidentDisplay = null;
 
@@ -104,6 +107,9 @@ var _Break = -1;
 //System Call
 var _SystemCall = 9;
 var _InvalidOpCode = 999;
+
+//Time
+var _Time = null;
 
 // CPU Scheduling
 var _Quantum = 6;

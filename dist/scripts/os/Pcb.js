@@ -19,6 +19,8 @@ var TSOS;
             this.block = 0;
             this.inMemory = false;
             this.block = 0;
+            this.timeArrived = 0;
+            this.timeFinished = 0;
             Pcb.PID++;
             this.pid = Pcb.PID; //Increment PID all the time!
             this.base = b;
@@ -32,7 +34,7 @@ var TSOS;
         * Displays the the status of the current PCB.
         */
         Pcb.prototype.displayPCB = function () {
-            document.getElementById("pcbPid").innerHTML = "" + this.getPid();
+            document.getElementById("pcbPid").innerHTML = "" + this.pid;
             document.getElementById("pcbBase").innerHTML = "" + this.base;
             document.getElementById("pcbLimit").innerHTML = "" + this.limit;
             document.getElementById("pcbStatus").innerHTML = this.state.toString();
@@ -142,8 +144,24 @@ var TSOS;
             this.ir = ir;
         };
 
+        Pcb.prototype.setTimeArrived = function (time) {
+            this.timeArrived = time;
+        };
+
+        Pcb.prototype.setTimeFinished = function (time) {
+            this.timeFinished = time;
+        };
+
         Pcb.prototype.getBlock = function () {
             return this.block;
+        };
+
+        Pcb.prototype.getTimeArrived = function () {
+            return this.timeArrived;
+        };
+
+        Pcb.prototype.getTimeFinished = function () {
+            return this.timeFinished;
         };
 
         Pcb.prototype.inMemory = function () {
@@ -151,6 +169,30 @@ var TSOS;
                 return "True";
             else
                 return "False";
+        };
+
+        Pcb.prototype.displayTimeMonitor = function () {
+            var table = "<table>";
+
+            table += "<th>PID</th>";
+            table += "<th>A-Time</th>";
+            table += "<th>T-Time</th>";
+            table += "<th>TA-Time</th>";
+
+            for (var i = 0; i < _ResidentQueue.length; i++) {
+                var p = _ResidentQueue[i];
+                if (p.getState() == "Terminated") {
+                    table += "<tr>";
+                    table += "<td>" + p.getPid() + "</td>";
+                    table += "<td>" + p.getTimeArrived() + "</td>";
+                    table += "<td>" + p.getTimeFinished() + "</td>";
+                    table += "<td>" + parseInt(p.getTimeFinished() - p.getTimeArrived()) + "</td>";
+                    table += "</tr>";
+                }
+            }
+
+            table += "</table>";
+            document.getElementById("monitor").innerHTML = table;
         };
         Pcb.PID = -1;
         return Pcb;
