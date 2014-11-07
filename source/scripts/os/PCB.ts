@@ -39,18 +39,18 @@ module TSOS{
         /**
          * Displays the the status of the current PCB.
          */
-        public displayPCB(){
-            document.getElementById("pcbPid").innerHTML = "" + this.pid;
-            document.getElementById("pcbBase").innerHTML = "" + this.base;
-            document.getElementById("pcbLimit").innerHTML =  "" + this.limit;
-            document.getElementById("pcbStatus").innerHTML = this.state.toString();
-            document.getElementById("pcbPc").innerHTML = "" + this.pc;
-            document.getElementById("pcbAcc").innerHTML = "" + this.acc;
-            document.getElementById("pcbIr").innerHTML = this.ir;
-            document.getElementById("pcbX").innerHTML = "" + this.x;
-            document.getElementById("pcbY").innerHTML = "" + this.y;
-            document.getElementById("pcbZ").innerHTML = "" + this.z;
-        }
+//        public displayPCB(){
+//            document.getElementById("pcbPid").innerHTML = "" + this.pid;
+//            document.getElementById("pcbBase").innerHTML = "" + this.base;
+//            document.getElementById("pcbLimit").innerHTML =  "" + this.limit;
+//            document.getElementById("pcbStatus").innerHTML = this.state.toString();
+//            document.getElementById("pcbPc").innerHTML = "" + this.pc;
+//            document.getElementById("pcbAcc").innerHTML = "" + this.acc;
+//            document.getElementById("pcbIr").innerHTML = this.ir;
+//            document.getElementById("pcbX").innerHTML = "" + this.x;
+//            document.getElementById("pcbY").innerHTML = "" + this.y;
+//            document.getElementById("pcbZ").innerHTML = "" + this.z;
+//        }
 
         public getPid() : number{
             return this.pid;  //return the loc al data member (NON - STATIC)
@@ -190,14 +190,13 @@ module TSOS{
 
             for(var i=0; i<_ResidentQueue.length;i++){
                 var p:TSOS.Pcb = _ResidentQueue[i];
-                if(p.getState() == "Terminated"){
-                    table += "<tr>";
-                    table += "<td>" + p.getPid() + "</td>";
-                    table += "<td>" + p.getTimeArrived() + "</td>";
-                    table += "<td>" + p.getTimeFinished() + "</td>";
-                    table += "<td>" + parseInt(p.getTimeFinished() - p.getTimeArrived()) + "</td>";
-                    table += "</tr>";
-                }
+
+                table += "<tr>";
+                table += "<td>" + p.getPid() + "</td>";
+                table += "<td>" + p.getTimeArrived() + "</td>";
+                table += "<td>" + p.getTimeFinished() + "</td>";
+                table += "<td>" + parseInt(p.getTimeFinished() - p.getTimeArrived()) + "</td>";
+                table += "</tr>";
             }
 
             table += "</table>";

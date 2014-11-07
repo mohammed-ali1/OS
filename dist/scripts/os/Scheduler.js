@@ -12,18 +12,9 @@ var TSOS;
         Scheduler.prototype.startNewProcess = function () {
             if (_ReadyQueue.getSize() > 0) {
                 _CurrentProcess = _ReadyQueue.dequeue();
-                alert("start new process ready size; " + _ReadyQueue.getSize() + ", PID: " + _CurrentProcess.getPid());
-
-                //               if(_CurrentProcess.getState() == "Killed"){
-                //                   ///do something...
-                //                   alert("killed caught");
-                //                   _KernelInterruptQueue.enqueue(new Interrupt(_Killed,0));
-                //                   return;
-                //               }
                 _CurrentProcess.setState(1);
                 _CPU.startProcessing(_CurrentProcess);
-
-                //               _CPU.isExecuting = true;
+                _CPU.isExecuting = true;
                 _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
                 TSOS.Shell.updateResident();
             } else if (_CurrentProcess.getState() != "Terminated" && _ReadyQueue.isEmpty()) {
@@ -63,7 +54,7 @@ var TSOS;
 
         Scheduler.prototype.reset = function () {
             _ClockCycle = 0;
-            _CurrentProcess.displayPCB();
+            //           _CurrentProcess.displayPCB();
             //           _CPU.displayCPU();
         };
 
@@ -84,7 +75,8 @@ var TSOS;
             _CurrentProcess.setIr(_CPU.IR);
             _CurrentProcess.setState(2); //set state to waiting
             _ReadyQueue.enqueue(_CurrentProcess); //push back to ready queue
-            _CurrentProcess.displayPCB(); //update display
+
+            //           _CurrentProcess.displayPCB();//update display
             _CPU.displayCPU();
         };
         return Scheduler;

@@ -200,25 +200,25 @@ h3 {
     padding: 10px;
 }
 
-#cpu, #readyQueue{
+#cpu, #readyQueue, #displayResident{
     border: 4px solid firebrick;
     width:350px;
     border-radius: 10px;
     table-layout: auto;
 }
 
-#cpu, #readyQueue{
+#cpu, #readyQueue, #displayResident{
     margin-top:-6%;
 }
 
-#cpu th, #readyQueue th{
+#cpu th, #readyQueue th, #displayResident th{
     text-align: center;
     color: firebrick;
     background-color: #FFD801;
     width: auto;
 }
 
-#cpu td, #readyQueue td{
+#cpu td, #readyQueue td, #displayResident td{
     /*padding: 5px;*/
     width: auto;
     text-align: center;

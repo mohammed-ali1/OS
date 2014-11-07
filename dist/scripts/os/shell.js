@@ -317,8 +317,7 @@ var TSOS;
 
             //Finally load into Memory
             _MemoryManager.load(base, x.toUpperCase().toString());
-
-            Shell.updateResident();
+            //            Shell.updateResident();
         };
 
         Shell.updateResident = function () {
@@ -327,17 +326,29 @@ var TSOS;
             tableView += "<th>Base</th>";
             tableView += "<th>Limit</th>";
             tableView += "<th>State</th>";
-            tableView += "<th>Memory Location</th>";
+            tableView += "<th>PC</th>";
+            tableView += "<th>IR</th>";
+            tableView += "<th>Acc</th>";
+            tableView += "<th>X</th>";
+            tableView += "<th>Y</th>";
+            tableView += "<th>Z</th>";
+
             for (var i = _ResidentQueue.length - 1; i >= 0; i--) {
                 var s = _ResidentQueue[i];
-                tableView += "<tr>";
-                tableView += "<td>" + s.getPid().toString() + "</td>";
-                tableView += "<td>" + s.getBase().toString() + "</td>";
-                tableView += "<td>" + s.getLimit().toString() + "</td>";
-                tableView += "<td>" + s.getState().toString() + "</td>";
-
-                //                tableView += "<td>" + s.inMemory().toString()+"</td>";
-                tableView += "</tr>";
+                if (s.getState() != "New" || s.getState() != "Ready") {
+                    tableView += "<tr>";
+                    tableView += "<td>" + s.getPid().toString() + "</td>";
+                    tableView += "<td>" + s.getBase().toString() + "</td>";
+                    tableView += "<td>" + s.getLimit().toString() + "</td>";
+                    tableView += "<td>" + s.getState().toString() + "</td>";
+                    tableView += "<td>" + parseInt(s.getPc() + s.getBase()) + "</td>";
+                    tableView += "<td>" + s.getIR() + "</td>";
+                    tableView += "<td>" + s.getAcc() + "</td>";
+                    tableView += "<td>" + s.getX() + "</td>";
+                    tableView += "<td>" + s.getY() + "</td>";
+                    tableView += "<td>" + s.getZ() + "</td>";
+                    tableView += "</tr>";
+                }
             }
             tableView += "</table>";
             document.getElementById("displayResident").innerHTML = tableView;
@@ -503,37 +514,39 @@ var TSOS;
         * @param args
         */
         Shell.prototype.shellKill = function (args) {
-            var killThisBitch;
-
+            //            var killThisBitch:TSOS.Pcb;
             if (_CurrentProcess.getPid() == args) {
-                _CurrentProcess.setState(4);
+                _CurrentProcess.setState(5);
                 _CurrentProcess.displayPCB();
-                alert("Current state: " + _CurrentProcess.getState());
+                alert("Current state: " + _CurrentProcess.getState() + ", Killed PID: " + _CurrentProcess.getPid());
                 Shell.updateResident();
-                _StdOut.putText("Killed Current Process: " + _CurrentProcess.getPid());
+                _StdOut.putText("Killed PID: " + _CurrentProcess.getPid());
 
                 //                _ReadyQueue.enqueue(_CurrentProcess);
-                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_Break, 0));
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_Killed, 0));
                 return;
             } else {
+                _StdOut.putText("I'm not even ACTIVE...WTF!");
                 return;
             }
-
-            for (var i = 0; i < _ResidentQueue.length; i++) {
-                if (_ResidentQueue[i].getPid() == args && _ResidentQueue[i].getState() != "Running" && _ResidentQueue[i].inMemory()) {
-                    _StdOut.putText("I'm not even Running...WTF!");
-                }
-                if (_ResidentQueue[i].getPid() == args && _ResidentQueue[i].getState() == "Running" && _ResidentQueue[i].inMemory()) {
-                    killThisBitch = _ResidentQueue[i];
-                    killThisBitch.setState(5);
-                    killThisBitch.displayPCB();
-                    _StdOut.putText("Process Killed: " + killThisBitch.getPid());
-                    _StdOut.advanceLine();
-                    _CPU.reset();
-                    _CPU.displayCPU();
-                    //clear memory block from the base.....???
-                }
-            }
+            //            for(var i=0; i<_ResidentQueue.length;i++){
+            //                if(_ResidentQueue[i].getPid() == args &&
+            //                    _ResidentQueue[i].getState() !="Running" &&
+            //                    _ResidentQueue[i].inMemory()){
+            //                    _StdOut.putText("I'm not even Running...WTF!");
+            //                }
+            //                if(_ResidentQueue[i].getPid() == args &&
+            //                    _ResidentQueue[i].getState() == "Running" &&
+            //                    _ResidentQueue[i].inMemory()) {     //Kill the process
+            //                    killThisBitch = _ResidentQueue[i];
+            //                    killThisBitch.setState(5);
+            //                    killThisBitch.displayPCB();
+            //                    _StdOut.putText("Process Killed: "+killThisBitch.getPid());
+            //                    _StdOut.advanceLine();
+            //                    _CPU.reset();
+            //                    _CPU.displayCPU();
+            //                    //clear memory block from the base.....???
+            //                }
         };
 
         /**
@@ -544,16 +557,15 @@ var TSOS;
             if (args.length == 0 || args < 0) {
                 _StdOut.putText("Load this Bitch again and RUN...!");
                 return;
-            }
-
-            if (_StepButton) {
+            } else if (_StepButton) {
                 _StdOut.putText("Single Step is on!");
                 return;
-            }
-
-            if (_ResidentQueue[args].getState() == "New") {
+            } else if (_ResidentQueue[args].getState() == "New") {
+                _ResidentQueue[args].setState(3);
                 _ReadyQueue.enqueue(_ResidentQueue[args[0]]); //only put what's NEW!
-                //                _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_RUN, 0));
+            } else {
+                _StdOut.putText("");
             }
             //            this.displayReadyQueue(_CurrentProcess);
         };
@@ -569,7 +581,8 @@ var TSOS;
         Shell.prototype.shellRunAll = function () {
             for (var i = 0; i < _ResidentQueue.length; i++) {
                 if (_ResidentQueue[i].getState() == "New")
-                    _ReadyQueue.enqueue(_ResidentQueue[i]);
+                    _ResidentQueue[i].setState(3);
+                _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_RUN, 0));
         };

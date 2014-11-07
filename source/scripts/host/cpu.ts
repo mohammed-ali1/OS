@@ -27,7 +27,6 @@ module TSOS {
                     public Yreg: number = 0,
                     public Zflag: number = 0,
                     public isExecuting: boolean = false) {
-
         }
 
         public reset(){

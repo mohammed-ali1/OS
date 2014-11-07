@@ -102,6 +102,7 @@ var TSOS;
             } else if (_CPU.isExecuting) {
                 _CPU.cycle();
                 _ClockCycle++;
+                TSOS.Shell.updateResident();
             } else {
                 this.krnTrace("Idle");
             }
@@ -189,8 +190,6 @@ var TSOS;
                     _CPU.reset(); //Re-Start the CPU!
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
                     _CurrentProcess.setState(4);
-                    _CurrentProcess.displayPCB();
-                    _CurrentProcess.displayTimeMonitor();
                     _Kernel.krnTrace("\n\nTERMINATING PID: " + _CurrentProcess.getPid() + "\n");
                     TSOS.Shell.updateResident();
                     _CurrentScheduler.startNewProcess();
@@ -202,10 +201,48 @@ var TSOS;
                     _CurrentScheduler.startNewProcess();
                     break;
                 case _ContextSwitch:
-                    _CurrentScheduler.contextSwitch();
+                    _ClockCycle = 0;
+
+                    //if nothing on ready queue
+                    //just reset and go back to Idle!
+                    if (_ReadyQueue.isEmpty() && _CurrentProcess.getState() == "Terminated") {
+                        _CPU.reset();
+                        return;
+                    } else {
+                        _CurrentProcess.setPc(_CPU.PC);
+                        _CurrentProcess.setAcc(_CPU.Acc);
+                        _CurrentProcess.setX(_CPU.Xreg);
+                        _CurrentProcess.setY(_CPU.Yreg);
+                        _CurrentProcess.setZ(_CPU.Zflag);
+                        _CurrentProcess.setIr(_CPU.IR);
+                        _CurrentProcess.setState(2); //set state to waiting
+                        _ReadyQueue.enqueue(_CurrentProcess); //push back to ready queue
+
+                        //                    _CurrentProcess.displayPCB();//update display
+                        _CPU.displayCPU();
+
+                        _CurrentProcess = _ReadyQueue.dequeue();
+                        if (_CurrentProcess.getState() == "Killed") {
+                            ///do something...
+                            alert("killed caught");
+                            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_Killed, 0));
+                            return;
+                        }
+                        _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
+
+                        _CurrentProcess.setState(1); //set state to running
+
+                        //           _CurrentProcess.setTimeArrived(_OSclock);
+                        _CPU.startProcessing(_CurrentProcess);
+                        _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
+                    }
                     break;
                 case _Killed:
-                    _ReadyQueue.dequeue();
+                    //                    _ReadyQueue.dequeue();
+                    _CPU.reset();
+                    _CPU.displayCPU();
+                    _Kernel.krnTrace("\n\nKILLING PID: " + _CurrentProcess.getPid() + "\n");
+                    TSOS.Shell.updateResident();
                     _CurrentScheduler.startNewProcess();
                     break;
                 default:
