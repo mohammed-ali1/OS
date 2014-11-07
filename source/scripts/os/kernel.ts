@@ -200,6 +200,8 @@ module TSOS {
                     _CPU.reset();//Re-Start the CPU!
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
                     _CurrentProcess.setState(4);
+                    //memory manager . clear block (x)
+                    ///clear the block
                     _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateResident();
                     _CurrentScheduler.startNewProcess();

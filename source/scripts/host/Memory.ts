@@ -150,6 +150,14 @@ module TSOS {
             this.programLength = -1;
         }
 
+        public clearBlock(base:number){
+
+            for(var i = base;i <= (base+_BlockSize)-1;i++){
+                _MainMemory[i] = "00";
+            }
+            this.updateMemory();
+        }
+
         public clearMemory(){
 
             for(var i=0; i<_MainMemorySize;i++){

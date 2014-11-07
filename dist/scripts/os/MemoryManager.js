@@ -25,8 +25,8 @@ var TSOS;
 
         MemoryManager.prototype.clearMemory = function () {
             _Memory.clearMemory();
-            _ResidentQueue.splice(0, _ResidentQueue.length);
-            alert("clearmem - Resident Length: " + _ResidentQueue.length);
+
+            //            _ResidentQueue.splice(0,_ResidentQueue.length);
             TSOS.Shell.updateResident();
         };
 
@@ -36,6 +36,10 @@ var TSOS;
 
         MemoryManager.prototype.size = function () {
             return _Memory.size();
+        };
+
+        MemoryManager.prototype.clearBlock = function (base) {
+            _Memory.clearBlock(base);
         };
 
         MemoryManager.prototype.getFreeBlock = function () {
@@ -49,19 +53,31 @@ var TSOS;
             //            }else{
             //                return -1;
             //            }
-            //Need more thinking here!!!
-            if (_ResidentQueue.length == 0) {
-                return 0;
-            } else if (_ResidentQueue.length == 1 && _ResidentQueue[0].getState() != "Terminated") {
-                var s = parseInt(_ResidentQueue[0].getLimit(), 10);
-                return (s + 1);
-            } else if (_ResidentQueue.length == 2 && _ResidentQueue[1].getState() != "Terminated") {
-                var s = parseInt(_ResidentQueue[1].getLimit(), 10);
-                return (s + 1);
-            } else {
-                _StdOut.putText("NO ROOM FOR Y0o BITCH!!!");
-                return -1;
+            var foundBlock = -1;
+            alert("Getting Block");
+            for (var i = 0; i < _ResidentQueue.length; i++) {
+                var temp = _ResidentQueue[i];
+
+                if (temp.getState() == "Terminated") {
+                    this.clearBlock(temp.getBase());
+                    foundBlock = temp.getBase();
+                    return foundBlock;
+                }
             }
+            return foundBlock;
+            //Need more thinking here!!!
+            //            if (_ResidentQueue.length == 0) {
+            //                return 0;
+            //            } else if (_ResidentQueue.length == 1 && _ResidentQueue[0].getState() != "Terminated") {
+            //                var s = parseInt(_ResidentQueue[0].getLimit(), 10);
+            //                return (s + 1);
+            //            } else if (_ResidentQueue.length == 2 && _ResidentQueue[1].getState() != "Terminated") {
+            //                var s = parseInt(_ResidentQueue[1].getLimit(), 10);
+            //                return (s + 1);
+            //            } else {
+            //                _StdOut.putText("NO ROOM FOR Y0o BITCH!!!");
+            //                return -1;
+            //            }
         };
         return MemoryManager;
     })();
