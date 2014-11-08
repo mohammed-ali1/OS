@@ -129,33 +129,20 @@
                 ></textarea>
     </div>
 
-    <div>
-        <h4 style="color: firebrick;">Ready Queue</h4>
-        <table id="readyQueue">
+    <div style="overflow-x: scroll overflow-y: scroll;">
+        <h4 style="color:firebrick;">Ready Queue to be...</h4>
+        <table id="displayResident">
             <tr>
-                <th>PID</th>
+                <th>Pid</th>
                 <th>Base</th>
                 <th>Limit</th>
                 <th>State</th>
                 <th>PC</th>
                 <th>IR</th>
-                <th>ACC</th>
+                <th>Acc</th>
                 <th>X</th>
                 <th>Y</th>
                 <th>Z</th>
-            </tr>
-
-            <tr>
-                <td id="pcbPid">0</td>
-                <td id="pcbBase">0</td>
-                <td id="pcbLimit">0</td>
-                <td id="pcbStatus">007</td>
-                <td id="pcbPc">0</td>
-                <td id="pcbIr">0</td>
-                <td id="pcbAcc">0</td>
-                <td id="pcbX">0</td>
-                <td id="pcbY">0</td>
-                <td id="pcbZ">0</td>
             </tr>
         </table>
     </div>
@@ -217,29 +204,13 @@
                 </tr>
             </table>
 
-            <h4 style="color:firebrick;">Ready Queue to be...</h4>
-            <table id="displayResident">
-                <tr>
-                    <th>Pid</th>
-                    <th>Base</th>
-                    <th>Limit</th>
-                    <th>State</th>
-                    <th>PC</th>
-                    <th>IR</th>
-                    <th>Acc</th>
-                    <th>X</th>
-                    <th>Y</th>
-                    <th>Z</th>
-                </tr>
-            </table>
-
-            <p>Processes Monitoring</p>
+            <h4 style="color: firebrick;">Processes Monitoring</h4>
             <table id="monitor">
                 <tr>
                     <th>PID</th>
-                    <th>Arrival Time</th>
-                     <th>Terminated Time</th>
-                    <th>Turnaround Time</th>
+                    <th>Arrived</th>
+                     <th>Terminated</th>
+                    <th>Turnaround</th>
                 </tr>
             </table>
         </div>

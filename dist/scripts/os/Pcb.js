@@ -27,8 +27,7 @@ var TSOS;
             this.pc = 0;
             this.limit = l;
             this.block = (this.base / _BlockSize);
-            if (location == true)
-                this.inMemory = true;
+            this.inMemory = location;
         }
         /**
         * Displays the the status of the current PCB.
@@ -170,17 +169,24 @@ var TSOS;
                 return "False";
         };
 
-        Pcb.prototype.displayTimeMonitor = function () {
+        Pcb.prototype.setInMemory = function (location) {
+            this.inMemory = location;
+        };
+
+        Pcb.prototype.getInMemory = function () {
+            return this.inMemory;
+        };
+
+        Pcb.displayTimeMonitor = function () {
             var table = "<table>";
 
             table += "<th>PID</th>";
-            table += "<th>A-Time</th>";
-            table += "<th>T-Time</th>";
-            table += "<th>TA-Time</th>";
+            table += "<th>Arrived</th>";
+            table += "<th>Terminated</th>";
+            table += "<th>Turnaround</th>";
 
-            for (var i = 0; i < _ResidentQueue.length; i++) {
-                var p = _ResidentQueue[i];
-
+            for (var i = _FakeQueue.length - 1; i >= 0; i--) {
+                var p = _FakeQueue[i];
                 table += "<tr>";
                 table += "<td>" + p.getPid() + "</td>";
                 table += "<td>" + p.getTimeArrived() + "</td>";

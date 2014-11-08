@@ -17,9 +17,12 @@ module TSOS{
            if(_ReadyQueue.getSize()>0) {
 
                _CurrentProcess = _ReadyQueue.dequeue();
+               if(_CurrentProcess.getState() == "Ready"){
+                   alert("Clock in new is: "+_OSclock);
+                   _CurrentProcess.setTimeArrived(_OSclock);
+               }
                _CurrentProcess.setState(1);
                _CPU.startProcessing(_CurrentProcess);
-               _CPU.isExecuting = true;
                _Kernel.krnTrace("\nPROCESSING PID: "+_CurrentProcess.getPid()+"\n");
                Shell.updateResident();
            }else if (_CurrentProcess.getState() != "Terminated" && _ReadyQueue.isEmpty()){
@@ -42,6 +45,13 @@ module TSOS{
            this.performSwitch();
 
            _CurrentProcess = _ReadyQueue.dequeue();
+
+           if(_CurrentProcess.getState() == "Ready"){
+               alert("Clock is: "+_OSclock);
+               _CurrentProcess.setTimeArrived(_OSclock);
+               Pcb.displayTimeMonitor();
+           }
+
            if(_CurrentProcess.getState() == "Killed"){
                ///do something...
                alert("killed caught");

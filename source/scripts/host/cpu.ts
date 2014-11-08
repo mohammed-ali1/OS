@@ -32,8 +32,8 @@ module TSOS {
         public reset(){
             _CPU.PC = 0;
             _CPU.Acc = 0;
-            _CPU.IR = "?";
-            _CPU.INS = "";
+            _CPU.IR = "???";
+            _CPU.INS = "CPU [ ]";
             _CPU.Xreg = 0;
             _CPU.Yreg = 0;
             _CPU.Zflag = 0;
@@ -56,6 +56,8 @@ module TSOS {
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set _CPU.isExecuting appropriately.
 
+//            alert("PC now: "+parseInt(_CPU.PC+_CurrentProcess.getBase()));
+
             //Read Stuff from Memory @ Program Counter
             _CPU.manageOpCodes(_MemoryManager.read(_CPU.PC));
 
@@ -70,7 +72,6 @@ module TSOS {
         }
 
         public displayCPU(){
-
             document.getElementById("pc").innerHTML = parseInt(_CPU.PC+_CurrentProcess.getBase()).toString(); //Off by one IDK why!
             document.getElementById("acc").innerHTML = _CPU.Acc.toString();
             document.getElementById("ir").innerHTML = _CPU.IR;
@@ -78,6 +79,11 @@ module TSOS {
             document.getElementById("y").innerHTML = _CPU.Yreg.toString();
             document.getElementById("z").innerHTML = _CPU.Zflag.toString();
             document.getElementById("instruction").innerHTML = _CPU.INS;
+            if(_CPU.PC == 0) {
+                document.getElementById("instruction").style.color = "#B22222";
+            }else{
+                document.getElementById("instruction").style.color = "#006600";
+            }
         }
 
         public manageOpCodes(str){
@@ -297,9 +303,10 @@ module TSOS {
                 if(_CPU.PC > _BlockSize){
                     _CPU.PC -= _BlockSize;
                 }
-//                alert("PC Before: "+parseInt(_CPU.PC+_CurrentProcess.getBase()));
+//                alert("PC After: "+parseInt(_CPU.PC+_CurrentProcess.getBase()));
 
-//                if(_CPU.PC > _CurrentProcess.getLimit()){
+//                if(_CPU.PC > _BlockSize){
+//                    alert("GETTING OUT OF BOUNDS!!!");
 //                    _KernelInterruptQueue.enqueue(new Interrupt(_MemoryErrr,0)); //Out of Memory Bounds!!!
 //                }
 

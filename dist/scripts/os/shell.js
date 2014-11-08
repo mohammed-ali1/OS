@@ -310,6 +310,9 @@ var TSOS;
             //Load in the Resident Queue
             _ResidentQueue.push(p);
 
+            //Push on Fake
+            _FakeQueue.push(p);
+
             //Print to Console
             _StdOut.putText("Loaded Successfully!");
             _Console.advanceLine();
@@ -333,8 +336,8 @@ var TSOS;
             tableView += "<th>Y</th>";
             tableView += "<th>Z</th>";
 
-            for (var i = _ResidentQueue.length - 1; i >= 0; i--) {
-                var s = _ResidentQueue[i];
+            for (var i = _FakeQueue.length - 1; i >= 0; i--) {
+                var s = _FakeQueue[i];
                 if (s.getState() != "New" || s.getState() != "Ready") {
                     tableView += "<tr>";
                     tableView += "<td>" + s.getPid().toString() + "</td>";
@@ -562,12 +565,11 @@ var TSOS;
                 return;
             } else if (_ResidentQueue[args].getState() == "New") {
                 _ResidentQueue[args].setState(3);
-                _ReadyQueue.enqueue(_ResidentQueue[args[0]]); //only put what's NEW!
+                _ReadyQueue.enqueue(_ResidentQueue[args]); //only put what's NEW!
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_RUN, 0));
             } else {
                 _StdOut.putText("");
             }
-            //            this.displayReadyQueue(_CurrentProcess);
         };
 
         Shell.prototype.displayReadyQueue = function (p) {

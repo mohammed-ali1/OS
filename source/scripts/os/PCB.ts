@@ -32,8 +32,7 @@ module TSOS{
             this.pc = 0;
             this.limit = l;
             this.block = (this.base / _BlockSize);
-            if(location == true)
-                this.inMemory = true;
+            this.inMemory = location;
         }
 
         /**
@@ -179,18 +178,25 @@ module TSOS{
                 return "False";
         }
 
-        public displayTimeMonitor(){
+        public setInMemory(location:boolean){
+            this.inMemory = location;
+        }
+
+        public getInMemory(){
+            return this.inMemory;
+        }
+
+        public static displayTimeMonitor(){
 
             var table = "<table>";
 
             table += "<th>PID</th>";
-            table += "<th>A-Time</th>";
-            table += "<th>T-Time</th>";
-            table += "<th>TA-Time</th>";
+            table += "<th>Arrived</th>";
+            table += "<th>Terminated</th>";
+            table += "<th>Turnaround</th>";
 
-            for(var i=0; i<_ResidentQueue.length;i++){
-                var p:TSOS.Pcb = _ResidentQueue[i];
-
+            for(var i=_FakeQueue.length-1; i>=0;i--){
+                var p:TSOS.Pcb = _FakeQueue[i];
                 table += "<tr>";
                 table += "<td>" + p.getPid() + "</td>";
                 table += "<td>" + p.getTimeArrived() + "</td>";

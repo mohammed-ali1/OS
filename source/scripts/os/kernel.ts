@@ -184,6 +184,7 @@ module TSOS {
                         var address  = _CPU.Yreg;
                         var print = "";
                         var temp = parseInt(_MemoryManager.read(address),16);
+                        alert("Y-REg: "+_CPU.Yreg);
                         var index = 0;
                         alert("Address in FF is: "+(temp) +" PID: "+ _CurrentProcess.getPid() + " PC: "+parseInt(_CurrentProcess.getBase()+_CPU.PC));
                         while (temp != "00"){
@@ -200,11 +201,16 @@ module TSOS {
                     _CPU.reset();//Re-Start the CPU!
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
                     _CurrentProcess.setState(4);
+                    _CurrentProcess.setTimeFinished(_OSclock);
+//                    _CurrentProcess = null;
+                    Pcb.displayTimeMonitor();
+//                    _CurrentProcess.setInMemory(false);
                     //memory manager . clear block (x)
                     ///clear the block
                     _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateResident();
                     _CurrentScheduler.startNewProcess();
+                    alert("RES: "+_ResidentQueue.length);
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
@@ -234,6 +240,13 @@ module TSOS {
                         _CPU.displayCPU();
 
                         _CurrentProcess = _ReadyQueue.dequeue();
+
+                        if(_CurrentProcess.getState() == "Ready"){
+                            alert("Clock is: "+_OSclock);
+                            _CurrentProcess.setTimeArrived(_OSclock);
+                            Pcb.displayTimeMonitor();
+                        }
+
                         if (_CurrentProcess.getState() == "Killed") {
                             ///do something...
                             alert("killed caught");
