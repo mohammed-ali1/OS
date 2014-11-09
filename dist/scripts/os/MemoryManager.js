@@ -24,13 +24,13 @@ var TSOS;
         };
 
         MemoryManager.prototype.clearMemory = function () {
-            if (_ResidentQueue.length == 3) {
-                _StdOut.putText("Clearing Memory for you....Thanks a Lot!");
+            if (_CurrentProcess.getState() == "Running" || _CurrentProcess.getState() == "Waiting") {
+                _StdOut.putText("Let me Terminate First.....DAmmmmm!");
+            } else {
+                _ResidentQueue.splice(0, _ResidentQueue.length);
+                _StdOut.putText("I have to Clear Memory for you....Thanks a Lot!");
                 _Console.advanceLine();
                 _Memory.clearMemory();
-                _ResidentQueue.splice(0, _ResidentQueue.length);
-            } else {
-                _StdOut.putText("Let me Terminate First.....DAMmmmm!");
             }
         };
 
@@ -50,48 +50,30 @@ var TSOS;
             if (_ResidentQueue.length >= 3) {
                 return -1;
             }
-            alert("base is: " + parseInt(_ResidentQueue.length * _BlockSize));
             return parseInt(_ResidentQueue.length * _BlockSize);
         };
 
         MemoryManager.prototype.getFreeBlock = function () {
-            //            alert("getting block");
-            //
-            //            var base = this.getNextBlock();
-            //
-            //            if(base != -1){
-            //                return base;
-            //            }
-            //
-            //            alert("Getting Block");
-            //            for(var i=0; i<_ResidentQueue.length;i++){
-            //
-            //                var temp:TSOS.Pcb = _ResidentQueue[i];
-            //
-            //                if(temp.getState() == "Terminated" && temp.getInMemory() == true){
-            //                    this.clearBlock(temp.getBase());
-            //                    base = temp.getBase();
-            //                    return base;
-            //                }
-            //            }
+            alert("RES: " + _ResidentQueue.length);
+
             if (_ResidentQueue.length == 3) {
                 this.clearMemory();
+                return -1;
             }
 
-            //            return base;
-            //Need more thinking here!!!
-            alert("RESIDENT: " + _ResidentQueue.length);
-            if (_ResidentQueue.length == 0) {
-                return 0;
-            } else if (_ResidentQueue.length == 1) {
-                var s = parseInt(_ResidentQueue[0].getLimit(), 10);
-                return (s + 1);
-            } else if (_ResidentQueue.length == 2) {
-                var s = parseInt(_ResidentQueue[1].getLimit(), 10);
-                return (s + 1);
-            } else {
-                _StdOut.putText("NO ROOM FOR Y0o BITCH!!!");
-                return -1;
+            if (_ResidentQueue.length < 3) {
+                if (_ResidentQueue.length == 0) {
+                    return 0;
+                } else if (_ResidentQueue.length == 1) {
+                    var s = parseInt(_ResidentQueue[0].getLimit(), 10);
+                    return (s + 1);
+                } else if (_ResidentQueue.length == 2) {
+                    var s = parseInt(_ResidentQueue[1].getLimit(), 10);
+                    return (s + 1);
+                } else {
+                    _StdOut.putText("NO ROOM FOR Y0o BITCH!!!");
+                    return -1;
+                }
             }
         };
         return MemoryManager;

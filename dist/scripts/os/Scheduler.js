@@ -13,7 +13,6 @@ var TSOS;
             if (_ReadyQueue.getSize() > 0) {
                 _CurrentProcess = _ReadyQueue.dequeue();
                 if (_CurrentProcess.getState() == "Ready") {
-                    alert("Clock in new is: " + _OSclock);
                     _CurrentProcess.setTimeArrived(_OSclock);
                 }
                 _CurrentProcess.setState(1);
@@ -41,7 +40,7 @@ var TSOS;
             _CurrentProcess = _ReadyQueue.dequeue();
 
             if (_CurrentProcess.getState() == "Ready") {
-                alert("Clock is: " + _OSclock);
+                //               alert("Clock is: "+_OSclock);
                 _CurrentProcess.setTimeArrived(_OSclock);
                 TSOS.Pcb.displayTimeMonitor();
             }

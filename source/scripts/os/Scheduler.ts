@@ -18,7 +18,6 @@ module TSOS{
 
                _CurrentProcess = _ReadyQueue.dequeue();
                if(_CurrentProcess.getState() == "Ready"){
-                   alert("Clock in new is: "+_OSclock);
                    _CurrentProcess.setTimeArrived(_OSclock);
                }
                _CurrentProcess.setState(1);
@@ -47,7 +46,7 @@ module TSOS{
            _CurrentProcess = _ReadyQueue.dequeue();
 
            if(_CurrentProcess.getState() == "Ready"){
-               alert("Clock is: "+_OSclock);
+//               alert("Clock is: "+_OSclock);
                _CurrentProcess.setTimeArrived(_OSclock);
                Pcb.displayTimeMonitor();
            }

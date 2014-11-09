@@ -184,9 +184,9 @@ module TSOS {
                         var address  = _CPU.Yreg;
                         var print = "";
                         var temp = parseInt(_MemoryManager.read(address),16);
-                        alert("Y-REg: "+_CPU.Yreg);
+//                        alert("Y-REg: "+_CPU.Yreg);
                         var index = 0;
-                        alert("Address in FF is: "+(temp) +" PID: "+ _CurrentProcess.getPid() + " PC: "+parseInt(_CurrentProcess.getBase()+_CPU.PC));
+//                        alert("Address in FF is: "+(temp) +" PID: "+ _CurrentProcess.getPid() + " PC: "+parseInt(_CurrentProcess.getBase()+_CPU.PC));
                         while (temp != "00"){
                             print += String.fromCharCode(temp).toString();
                             index++;
@@ -210,7 +210,6 @@ module TSOS {
                     _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateResident();
                     _CurrentScheduler.startNewProcess();
-                    alert("RES: "+_ResidentQueue.length);
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
@@ -242,7 +241,6 @@ module TSOS {
                         _CurrentProcess = _ReadyQueue.dequeue();
 
                         if(_CurrentProcess.getState() == "Ready"){
-                            alert("Clock is: "+_OSclock);
                             _CurrentProcess.setTimeArrived(_OSclock);
                             Pcb.displayTimeMonitor();
                         }

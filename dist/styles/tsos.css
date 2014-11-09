@@ -218,11 +218,18 @@ h3 {
     width: auto;
 }
 
-#cpu td, #readyQueue td, #displayResident td, #monitor td{
+#cpu td, #readyQueue td, #monitor td{
     /*padding: 5px;*/
     width: auto;
     text-align: center;
     border-radius: 5px;
     color: #ffffff;
     background-color: #E66C2C;
+}
+
+#displayResident td{
+    width: auto;
+    text-align: center;
+    border-radius: 5px;
+    color: #ffffff;
 }

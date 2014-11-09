@@ -384,18 +384,35 @@ module TSOS {
 
                 var s:TSOS.Pcb = _FakeQueue[i];
                 if(s.getState() != "New"|| s.getState()!="Ready") {
-                    tableView += "<tr>";
-                    tableView += "<td>" + s.getPid().toString() + "</td>";
-                    tableView += "<td>" + s.getBase().toString() + "</td>";
-                    tableView += "<td>" + s.getLimit().toString() + "</td>";
-                    tableView += "<td>" + s.getState().toString() + "</td>";
-                    tableView += "<td>" + parseInt(s.getPc()+s.getBase()) + "</td>";
-                    tableView += "<td>" + s.getIR() + "</td>";
-                    tableView += "<td>" + s.getAcc() + "</td>";
-                    tableView += "<td>" + s.getX() + "</td>";
-                    tableView += "<td>" + s.getY() + "</td>";
-                    tableView += "<td>" + s.getZ() + "</td>";
-                    tableView += "</tr>";
+
+                    if(s.getState() == "Running") {
+                        tableView += "<tr style='background-color: limegreen;'>";
+                        tableView += "<td>" + s.getPid().toString() + "</td>";
+                        tableView += "<td>" + s.getBase().toString() + "</td>";
+                        tableView += "<td>" + s.getLimit().toString() + "</td>";
+                        tableView += "<td>" + s.getState().toString() + "</td>";
+                        tableView += "<td>" + parseInt(s.getPc() + s.getBase()) + "</td>";
+                        tableView += "<td>" + s.getIR() + "</td>";
+                        tableView += "<td>" + s.getAcc() + "</td>";
+                        tableView += "<td>" + s.getX() + "</td>";
+                        tableView += "<td>" + s.getY() + "</td>";
+                        tableView += "<td>" + s.getZ() + "</td>";
+                        tableView += "</tr>";
+                    }
+                    if (s.getState() == "Waiting" || s.getState() == "Terminated"){
+                        tableView += "<tr style='background-color: firebrick;'>";
+                        tableView += "<td>" + s.getPid().toString() + "</td>";
+                        tableView += "<td>" + s.getBase().toString() + "</td>";
+                        tableView += "<td>" + s.getLimit().toString() + "</td>";
+                        tableView += "<td>" + s.getState().toString() + "</td>";
+                        tableView += "<td>" + parseInt(s.getPc() + s.getBase()) + "</td>";
+                        tableView += "<td>" + s.getIR() + "</td>";
+                        tableView += "<td>" + s.getAcc() + "</td>";
+                        tableView += "<td>" + s.getX() + "</td>";
+                        tableView += "<td>" + s.getY() + "</td>";
+                        tableView += "<td>" + s.getZ() + "</td>";
+                        tableView += "</tr>";
+                    }
                 }
             }
             tableView += "</table>";
@@ -555,7 +572,6 @@ module TSOS {
          * Clears Memory Partitions
          */
         public shellClearMem(){
-            _StdOut.putText("Memory Wiped!");
             _MemoryManager.clearMemory();
         }
 
@@ -569,16 +585,13 @@ module TSOS {
 
             if(_CurrentProcess.getPid() == args){
                 _CurrentProcess.setState(5);
-                _CurrentProcess.displayPCB();
                 alert("Current state: "+_CurrentProcess.getState()+", Killed PID: "+_CurrentProcess.getPid());
                 Shell.updateResident();
                 _StdOut.putText("Killed PID: "+_CurrentProcess.getPid());
 //                _ReadyQueue.enqueue(_CurrentProcess);
                 _KernelInterruptQueue.enqueue(new Interrupt(_Killed,0));
-                return;
             }else{
                 _StdOut.putText("I'm not even ACTIVE...WTF!");
-                return;
             }
 
 //            for(var i=0; i<_ResidentQueue.length;i++){
