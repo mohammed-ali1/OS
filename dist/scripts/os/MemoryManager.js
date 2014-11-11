@@ -4,18 +4,26 @@
 var TSOS;
 (function (TSOS) {
     var MemoryManager = (function () {
-        //Address Translation Coming Soon
-        //Prior to Project 3!
         function MemoryManager() {
             _Memory = new TSOS.Memory();
         }
         MemoryManager.prototype.read = function (index) {
             //                alert("read at: "+parseInt(_CurrentProcess.getBase()+index)+", OP: "+_CPU.IR);
+            if (parseInt(_CurrentProcess.getBase() + index + 1) > parseInt(_CurrentProcess.getLimit()) || parseInt(_CurrentProcess.getBase() + index < _CurrentProcess.getBase())) {
+                //memory bound interrupt
+                _Kernel.krnInterruptHandler(_MemoryBoundError, 0);
+                return;
+            }
             return _Memory.read(parseInt(_CurrentProcess.getBase() + index));
         };
 
         MemoryManager.prototype.store = function (index, str) {
             //            alert("store at: "+parseInt(_CurrentProcess.getBase()+index)+", str: "+str);
+            if (parseInt(_CurrentProcess.getBase() + index + 1) > parseInt(_CurrentProcess.getLimit()) || parseInt(_CurrentProcess.getBase() + index < _CurrentProcess.getBase())) {
+                //memory bound interrupt
+                _Kernel.krnInterruptHandler(_MemoryBoundError, 0);
+                return;
+            }
             _Memory.store(parseInt(_CurrentProcess.getBase() + index), str);
         };
 
@@ -51,18 +59,12 @@ var TSOS;
                 alert("reading at base: " + base + ", address: " + address);
                 if (address == "00") {
                     alert("Returning: " + base);
-                    _BeginBase += base;
                     return base;
-                }
-
-                if (_BeginBase > 512) {
-                    _BeginBase = 0;
                 }
 
                 for (var j = 0; j < _ResidentQueue.length; j++) {
                     var free = _ResidentQueue[j];
                     if (base == free.getBase() && free.getState() == "Terminated") {
-                        _BeginBase += base;
                         alert("Return base as: " + free.getBase());
                         return free.getBase();
                     }

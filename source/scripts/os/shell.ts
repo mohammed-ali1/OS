@@ -339,7 +339,7 @@ module TSOS {
             }
 
 //            Get the free block first!
-            var base = _MemoryManager.getFreeBlock();
+            var base = _MemoryManager.getBlockAvailable();
 
             if(base == -1)
                 return;
@@ -397,7 +397,7 @@ module TSOS {
                         tableView += "<td>" + s.getZ() + "</td>";
                         tableView += "</tr>";
                     }
-                    if (s.getState() == "Waiting" || s.getState() == "Terminated" || s.getState() == "Killed"){
+                    if (s.getState() == "Waiting" || s.getState() == "Terminated"){
                         tableView += "<tr style='background-color: firebrick;'>";
                         tableView += "<td>" + s.getPid().toString() + "</td>";
                         tableView += "<td>" + s.getBase().toString() + "</td>";
@@ -589,6 +589,17 @@ module TSOS {
          */
         public shellKill(args){
 
+            if(_CurrentProcess.getPid() == args){
+                alert("About to kill pid: "+_CurrentProcess.getPid());
+                _CurrentProcess.setState(4);
+                _StdOut.putText("Killed PID: " +_CurrentProcess.getPid());
+                _Kernel.krnInterruptHandler(_Killed, process);
+                Shell.updateResident();
+                _CPU.reset();
+                _CurrentScheduler.startNewProcess();
+                return;
+            }
+
             alert("Need to kill: "+args);
 
             for(var i=0; i<_ReadyQueue.getSize();i++){
@@ -624,6 +635,13 @@ module TSOS {
          * @param args
          */
         public shellRun(args){
+
+//            if(_CurrentProcess.getState() == "Running"|| _CurrentProcess.getState() =="Waiting"){
+//                return;
+//            }
+
+            alert("args: "+args);
+
             if(args.length == 0 || args < 0){
                 _StdOut.putText("Load this Bitch again and RUN...!");
                 return;
@@ -632,9 +650,10 @@ module TSOS {
                 _StdOut.putText("Single Step is on!");
                 return;
             }
-            else if(_FakeQueue[args].getState() == "New") {
-                _FakeQueue[args].setState(3);
-                _ReadyQueue.enqueue(_FakeQueue[args]); //only put what's NEW!
+            else if(_ResidentQueue[args].getState() == "New") {
+                alert("args: "+args);
+                _ResidentQueue[args].setState(3);
+                _ReadyQueue.enqueue(_ResidentQueue[args]); //only put what's NEW!
                 _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
             }else{
                 _StdOut.putText("");
@@ -654,9 +673,7 @@ module TSOS {
                 if(_ResidentQueue[i].getState() == "New")
                 _ResidentQueue[i].setState(3);
                 _ReadyQueue.enqueue(_ResidentQueue[i]);
-                _FakeReadyQueue.enqueue(_ResidentQueue[i]);
             }
-            alert("FakeReady "+_FakeReadyQueue.getSize());
             _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
         }
     }

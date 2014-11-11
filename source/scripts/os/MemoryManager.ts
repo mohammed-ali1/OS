@@ -5,20 +5,30 @@ module TSOS{
 
     export class MemoryManager{
 
-        //Address Translation Coming Soon
-        //Prior to Project 3!
-
         constructor(){
             _Memory = new Memory();
         }
 
         public read(index:number){
 //                alert("read at: "+parseInt(_CurrentProcess.getBase()+index)+", OP: "+_CPU.IR);
-                return _Memory.read(parseInt(_CurrentProcess.getBase()+index));
+
+            if(parseInt(_CurrentProcess.getBase()+index+1) > parseInt(_CurrentProcess.getLimit())||
+                parseInt(_CurrentProcess.getBase()+index < _CurrentProcess.getBase())){
+                //memory bound interrupt
+                _Kernel.krnInterruptHandler(_MemoryBoundError,0);
+                return;
+            }
+            return _Memory.read(parseInt(_CurrentProcess.getBase()+index));
         }
 
         public store(index:number, str:string){
 //            alert("store at: "+parseInt(_CurrentProcess.getBase()+index)+", str: "+str);
+            if(parseInt(_CurrentProcess.getBase()+index+1) > parseInt(_CurrentProcess.getLimit()) ||
+                parseInt(_CurrentProcess.getBase()+index < _CurrentProcess.getBase())){
+                //memory bound interrupt
+                _Kernel.krnInterruptHandler(_MemoryBoundError,0);
+                return;
+            }
             _Memory.store(parseInt(_CurrentProcess.getBase()+index),str);
         }
 
@@ -51,45 +61,17 @@ module TSOS{
 
         public getBlockAvailable(){
 
-//            if(_BeginBase > 512){
-//                alert("base > "+_BeginBase);
-//                return -1;
-//            }
-//
-//            alert("Begin Base: "+_BeginBase);
-//
-//            var base = _Memory.read(_BeginBase);
-//
-//            if(base  == "00"){
-//                return _BeginBase;
-//                _BeginBase += _BlockSize;
-//            }
-//
-//            for(var j=0; j<_ResidentQueue.length;j++){
-//                var free:TSOS.Pcb = _ResidentQueue[j];
-//                if(base ==  free.getBase() && free.getState() == "Terminated"){
-//                    _BeginBase += _BlockSize;
-//                    return free.getBase();
-//                }
-//            }
-
             for(var base=0; base<=(_BlockSize*2);base+=_BlockSize){
                 var address = _Memory.read(base);
                 alert("reading at base: "+base+", address: "+address);
                 if(address == "00"){
                     alert("Returning: "+base);
-                    _BeginBase += base;
                     return base;
-                }
-
-                if(_BeginBase > 512){
-                    _BeginBase = 0;
                 }
 
                 for(var j=0; j<_ResidentQueue.length;j++){
                     var free:TSOS.Pcb = _ResidentQueue[j];
                     if(base ==  free.getBase() && free.getState() == "Terminated"){
-                        _BeginBase += base;
                         alert("Return base as: "+free.getBase());
                         return free.getBase();
                     }

@@ -34,8 +34,6 @@ module TSOS {
             //Initialize Ready Queue for the Processes to be loaded
             _ReadyQueue = new Queue();
             _FakeQueue = new Array();
-            _FakeReadyQueue = new Queue();
-//            _FakeQueue = _ReadyQueue;
 
             //Initialize Resident Queue
             _ResidentQueue = new Array();
@@ -178,6 +176,7 @@ module TSOS {
                     Shell.updateResident();
                     _ResidentQueue.splice(_ResidentQueue.indexOf(_CurrentProcess.getPid()),1);
                     _CurrentScheduler.startNewProcess();
+                     alert("RESIDENT QUEUE: "+_ResidentQueue.length);
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
@@ -190,13 +189,17 @@ module TSOS {
                     this.contextSwitch();
                     break;
                 case _Killed:
-//                    _CPU.reset();
-//                    _CPU.displayCPU();
                     alert("In killed...killing: "+params.getPid());
                     alert("Ready: "+_ReadyQueue.getSize());
                     _Kernel.krnTrace("\n\nKILLING PID: "+params.getPid()+"\n");
                     Shell.updateResident();
-//                    _CurrentScheduler.startNewProcess();
+                    break;
+                case _MemoryBoundError:
+                    alert("MEMORY BOUND REACHED for pid: "+_CurrentProcess.getPid());
+                    _StdOut.putText("Memory Limit Reached!");
+                    _CurrentProcess.setState(4);
+                    _CPU.reset();
+                    _CurrentScheduler.startNewProcess();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
