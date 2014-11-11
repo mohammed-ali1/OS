@@ -20,6 +20,10 @@ module TSOS{
                if(_CurrentProcess.getState() == "Ready"){
                    _CurrentProcess.setTimeArrived(_OSclock);
                }
+
+               if(_CurrentProcess.getState() == "Killed"){
+                   this.startNewProcess();
+               }
                _CurrentProcess.setState(1);
                _CPU.startProcessing(_CurrentProcess);
                _Kernel.krnTrace("\nPROCESSING PID: "+_CurrentProcess.getPid()+"\n");

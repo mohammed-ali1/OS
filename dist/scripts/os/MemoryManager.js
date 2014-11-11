@@ -24,7 +24,7 @@ var TSOS;
         };
 
         MemoryManager.prototype.clearMemory = function () {
-            if (_ResidentQueue.length > 0) {
+            if (_CurrentProcess.getState() == "Running" || _CurrentProcess.getState() == "Waiting") {
                 _StdOut.putText("Let one of the PROCESS Terminate First.....DAmmmmm!");
             } else {
                 _StdOut.putText("I had to Clear Memory for you....Thanks a Lot!");
@@ -82,10 +82,6 @@ var TSOS;
         MemoryManager.prototype.getFreeBlock = function () {
             alert("RES: " + _ResidentQueue.length);
 
-            //            if(_ResidentQueue.length == 3){
-            //                this.clearMemory();
-            //                return -1;
-            //            }
             if (_ResidentQueue.length < 3) {
                 if (_ResidentQueue.length == 0) {
                     return 0;

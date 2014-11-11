@@ -178,7 +178,6 @@ module TSOS {
                     _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateResident();
                     _ResidentQueue.splice(_ResidentQueue.indexOf(_CurrentProcess.getPid()),1);
-                    alert("Resident Queue: "+_ResidentQueue.length);
                     _CurrentScheduler.startNewProcess();
                     break;
                 case _InvalidOpCode:
@@ -192,13 +191,12 @@ module TSOS {
                     this.contextSwitch();
                     break;
                 case _Killed:
-                    _ResidentQueue.splice(_ResidentQueue.indexOf(_CurrentProcess.getPid()),1);
-                    _ReadyQueue.q.splice(_ReadyQueue.q.indexOf(_CurrentProcess.getPid()),1);
-                    alert("Ready Queue length: "+_ReadyQueue.getSize());
-                    alert("Resident Queue length: "+_ResidentQueue.length);
                     _CPU.reset();
                     _CPU.displayCPU();
-                    _Kernel.krnTrace("\n\nKILLING PID: "+_CurrentProcess.getPid()+"\n");
+//                    _ResidentQueue.splice(_ResidentQueue.indexOf(params.getPid()),16);
+//                    _ReadyQueue.q.splice(_ReadyQueue.q.indexOf(params.getPid()),1);
+                    alert("In killed...killing: "+params.getPid() + "Ready Queue: "+_ReadyQueue.getSize());
+                    _Kernel.krnTrace("\n\nKILLING PID: "+params.getPid()+"\n");
                     Shell.updateResident();
                     _CurrentScheduler.startNewProcess();
                     break;
@@ -258,7 +256,7 @@ module TSOS {
         public contextSwitch(){
 
             if(_ReadyQueue.isEmpty() && (_CurrentProcess.getState() == "Terminated" ||
-                                        _CurrentProcess.getState() == "Terminated")){
+                                        _CurrentProcess.getState() == "Killed")){
                 _CPU.reset();
             }else {
                 _CurrentProcess.setPc(_CPU.PC);
@@ -280,9 +278,9 @@ module TSOS {
 
                 if (_CurrentProcess.getState() == "Killed") {
                     ///do something...
-                    alert("killed caught");
-                    this.krnInterruptHandler(_Killed, 0);
-                    return;
+                    alert("killed caught @ PID: "+_CurrentProcess.getPid());
+                    _ReadyQueue.dequeue();
+                    this.contextSwitch();
                 }
                 _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
                 _CurrentProcess.setState(1); //set state to running

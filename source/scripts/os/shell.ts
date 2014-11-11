@@ -592,13 +592,15 @@ module TSOS {
             for(var i=0; i<_FakeQueue.length;i++){
 
                 var process:TSOS.Pcb = _FakeQueue[i];
-                if(process.getPid() == args){
-                    process.setState(5);
-                    alert("killing pid: "+process.getPid());
-                    _StdOut.putText("Killed PID: "+process.getPid());
-                    _Kernel.krnInterruptHandler(_Killed,0);
-//                    _KernelInterruptQueue.enqueue(new Interrupt(_Killed,0));
-                    break;
+                if(process.getState() != "Terminated" && process.getState() !="Killed")
+                {
+                    if (process.getPid() == args) {
+                        process.setState(5);
+                        alert("killing pid: " + process.getPid());
+                        _StdOut.putText("Killed PID: " + process.getPid());
+                        _Kernel.krnInterruptHandler(_Killed, process);
+                        break;
+                    }
                 }
             }
 
@@ -626,9 +628,9 @@ module TSOS {
                 _StdOut.putText("Single Step is on!");
                 return;
             }
-            else if(_ResidentQueue[args].getState() == "New") {
-                _ResidentQueue[args].setState(3);
-                _ReadyQueue.enqueue(_ResidentQueue[args]); //only put what's NEW!
+            else if(_FakeQueue[args].getState() == "New") {
+                _FakeQueue[args].setState(3);
+                _ReadyQueue.enqueue(_FakeQueue[args]); //only put what's NEW!
                 _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
             }else{
                 _StdOut.putText("");

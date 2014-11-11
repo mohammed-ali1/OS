@@ -28,7 +28,7 @@ module TSOS{
 
         public clearMemory(){
 
-            if(_ResidentQueue.length>0){
+            if(_CurrentProcess.getState() == "Running" || _CurrentProcess.getState() == "Waiting"){
                 _StdOut.putText("Let one of the PROCESS Terminate First.....DAmmmmm!");
             }else{
                 _StdOut.putText("I had to Clear Memory for you....Thanks a Lot!");
@@ -110,14 +110,7 @@ module TSOS{
 
             alert("RES: "+_ResidentQueue.length);
 
-
-
-//            if(_ResidentQueue.length == 3){
-//                this.clearMemory();
-//                return -1;
-//            }
-
-            if(_ResidentQueue.length < 3 ) {
+            if(_ResidentQueue.length <3) {
                 if (_ResidentQueue.length == 0) {
                     return 0;
                 } else if (_ResidentQueue.length == 1) {
