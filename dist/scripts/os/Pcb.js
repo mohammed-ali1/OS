@@ -29,21 +29,6 @@ var TSOS;
             this.block = (this.base / _BlockSize);
             this.inMemory = location;
         }
-        /**
-        * Displays the the status of the current PCB.
-        */
-        //        public displayPCB(){
-        //            document.getElementById("pcbPid").innerHTML = "" + this.pid;
-        //            document.getElementById("pcbBase").innerHTML = "" + this.base;
-        //            document.getElementById("pcbLimit").innerHTML =  "" + this.limit;
-        //            document.getElementById("pcbStatus").innerHTML = this.state.toString();
-        //            document.getElementById("pcbPc").innerHTML = "" + this.pc;
-        //            document.getElementById("pcbAcc").innerHTML = "" + this.acc;
-        //            document.getElementById("pcbIr").innerHTML = this.ir;
-        //            document.getElementById("pcbX").innerHTML = "" + this.x;
-        //            document.getElementById("pcbY").innerHTML = "" + this.y;
-        //            document.getElementById("pcbZ").innerHTML = "" + this.z;
-        //        }
         Pcb.prototype.getPid = function () {
             return this.pid;
         };
@@ -72,6 +57,14 @@ var TSOS;
                 default:
                     this.state = "New";
             }
+
+            if (this.state == "Terminated" || this.state == "Killed") {
+                this.inMemory = false;
+            }
+        };
+
+        Pcb.prototype.getInMemory = function () {
+            return this.inMemory;
         };
 
         Pcb.prototype.getState = function () {
@@ -160,13 +153,6 @@ var TSOS;
 
         Pcb.prototype.getTimeFinished = function () {
             return this.timeFinished;
-        };
-
-        Pcb.prototype.inMemory = function () {
-            if (this.inMemory)
-                return "True";
-            else
-                return "False";
         };
 
         Pcb.prototype.setInMemory = function (location) {

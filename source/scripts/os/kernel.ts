@@ -94,15 +94,8 @@ module TSOS {
                 // TODO: Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
-            } else if (_ClockCycle >= _Quantum) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
-                //dont call cpu cycle
-                //call the scheduler instead
-
-//                _CPU.isExecuting = false;
-//                _KernelInterruptQueue.enqueue(new Interrupt(_ContextSwitch,0));
-//                return;
+            } else if (_ClockCycle >= _Quantum) { // If there are no interrupts then run one CPU cycle if there is anything being processed.
                 this.krnInterruptHandler(_ContextSwitch,0);
-
             }else if(_CPU.isExecuting){
                 _CPU.cycle();
                 _ClockCycle++;
@@ -112,27 +105,6 @@ module TSOS {
                 this.krnTrace("Idle");
             }
         }
-
-        /**
-         * Execute the PID from the Ready Queue!
-         * @param p, the PID to execute.
-         */
-//        public krnExe(p:Pcb){
-//
-//            _CurrentProcess = p;
-//            this.krnTrace("Processing PID: " +  _CurrentProcess.getPid());
-//            _StdOut.putText("Processing PID: "+_CurrentProcess.getPid());
-//            alert("pid: "+_CurrentProcess.getPid()+", Base: "+_CurrentProcess.getBase()+", Limit: "+_CurrentProcess.getLimit());
-//            _Console.advanceLine();
-//            _OsShell.putPrompt();
-//           _CPU.isExecuting = true;
-//            _CPU.PC = 0;
-//            _CPU.displayCPU();
-//            _CurrentProcess.setState(1); //set state "Running"
-//            Shell.updateResident();
-//            Shell.updateReady(_CurrentProcess);
-//        }
-
         //
         // Interrupt Handling
         //
@@ -202,13 +174,11 @@ module TSOS {
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
                     _CurrentProcess.setState(4);
                     _CurrentProcess.setTimeFinished(_OSclock);
-//                    _CurrentProcess = null;
                     Pcb.displayTimeMonitor();
-//                    _CurrentProcess.setInMemory(false);
-                    //memory manager . clear block (x)
-                    ///clear the block
                     _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateResident();
+                    _ResidentQueue.splice(_ResidentQueue.indexOf(_CurrentProcess.getPid()),1);
+                    alert("Resident Queue: "+_ResidentQueue.length);
                     _CurrentScheduler.startNewProcess();
                     break;
                 case _InvalidOpCode:
@@ -218,49 +188,14 @@ module TSOS {
                     _CurrentScheduler.startNewProcess();
                     break;
                 case _ContextSwitch:
-
                     _ClockCycle = 0;
-                    //if nothing on ready queue
-                    //just reset and go back to Idle!
-
-                    if(_ReadyQueue.isEmpty() && _CurrentProcess.getState() == "Terminated"){
-                        _CPU.reset();
-                        return;
-                    }else {
-                        _CurrentProcess.setPc(_CPU.PC);
-                        _CurrentProcess.setAcc(_CPU.Acc);
-                        _CurrentProcess.setX(_CPU.Xreg);
-                        _CurrentProcess.setY(_CPU.Yreg);
-                        _CurrentProcess.setZ(_CPU.Zflag);
-                        _CurrentProcess.setIr(_CPU.IR);
-                        _CurrentProcess.setState(2); //set state to waiting
-                        _ReadyQueue.enqueue(_CurrentProcess);//push back to ready queue
-//                    _CurrentProcess.displayPCB();//update display
-                        _CPU.displayCPU();
-
-                        _CurrentProcess = _ReadyQueue.dequeue();
-
-                        if(_CurrentProcess.getState() == "Ready"){
-                            _CurrentProcess.setTimeArrived(_OSclock);
-                            Pcb.displayTimeMonitor();
-                        }
-
-                        if (_CurrentProcess.getState() == "Killed") {
-                            ///do something...
-                            alert("killed caught");
-                            _KernelInterruptQueue.enqueue(new Interrupt(_Killed, 0));
-                            return;
-                        }
-                        _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
-
-                        _CurrentProcess.setState(1); //set state to running
-//           _CurrentProcess.setTimeArrived(_OSclock);
-                        _CPU.startProcessing(_CurrentProcess);
-                        _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
-                    }
+                    this.contextSwitch();
                     break;
                 case _Killed:
-//                    _ReadyQueue.dequeue();
+                    _ResidentQueue.splice(_ResidentQueue.indexOf(_CurrentProcess.getPid()),1);
+                    _ReadyQueue.q.splice(_ReadyQueue.q.indexOf(_CurrentProcess.getPid()),1);
+                    alert("Ready Queue length: "+_ReadyQueue.getSize());
+                    alert("Resident Queue length: "+_ResidentQueue.length);
                     _CPU.reset();
                     _CPU.displayCPU();
                     _Kernel.krnTrace("\n\nKILLING PID: "+_CurrentProcess.getPid()+"\n");
@@ -317,6 +252,43 @@ module TSOS {
             Control.hostLog("OS ERROR - TRAP: " + msg);
             // TODO: Display error on console, perhaps in some sort of colored screen. (Perhaps blue?)
             this.krnShutdown();
+        }
+
+
+        public contextSwitch(){
+
+            if(_ReadyQueue.isEmpty() && (_CurrentProcess.getState() == "Terminated" ||
+                                        _CurrentProcess.getState() == "Terminated")){
+                _CPU.reset();
+            }else {
+                _CurrentProcess.setPc(_CPU.PC);
+                _CurrentProcess.setAcc(_CPU.Acc);
+                _CurrentProcess.setX(_CPU.Xreg);
+                _CurrentProcess.setY(_CPU.Yreg);
+                _CurrentProcess.setZ(_CPU.Zflag);
+                _CurrentProcess.setIr(_CPU.IR);
+                _CurrentProcess.setState(2); //set state to waiting
+
+                _ReadyQueue.enqueue(_CurrentProcess);//push back to ready queue
+                _CPU.displayCPU();
+                _CurrentProcess = _ReadyQueue.dequeue();
+
+                if(_CurrentProcess.getState() == "Ready"){
+                    _CurrentProcess.setTimeArrived(_OSclock);
+                    Pcb.displayTimeMonitor();
+                }
+
+                if (_CurrentProcess.getState() == "Killed") {
+                    ///do something...
+                    alert("killed caught");
+                    this.krnInterruptHandler(_Killed, 0);
+                    return;
+                }
+                _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
+                _CurrentProcess.setState(1); //set state to running
+                _CPU.startProcessing(_CurrentProcess);
+                _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
+            }
         }
     }
 }

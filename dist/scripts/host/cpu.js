@@ -312,12 +312,12 @@ var TSOS;
         };
 
         Cpu.prototype.updatePcb = function (p) {
-            _CurrentProcess.pc = _CPU.PC;
-            _CurrentProcess.acc = _CPU.Acc;
-            _CurrentProcess.ir = _CPU.IR;
-            _CurrentProcess.x = _CPU.Xreg;
-            _CurrentProcess.y = _CPU.Yreg;
-            _CurrentProcess.z = _CPU.Zflag;
+            p.setPc(_CPU.PC);
+            p.setAcc(_CPU.Acc);
+            p.setIr(_CPU.IR);
+            p.setX(_CPU.Xreg);
+            p.setY(_CPU.Yreg);
+            p.setZ(_CPU.Zflag);
         };
         return Cpu;
     })();

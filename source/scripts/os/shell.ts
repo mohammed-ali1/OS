@@ -361,8 +361,6 @@ module TSOS {
 
             //Finally load into Memory
             _MemoryManager.load(base,x.toUpperCase().toString());
-
-//            Shell.updateResident();
         }
 
         public static updateResident(){
@@ -399,7 +397,7 @@ module TSOS {
                         tableView += "<td>" + s.getZ() + "</td>";
                         tableView += "</tr>";
                     }
-                    if (s.getState() == "Waiting" || s.getState() == "Terminated"){
+                    if (s.getState() == "Waiting" || s.getState() == "Terminated" || s.getState() == "Killed"){
                         tableView += "<tr style='background-color: firebrick;'>";
                         tableView += "<td>" + s.getPid().toString() + "</td>";
                         tableView += "<td>" + s.getBase().toString() + "</td>";
@@ -557,15 +555,25 @@ module TSOS {
 
         public shellPs(){
 
-            _StdOut.putText("Current Process ID: "+_CurrentProcess.getPid());
-            return;
-            for(var i=0; i<_ResidentQueue.length;i++){
-                var temp : TSOS.Pcb = _ResidentQueue[i];
-                if(temp.getState() == "Running"){
-                    _StdOut.putText("Pid: " +temp.getPid());
-                    _Console.advanceLine();
+            var nobueno:boolean = false;
+
+            for(var i=0; i<_FakeQueue.length;i++){
+                var temp : TSOS.Pcb = _FakeQueue[i];
+                alert("temp pid; "+temp.getPid() + " length: "+_FakeQueue.length);
+                if(temp.getState() == "Running" || temp.getState() == "Waiting") {
+                    nobueno = true;
+                    if (i + 1 == _FakeQueue.length) {
+                        _StdOut.putText("Pid: " + temp.getPid());
+                    } else {
+                        _StdOut.putText("PID: " + temp.getPid() + ", ");
+                    }
                 }
             }
+
+            if(nobueno == false){
+                _StdOut.putText("noo procesos en ejecución !");
+            }
+
         }
 
         /**
@@ -581,38 +589,28 @@ module TSOS {
          */
         public shellKill(args){
 
-//            var killThisBitch:TSOS.Pcb;
+            for(var i=0; i<_FakeQueue.length;i++){
 
-            if(_CurrentProcess.getPid() == args){
-                _CurrentProcess.setState(5);
-                alert("Current state: "+_CurrentProcess.getState()+", Killed PID: "+_CurrentProcess.getPid());
-                Shell.updateResident();
-                _StdOut.putText("Killed PID: "+_CurrentProcess.getPid());
-//                _ReadyQueue.enqueue(_CurrentProcess);
-                _KernelInterruptQueue.enqueue(new Interrupt(_Killed,0));
-            }else{
-                _StdOut.putText("I'm not even ACTIVE...WTF!");
+                var process:TSOS.Pcb = _FakeQueue[i];
+                if(process.getPid() == args){
+                    process.setState(5);
+                    alert("killing pid: "+process.getPid());
+                    _StdOut.putText("Killed PID: "+process.getPid());
+                    _Kernel.krnInterruptHandler(_Killed,0);
+//                    _KernelInterruptQueue.enqueue(new Interrupt(_Killed,0));
+                    break;
+                }
             }
 
-//            for(var i=0; i<_ResidentQueue.length;i++){
-//                if(_ResidentQueue[i].getPid() == args &&
-//                    _ResidentQueue[i].getState() !="Running" &&
-//                    _ResidentQueue[i].inMemory()){
-//                    _StdOut.putText("I'm not even Running...WTF!");
-//                }
-//                if(_ResidentQueue[i].getPid() == args &&
-//                    _ResidentQueue[i].getState() == "Running" &&
-//                    _ResidentQueue[i].inMemory()) {     //Kill the process
-//                    killThisBitch = _ResidentQueue[i];
-//                    killThisBitch.setState(5);
-//                    killThisBitch.displayPCB();
-//                    _StdOut.putText("Process Killed: "+killThisBitch.getPid());
-//                    _StdOut.advanceLine();
-//                    _CPU.reset();
-//                    _CPU.displayCPU();
-//                    //clear memory block from the base.....???
-//                }
-
+//            if(_CurrentProcess.getPid() == args){
+//                _CurrentProcess.setState(5);
+//                alert("Current state: "+_CurrentProcess.getState()+", Killed PID: "+_CurrentProcess.getPid());
+//                Shell.updateResident();
+//                _StdOut.putText("Killed PID: "+_CurrentProcess.getPid());
+//                _KernelInterruptQueue.enqueue(new Interrupt(_Killed,0));
+//            }else{
+//                _StdOut.putText("I'm not even ACTIVE...WTF!");
+//            }
         }
 
         /**
@@ -620,7 +618,6 @@ module TSOS {
          * @param args
          */
         public shellRun(args){
-
             if(args.length == 0 || args < 0){
                 _StdOut.putText("Load this Bitch again and RUN...!");
                 return;
@@ -639,7 +636,6 @@ module TSOS {
         }
 
         public displayReadyQueue(p:Pcb){
-
             var table = "<table>";
                 table += "<tr>";
                 table += "<td>" + p.getPid() + p.getBase() + p.getLimit() +"</td>";
@@ -648,7 +644,6 @@ module TSOS {
         }
 
         public shellRunAll(){
-
             for(var i=0; i<_ResidentQueue.length;i++){
                 if(_ResidentQueue[i].getState() == "New")
                 _ResidentQueue[i].setState(3);

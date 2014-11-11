@@ -28,19 +28,15 @@ var TSOS;
         Scheduler.prototype.contextSwitch = function () {
             this.reset();
 
-            //if nothing on ready queue
-            //just reset and go back to Idle!
             if (_ReadyQueue.isEmpty() && _CurrentProcess.getState() == "Terminated") {
                 _CPU.reset();
                 return;
             }
 
             this.performSwitch();
-
             _CurrentProcess = _ReadyQueue.dequeue();
 
             if (_CurrentProcess.getState() == "Ready") {
-                //               alert("Clock is: "+_OSclock);
                 _CurrentProcess.setTimeArrived(_OSclock);
                 TSOS.Pcb.displayTimeMonitor();
             }
@@ -54,8 +50,6 @@ var TSOS;
             _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
 
             _CurrentProcess.setState(1); //set state to running
-
-            //           _CurrentProcess.setTimeArrived(_OSclock);
             _CPU.startProcessing(_CurrentProcess);
             _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
             TSOS.Shell.updateResident();
@@ -63,19 +57,9 @@ var TSOS;
 
         Scheduler.prototype.reset = function () {
             _ClockCycle = 0;
-            //           _CurrentProcess.displayPCB();
-            //           _CPU.displayCPU();
         };
 
         Scheduler.prototype.performSwitch = function () {
-            //
-            //           if(_CurrentProcess.getState() == "Terminated"){
-            //               ///do something...
-            //               alert("Terminated caught ready size; "+_ReadyQueue.getSize());
-            ////               _ReadyQueue.dequeue();
-            //               this.startNewProcess();
-            ////               return;
-            //           }
             _CurrentProcess.setPc(_CPU.PC);
             _CurrentProcess.setAcc(_CPU.Acc);
             _CurrentProcess.setX(_CPU.Xreg);
@@ -84,8 +68,6 @@ var TSOS;
             _CurrentProcess.setIr(_CPU.IR);
             _CurrentProcess.setState(2); //set state to waiting
             _ReadyQueue.enqueue(_CurrentProcess); //push back to ready queue
-
-            //           _CurrentProcess.displayPCB();//update display
             _CPU.displayCPU();
         };
         return Scheduler;

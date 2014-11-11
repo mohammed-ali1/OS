@@ -110,6 +110,7 @@ var _InvalidOpCode = 999;
 
 //Time
 var _Time = null;
+var _BeginBase = 0;
 
 // CPU Scheduling
 var _Quantum = 6;

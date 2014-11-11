@@ -129,22 +129,25 @@
                 ></textarea>
     </div>
 
-    <div style="overflow-x: scroll overflow-y: scroll;">
-        <h4 style="color:firebrick;">Ready Queue to be...</h4>
-        <table id="displayResident">
-            <tr>
-                <th>Pid</th>
-                <th>Base</th>
-                <th>Limit</th>
-                <th>State</th>
-                <th>PC</th>
-                <th>IR</th>
-                <th>Acc</th>
-                <th>X</th>
-                <th>Y</th>
-                <th>Z</th>
-            </tr>
-        </table>
+    <div style="height: 150px; overflow: scroll; border: transparent; border-radius: 10px;">
+        <h4 style="color:firebrick;">Processes</h4>
+
+        <div>
+            <table id="displayResident">
+                <tr>
+                    <th>Pid</th>
+                    <th>Base</th>
+                    <th>Limit</th>
+                    <th>State</th>
+                    <th>PC</th>
+                    <th>IR</th>
+                    <th>Acc</th>
+                    <th>X</th>
+                    <th>Y</th>
+                    <th>Z</th>
+                </tr>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -204,15 +207,17 @@
                 </tr>
             </table>
 
-            <h4 style="color: firebrick;">Processes Monitoring</h4>
-            <table id="monitor">
-                <tr>
-                    <th>PID</th>
-                    <th>Arrived</th>
-                     <th>Terminated</th>
-                    <th>Turnaround</th>
-                </tr>
-            </table>
+            <div style="height: 130px; overflow: scroll; border:transparent; border-radius: 10px;">
+                <h4 style="color: firebrick;">Processes Monitoring</h4>
+                <table id="monitor">
+                    <tr>
+                        <th>PID</th>
+                        <th>Arrived</th>
+                         <th>Terminated</th>
+                        <th>Turnaround</th>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -223,32 +228,6 @@
     <br>
     Reproduction is prohibited without the express written consent of
     Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
-
-    <!--<script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization',-->
-    <!--'version':'1','packages':['timeline']}]}"></script>-->
-    <!--<script type="text/javascript">-->
-    <!--google.setOnLoadCallback(drawChart);-->
-
-    <!--function drawChart() {-->
-    <!--var container = document.getElementById('example1');-->
-
-    <!--var chart = new google.visualization.Timeline(container);-->
-
-    <!--var dataTable = new google.visualization.DataTable();-->
-
-    <!--dataTable.addColumn({ type: 'string', id: 'string' });-->
-    <!--dataTable.addColumn({ type: 'date', number: 'Start' });-->
-    <!--dataTable.addColumn({ type: 'date', number: 'End' });-->
-
-    <!--dataTable.addRows([-->
-    <!--[ "Pid: ", new Date(1212, 25, 10), new Date(1212,26, 10) ]]);-->
-
-    <!--chart.draw(dataTable);-->
-    <!--}-->
-    <!--</script>-->
-    <!--<div id="example1" style="width: 900px; height: 180px;"></div>-->
-
-
 </footer>
 
 </body>

@@ -207,6 +207,17 @@ h3 {
     table-layout: auto;
 }
 
+#displayResident th{
+    border: 1px solid firebrick;
+    border-radius: 5px;
+}
+
+#displayResident{
+    width:350px;
+    border-radius: 10px;
+    table-layout: auto;
+}
+
 #cpu, #readyQueue, #displayResident, #monitor{
     margin-top:-6%;
 }

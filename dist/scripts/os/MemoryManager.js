@@ -24,11 +24,10 @@ var TSOS;
         };
 
         MemoryManager.prototype.clearMemory = function () {
-            if (_CurrentProcess.getState() == "Running" || _CurrentProcess.getState() == "Waiting") {
-                _StdOut.putText("Let me Terminate First.....DAmmmmm!");
+            if (_ResidentQueue.length > 0) {
+                _StdOut.putText("Let one of the PROCESS Terminate First.....DAmmmmm!");
             } else {
-                _ResidentQueue.splice(0, _ResidentQueue.length);
-                _StdOut.putText("I have to Clear Memory for you....Thanks a Lot!");
+                _StdOut.putText("I had to Clear Memory for you....Thanks a Lot!");
                 _Console.advanceLine();
                 _Memory.clearMemory();
             }
@@ -46,6 +45,33 @@ var TSOS;
             _Memory.clearBlock(base);
         };
 
+        MemoryManager.prototype.getBlockAvailable = function () {
+            for (var base = 0; base <= (_BlockSize * 2); base += _BlockSize) {
+                var address = _Memory.read(base);
+                alert("reading at base: " + base + ", address: " + address);
+                if (address == "00") {
+                    alert("Returning: " + base);
+                    _BeginBase += base;
+                    return base;
+                }
+
+                if (_BeginBase > 512) {
+                    _BeginBase = 0;
+                }
+
+                for (var j = 0; j < _ResidentQueue.length; j++) {
+                    var free = _ResidentQueue[j];
+                    if (base == free.getBase() && free.getState() == "Terminated") {
+                        _BeginBase += base;
+                        alert("Return base as: " + free.getBase());
+                        return free.getBase();
+                    }
+                }
+            }
+            alert("last -1");
+            return -1;
+        };
+
         MemoryManager.prototype.getNextBlock = function () {
             if (_ResidentQueue.length >= 3) {
                 return -1;
@@ -56,11 +82,10 @@ var TSOS;
         MemoryManager.prototype.getFreeBlock = function () {
             alert("RES: " + _ResidentQueue.length);
 
-            if (_ResidentQueue.length == 3) {
-                this.clearMemory();
-                return -1;
-            }
-
+            //            if(_ResidentQueue.length == 3){
+            //                this.clearMemory();
+            //                return -1;
+            //            }
             if (_ResidentQueue.length < 3) {
                 if (_ResidentQueue.length == 0) {
                     return 0;
@@ -70,10 +95,10 @@ var TSOS;
                 } else if (_ResidentQueue.length == 2) {
                     var s = parseInt(_ResidentQueue[1].getLimit(), 10);
                     return (s + 1);
-                } else {
-                    _StdOut.putText("NO ROOM FOR Y0o BITCH!!!");
-                    return -1;
                 }
+            } else {
+                _StdOut.putText("NO ROOM FOR Y0o BITCH!!!");
+                return -1;
             }
         };
         return MemoryManager;
