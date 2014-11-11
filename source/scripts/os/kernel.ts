@@ -34,6 +34,7 @@ module TSOS {
             //Initialize Ready Queue for the Processes to be loaded
             _ReadyQueue = new Queue();
             _FakeQueue = new Array();
+            _FakeReadyQueue = new Queue();
 //            _FakeQueue = _ReadyQueue;
 
             //Initialize Resident Queue
@@ -156,9 +157,7 @@ module TSOS {
                         var address  = _CPU.Yreg;
                         var print = "";
                         var temp = parseInt(_MemoryManager.read(address),16);
-//                        alert("Y-REg: "+_CPU.Yreg);
                         var index = 0;
-//                        alert("Address in FF is: "+(temp) +" PID: "+ _CurrentProcess.getPid() + " PC: "+parseInt(_CurrentProcess.getBase()+_CPU.PC));
                         while (temp != "00"){
                             print += String.fromCharCode(temp).toString();
                             index++;
@@ -191,14 +190,13 @@ module TSOS {
                     this.contextSwitch();
                     break;
                 case _Killed:
-                    _CPU.reset();
-                    _CPU.displayCPU();
-//                    _ResidentQueue.splice(_ResidentQueue.indexOf(params.getPid()),16);
-//                    _ReadyQueue.q.splice(_ReadyQueue.q.indexOf(params.getPid()),1);
-                    alert("In killed...killing: "+params.getPid() + "Ready Queue: "+_ReadyQueue.getSize());
+//                    _CPU.reset();
+//                    _CPU.displayCPU();
+                    alert("In killed...killing: "+params.getPid());
+                    alert("Ready: "+_ReadyQueue.getSize());
                     _Kernel.krnTrace("\n\nKILLING PID: "+params.getPid()+"\n");
                     Shell.updateResident();
-                    _CurrentScheduler.startNewProcess();
+//                    _CurrentScheduler.startNewProcess();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -255,8 +253,9 @@ module TSOS {
 
         public contextSwitch(){
 
-            if(_ReadyQueue.isEmpty() && (_CurrentProcess.getState() == "Terminated" ||
-                                        _CurrentProcess.getState() == "Killed")){
+//            alert("in switch current pid; "+_CurrentProcess.getPid() + " State: "+_CurrentProcess.getState());
+
+            if(_ReadyQueue.isEmpty() && (_CurrentProcess.getState() == "Terminated")){
                 _CPU.reset();
             }else {
                 _CurrentProcess.setPc(_CPU.PC);
@@ -276,11 +275,10 @@ module TSOS {
                     Pcb.displayTimeMonitor();
                 }
 
-                if (_CurrentProcess.getState() == "Killed") {
+                if (_CurrentProcess.getState() == "Terminated") {
                     ///do something...
                     alert("killed caught @ PID: "+_CurrentProcess.getPid());
-                    _ReadyQueue.dequeue();
-                    this.contextSwitch();
+                    this.krnInterruptHandler(_RUN,0);
                 }
                 _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
                 _CurrentProcess.setState(1); //set state to running

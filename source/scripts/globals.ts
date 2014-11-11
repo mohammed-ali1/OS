@@ -92,6 +92,7 @@ var _RUN = -5;
 var _ClockCycle:number = 0;
 var _ContextSwitch : number = 915;
 var _FakeQueue: any[] = null;
+var _FakeReadyQueue: TSOS.Queue;
 var _Killed : number = 89;
 
 var _ResidentDisplay : HTMLTableElement = null;

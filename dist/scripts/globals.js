@@ -90,6 +90,7 @@ var _RUN = -5;
 var _ClockCycle = 0;
 var _ContextSwitch = 915;
 var _FakeQueue = null;
+var _FakeReadyQueue;
 var _Killed = 89;
 
 var _ResidentDisplay = null;

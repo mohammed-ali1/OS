@@ -540,16 +540,20 @@ var TSOS;
         * @param args
         */
         Shell.prototype.shellKill = function (args) {
-            for (var i = 0; i < _FakeQueue.length; i++) {
-                var process = _FakeQueue[i];
-                if (process.getState() != "Terminated" && process.getState() != "Killed") {
+            alert("Need to kill: " + args);
+
+            for (var i = 0; i < _ReadyQueue.getSize(); i++) {
+                var process = _ReadyQueue.q[i];
+                if (process.getState() != "Terminated") {
                     if (process.getPid() == args) {
-                        process.setState(5);
+                        process.setState(4);
                         alert("killing pid: " + process.getPid());
                         _StdOut.putText("Killed PID: " + process.getPid());
                         _Kernel.krnInterruptHandler(_Killed, process);
                         break;
                     }
+                } else {
+                    _StdOut.putText("I'm already dead......Why are you so mean....?");
                 }
             }
             //            if(_CurrentProcess.getPid() == args){
@@ -596,7 +600,9 @@ var TSOS;
                 if (_ResidentQueue[i].getState() == "New")
                     _ResidentQueue[i].setState(3);
                 _ReadyQueue.enqueue(_ResidentQueue[i]);
+                _FakeReadyQueue.enqueue(_ResidentQueue[i]);
             }
+            alert("FakeReady " + _FakeReadyQueue.getSize());
             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_RUN, 0));
         };
         return Shell;
