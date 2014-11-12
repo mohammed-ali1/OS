@@ -12,24 +12,24 @@ module TSOS{
         public read(index:number){
 //                alert("read at: "+parseInt(_CurrentProcess.getBase()+index)+", OP: "+_CPU.IR);
 
-            if(parseInt(_CurrentProcess.getBase()+index+1) > parseInt(_CurrentProcess.getLimit())||
-                parseInt(_CurrentProcess.getBase()+index < _CurrentProcess.getBase())){
+            if(parseInt(_CurrentProcess.getBase()+index) > parseInt(_CurrentProcess.getLimit()) ||
+                parseInt(_CurrentProcess.getBase()+index) < parseInt(_CurrentProcess.getBase())){
                 //memory bound interrupt
-                _Kernel.krnInterruptHandler(_MemoryBoundError,0);
-                return;
+                _Kernel.krnInterruptHandler(_MemoryBoundError,_CurrentProcess);
+            }else {
+                return _Memory.read(parseInt(_CurrentProcess.getBase() + index));
             }
-            return _Memory.read(parseInt(_CurrentProcess.getBase()+index));
         }
 
         public store(index:number, str:string){
 //            alert("store at: "+parseInt(_CurrentProcess.getBase()+index)+", str: "+str);
-            if(parseInt(_CurrentProcess.getBase()+index+1) > parseInt(_CurrentProcess.getLimit()) ||
-                parseInt(_CurrentProcess.getBase()+index < _CurrentProcess.getBase())){
+            if(parseInt(_CurrentProcess.getBase()+index) > parseInt(_CurrentProcess.getLimit()) ||
+                parseInt(_CurrentProcess.getBase()+index) < parseInt(_CurrentProcess.getBase())){
                 //memory bound interrupt
-                _Kernel.krnInterruptHandler(_MemoryBoundError,0);
-                return;
+                _Kernel.krnInterruptHandler(_MemoryBoundError,_CurrentProcess);
+            }else {
+                _Memory.store(parseInt(_CurrentProcess.getBase() + index), str);
             }
-            _Memory.store(parseInt(_CurrentProcess.getBase()+index),str);
         }
 
         public load(base ,str:string){
@@ -71,7 +71,7 @@ module TSOS{
 
                 for(var j=0; j<_ResidentQueue.length;j++){
                     var free:TSOS.Pcb = _ResidentQueue[j];
-                    if(base ==  free.getBase() && free.getState() == "Terminated"){
+                    if(base ==  free.getBase() && (free.getState() == "Terminated" || free.getState() == "Killed")){
                         alert("Return base as: "+free.getBase());
                         return free.getBase();
                     }

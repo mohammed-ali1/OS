@@ -24,15 +24,16 @@ module TSOS{
                    _CurrentProcess.setTimeArrived(_OSclock);
                }
 
-               if(_CurrentProcess.getState() == "Terminated"){
+               if(_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed"){
                    alert("Terminate caught: PID: " + _CurrentProcess.getPid());
+                   _ClockCycle = 0;
                    this.startNewProcess();
                }
                _CurrentProcess.setState(1);
                _CPU.startProcessing(_CurrentProcess);
                _Kernel.krnTrace("\nPROCESSING PID: "+_CurrentProcess.getPid()+"\n");
-               Shell.updateResident();
-           }else if ((_CurrentProcess.getState() != "Terminated") && _ReadyQueue.isEmpty()){
+               Shell.updateReadyQueue();
+           }else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() !="Killed") && _ReadyQueue.isEmpty()){
                _ClockCycle = 0;
                return;
            }

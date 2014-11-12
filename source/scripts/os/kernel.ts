@@ -92,16 +92,19 @@ module TSOS {
                 // Process the first interrupt on the interrupt queue.
                 // TODO: Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
                 var interrupt = _KernelInterruptQueue.dequeue();
+                _Mode = 0;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_ClockCycle >= _Quantum) { // If there are no interrupts then run one CPU cycle if there is anything being processed.
+                _Mode = 0;
                 this.krnInterruptHandler(_ContextSwitch,0);
             }else if(_CPU.isExecuting){
                 _CPU.cycle();
                 _ClockCycle++;
-                Shell.updateResident();
+                Shell.updateReadyQueue();
             }
             else { // If there are no interrupts and there is nothing being executed then just be idle.
                 this.krnTrace("Idle");
+                _Mode = 1;
             }
         }
         //
@@ -142,7 +145,6 @@ module TSOS {
                     if(_CPU.PC > _CurrentProcess.getLength()){ //Use the program length to break
                         Control.hostStopButton_click(this); //helps us exit next button!
                         _CurrentProcess.setState(4);
-                        _CurrentProcess.displayPCB();
                         _CPU.reset();
                         _CPU.displayCPU();
                     }
@@ -173,7 +175,7 @@ module TSOS {
                     _CurrentProcess.setTimeFinished(_OSclock);
                     Pcb.displayTimeMonitor();
                     _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
-                    Shell.updateResident();
+                    Shell.updateReadyQueue();
                     _ResidentQueue.splice(_ResidentQueue.indexOf(_CurrentProcess.getPid()),1);
                     _CurrentScheduler.startNewProcess();
                      alert("RESIDENT QUEUE: "+_ResidentQueue.length);
@@ -190,16 +192,16 @@ module TSOS {
                     break;
                 case _Killed:
                     alert("In killed...killing: "+params.getPid());
-                    alert("Ready: "+_ReadyQueue.getSize());
                     _Kernel.krnTrace("\n\nKILLING PID: "+params.getPid()+"\n");
-                    Shell.updateResident();
+                    Shell.updateReadyQueue();
                     break;
                 case _MemoryBoundError:
-                    alert("MEMORY BOUND REACHED for pid: "+_CurrentProcess.getPid());
-                    _StdOut.putText("Memory Limit Reached!");
-                    _CurrentProcess.setState(4);
+                    alert("MEMORY BOUND REACHED for pid: "+params.getPid() + " PC:  "+ parseInt(_CurrentProcess.getBase()+_CPU.PC));
+                    _StdOut.putText("Memory Limit Reached for PID: "+params.getPid());
+                    params.setState(4);
+                    _ClockCycle = 0;
                     _CPU.reset();
-                    _CurrentScheduler.startNewProcess();
+                    this.krnInterruptHandler(_RUN,0);
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -258,7 +260,7 @@ module TSOS {
 
 //            alert("in switch current pid; "+_CurrentProcess.getPid() + " State: "+_CurrentProcess.getState());
 
-            if(_ReadyQueue.isEmpty() && (_CurrentProcess.getState() == "Terminated")){
+            if(_ReadyQueue.isEmpty() && (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed")){
                 _CPU.reset();
             }else {
                 _CurrentProcess.setPc(_CPU.PC);
@@ -278,9 +280,11 @@ module TSOS {
                     Pcb.displayTimeMonitor();
                 }
 
-                if (_CurrentProcess.getState() == "Terminated") {
+                if (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed") {
                     ///do something...
                     alert("killed caught @ PID: "+_CurrentProcess.getPid());
+//                    this.contextSwitch();
+                    _ClockCycle = 0;
                     this.krnInterruptHandler(_RUN,0);
                 }
                 _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");

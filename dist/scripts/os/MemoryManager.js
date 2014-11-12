@@ -9,22 +9,22 @@ var TSOS;
         }
         MemoryManager.prototype.read = function (index) {
             //                alert("read at: "+parseInt(_CurrentProcess.getBase()+index)+", OP: "+_CPU.IR);
-            if (parseInt(_CurrentProcess.getBase() + index + 1) > parseInt(_CurrentProcess.getLimit()) || parseInt(_CurrentProcess.getBase() + index < _CurrentProcess.getBase())) {
+            if (parseInt(_CurrentProcess.getBase() + index) > parseInt(_CurrentProcess.getLimit()) || parseInt(_CurrentProcess.getBase() + index) < parseInt(_CurrentProcess.getBase())) {
                 //memory bound interrupt
-                _Kernel.krnInterruptHandler(_MemoryBoundError, 0);
-                return;
+                _Kernel.krnInterruptHandler(_MemoryBoundError, _CurrentProcess);
+            } else {
+                return _Memory.read(parseInt(_CurrentProcess.getBase() + index));
             }
-            return _Memory.read(parseInt(_CurrentProcess.getBase() + index));
         };
 
         MemoryManager.prototype.store = function (index, str) {
             //            alert("store at: "+parseInt(_CurrentProcess.getBase()+index)+", str: "+str);
-            if (parseInt(_CurrentProcess.getBase() + index + 1) > parseInt(_CurrentProcess.getLimit()) || parseInt(_CurrentProcess.getBase() + index < _CurrentProcess.getBase())) {
+            if (parseInt(_CurrentProcess.getBase() + index) > parseInt(_CurrentProcess.getLimit()) || parseInt(_CurrentProcess.getBase() + index) < parseInt(_CurrentProcess.getBase())) {
                 //memory bound interrupt
-                _Kernel.krnInterruptHandler(_MemoryBoundError, 0);
-                return;
+                _Kernel.krnInterruptHandler(_MemoryBoundError, _CurrentProcess);
+            } else {
+                _Memory.store(parseInt(_CurrentProcess.getBase() + index), str);
             }
-            _Memory.store(parseInt(_CurrentProcess.getBase() + index), str);
         };
 
         MemoryManager.prototype.load = function (base, str) {
@@ -64,7 +64,7 @@ var TSOS;
 
                 for (var j = 0; j < _ResidentQueue.length; j++) {
                     var free = _ResidentQueue[j];
-                    if (base == free.getBase() && free.getState() == "Terminated") {
+                    if (base == free.getBase() && (free.getState() == "Terminated" || free.getState() == "Killed")) {
                         alert("Return base as: " + free.getBase());
                         return free.getBase();
                     }

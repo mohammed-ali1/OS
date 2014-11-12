@@ -15,23 +15,15 @@ var TSOS;
             _MainMemory = new Array();
             _MainMemoryBase = new Array();
 
-            var temp = _MainMemorySize;
-
-            if (temp / _MemoryPartitions == 256 * 1)
-                this.segment = 0;
-            if (temp / _MemoryPartitions == 256 * 2)
-                this.segment = 1;
-            if (temp / _MemoryPartitions == 256 * 3)
-                this.segment = 2;
-
             var table = "<table>";
 
             for (var i = 0; i < _MainMemorySize; i += 8) {
                 _MainMemoryBase[i] = i.toString(16).toUpperCase();
                 if (i % 256 == 0) {
-                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                    Memory.segment++;
+                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 12px;'>" + "[" + Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 } else {
-                    table += "<tr><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                    table += "<tr><td style='font-size: 12px;'>" + "[" + Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
 
                 for (var j = i; j <= i + 7; j++) {
@@ -86,39 +78,46 @@ var TSOS;
         /**
         * Updates the Memory with the current base and the length. - add borders to the program input
         */
-        Memory.prototype.updateMemoryWithBase = function (base) {
-            var table = "<table>";
-
-            for (var i = 0; i < _MainMemorySize; i += 8) {
-                if (i % 256 == 0) {
-                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
-                } else {
-                    table += "<tr><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
-                }
-                for (var j = i; j <= i + 7; j++) {
-                    if ((j + base) <= (this.programLength)) {
-                        table += "<td style='border: 1px solid;'>" + _MainMemory[j] + "</td>";
-                    } else {
-                        table += "<td>" + _MainMemory[j] + "</td>";
-                    }
-                }
-                table += "</tr>";
-            }
-            table += "</table>";
-            document.getElementById("table").innerHTML = table;
-        };
-
+        //        public updateMemoryWithBase(base){
+        //
+        //            var table = "<table>";
+        //
+        //            for(var i=0; i<_MainMemorySize;i+=8){
+        //
+        //                if(i % 256 == 0){
+        //                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 12px;'>" + "["+
+        //                        this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+        //                }
+        //                else{
+        //                    table += "<tr><td style='font-size: 12px;'>" + "["+
+        //                        this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+        //                }
+        //                for(var j=i; j<=i+7;j++) {
+        //                    if ((j+base) <= (this.programLength)) {
+        //                        table += "<td style='border: 1px solid;'>" + _MainMemory[j] + "</td>";
+        //                    } else {
+        //                        table += "<td>" + _MainMemory[j] + "</td>";
+        //                    }
+        //                }
+        //                table += "</tr>";
+        //            }
+        //            table +="</table>";
+        //            document.getElementById("table").innerHTML = table;
+        //        }
         /**
         * Updates the Memory.
         */
         Memory.prototype.updateMemory = function () {
+            Memory.segment = -1;
+
             var table = "<table>";
 
             for (var i = 0; i < _MainMemorySize; i += 8) {
                 if (i % 256 == 0) {
-                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                    Memory.segment++;
+                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 12px;'>" + "[" + Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 } else {
-                    table += "<tr><td style='font-size: 12px;'>" + "[" + this.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                    table += "<tr><td style='font-size: 12px;'>" + "[" + Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 for (var j = i; j <= i + 7; j++) {
                     table += "<td>" + _MainMemory[j] + "</td>";
@@ -160,6 +159,7 @@ var TSOS;
         Memory.prototype.getBlock_2 = function () {
             return 512;
         };
+        Memory.segment = -1;
         return Memory;
     })();
     TSOS.Memory = Memory;
