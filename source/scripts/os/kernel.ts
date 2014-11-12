@@ -125,8 +125,8 @@ module TSOS {
         public krnInterruptHandler(irq, params) {
             // This is the Interrupt Handler Routine.  Pages 8 and 560. {
             // Trace our entrance here so we can compute Interrupt Latency by analyzing the log file later on.  Page 766.
+            _Mode = 0;
             this.krnTrace("Handling IRQ~" + irq);
-
             // Invoke the requested Interrupt Service Routine via Switch/Case rather than an Interrupt Vector.
             // TODO: Consider using an Interrupt Vector in the future.
             // Note: There is no need to "dismiss" or acknowledge the interrupts in our design here.
@@ -176,14 +176,21 @@ module TSOS {
                     Pcb.displayTimeMonitor();
                     _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateReadyQueue();
-                    _ResidentQueue.splice(_ResidentQueue.indexOf(_CurrentProcess.getPid()),1);
+                    _CurrentProcess.setInUse(false);
                     _CurrentScheduler.startNewProcess();
-                     alert("RESIDENT QUEUE: "+_ResidentQueue.length);
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
                     break;
                 case _RUN:
+                    if(_CPU.isExecuting){
+                        _ReadyQueue.enqueue(params);
+                    }else{
+                        _ReadyQueue.enqueue(params);
+                        _CurrentScheduler.startNewProcess();
+                    }
+                    break;
+                case _RUNALL:
                     _CurrentScheduler.startNewProcess();
                     break;
                 case _ContextSwitch:
@@ -191,17 +198,35 @@ module TSOS {
                     this.contextSwitch();
                     break;
                 case _Killed:
-                    alert("In killed...killing: "+params.getPid());
-                    _Kernel.krnTrace("\n\nKILLING PID: "+params.getPid()+"\n");
+                    this.krnTrace("\n\nKILLING PID: "+params.getPid()+"\n");
                     Shell.updateReadyQueue();
                     break;
                 case _MemoryBoundError:
-                    alert("MEMORY BOUND REACHED for pid: "+params.getPid() + " PC:  "+ parseInt(_CurrentProcess.getBase()+_CPU.PC));
                     _StdOut.putText("Memory Limit Reached for PID: "+params.getPid());
+                    //throw a bsod
                     params.setState(4);
                     _ClockCycle = 0;
                     _CPU.reset();
-                    this.krnInterruptHandler(_RUN,0);
+                    this.bsod("Illegal Memory Access");
+                    this.krnShutdown();
+                    break;
+                case _KilledReset:
+                    params.setState(5);
+                    _StdOut.putText("Killed PID: " +params.getPid());
+                    Shell.updateReadyQueue();
+                    _ClockCycle = 0;
+                    this.krnInterruptHandler(_RUNALL,0);
+                    _CPU.reset();
+                    break;
+                case _KilledRunAll:
+                    params.setState(5);
+                    _StdOut.putText("Killed PID: " +params.getPid());
+                    Shell.updateReadyQueue();
+                    _ClockCycle = 0;
+                    this.krnInterruptHandler(_RUNALL, 0);
+                    break;
+                case _BSOD:
+                    this.bsod(params);
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -256,9 +281,10 @@ module TSOS {
         }
 
 
+        /**
+         * Context Switches to the next process after saving the current state
+         */
         public contextSwitch(){
-
-//            alert("in switch current pid; "+_CurrentProcess.getPid() + " State: "+_CurrentProcess.getState());
 
             if(_ReadyQueue.isEmpty() && (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed")){
                 _CPU.reset();
@@ -281,17 +307,29 @@ module TSOS {
                 }
 
                 if (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed") {
-                    ///do something...
-                    alert("killed caught @ PID: "+_CurrentProcess.getPid());
-//                    this.contextSwitch();
                     _ClockCycle = 0;
-                    this.krnInterruptHandler(_RUN,0);
+                    this.krnInterruptHandler(_RUNALL,0);
                 }
+
                 _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
                 _CurrentProcess.setState(1); //set state to running
                 _CPU.startProcessing(_CurrentProcess);
                 _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
             }
+        }
+
+        /**
+         * Throws a BSOD Error.
+         */
+        public bsod(message1):void{
+
+            _DrawingContext.clearRect(0,0,_Canvas.width,_Canvas.height);
+            _DrawingContext.fillStyle = "blue";
+            _DrawingContext.fillRect(0,0,_Canvas.width,_Canvas.height);
+            _DrawingContext.drawText("sans",20,50,150,message1);
+            _DrawingContext.drawText("sans",20,50,250,"Why do you think this happened?");
+            _CPU.reset();
+            this.krnShutdown();
         }
     }
 }

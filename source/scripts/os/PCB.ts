@@ -19,12 +19,12 @@ module TSOS{
         private state:string = "?";
         private length:number = 0; //Length of the program
         private block : number = 0;
-        private inMemory:boolean = false;
+        private using:boolean = false;
         private block:number = 0;
         private timeArrived : number = 0;
         private timeFinished: number = 0;
 
-        constructor(b:number, l:number, location:boolean){
+        constructor(b:number, l:number, using:boolean){
 
             Pcb.PID++;
             this.pid = Pcb.PID;  //Increment PID all the time!
@@ -32,7 +32,7 @@ module TSOS{
             this.pc = 0;
             this.limit = l;
             this.block = (this.base / _BlockSize);
-            this.inMemory = location;
+            this.using = using;
         }
 
         public getPid() : number{
@@ -64,14 +64,10 @@ module TSOS{
                 default :
                     this.state = "New";
             }
-
-            if(this.state == "Terminated" || this.state == "Killed"){
-                this.inMemory = false;
-            }
         }
 
-        public getInMemory():boolean{
-            return this.inMemory;
+        public getInUse():boolean{
+            return this.using;
         }
 
         public getState(){
@@ -162,12 +158,8 @@ module TSOS{
             return this.timeFinished;
         }
 
-        public setInMemory(location:boolean){
-            this.inMemory = location;
-        }
-
-        public getInMemory(){
-            return this.inMemory;
+        public setInUse(location:boolean){
+            this.using = location;
         }
 
         public static displayTimeMonitor(){

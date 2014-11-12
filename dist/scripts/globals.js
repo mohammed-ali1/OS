@@ -87,10 +87,14 @@ var _ResidentQueue = null;
 var _ReadyQueue;
 var _CurrentProcess = null;
 var _RUN = -5;
+var _RUNALL = -10;
 var _ClockCycle = 0;
 var _ContextSwitch = 915;
 var _FakeQueue = null;
 var _Killed = 89;
+var _BSOD = -200;
+var _KilledReset = -100;
+var _KilledRunAll = -101;
 
 //history of commands
 var _ConsoleHistory = null;

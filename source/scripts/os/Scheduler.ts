@@ -12,13 +12,16 @@ module TSOS{
             this.currentScheduler = this.scheduler[index];
         }
 
+       /**
+        * Starts the Next Available Process int Ready Queue
+        */
        public startNewProcess(){
 
            if(_ReadyQueue.getSize()>0) {
 
                _CurrentProcess = _ReadyQueue.dequeue();
 
-               alert("current process: " +_CurrentProcess.getPid());
+//               alert("current process: " +_CurrentProcess.getPid());
 
                if(_CurrentProcess.getState() == "Ready"){
                    _CurrentProcess.setTimeArrived(_OSclock);
@@ -33,7 +36,7 @@ module TSOS{
                _CPU.startProcessing(_CurrentProcess);
                _Kernel.krnTrace("\nPROCESSING PID: "+_CurrentProcess.getPid()+"\n");
                Shell.updateReadyQueue();
-           }else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() !="Killed") && _ReadyQueue.isEmpty()){
+           }else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() == "Killed") && _ReadyQueue.isEmpty()){
                _ClockCycle = 0;
                return;
            }

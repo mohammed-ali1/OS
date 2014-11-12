@@ -88,11 +88,16 @@ var _Pcb:TSOS.Pcb;
 var _ResidentQueue: any[] =  null;
 var _ReadyQueue : TSOS.Queue;
 var _CurrentProcess :any = null;
-var _RUN = -5;
+var _RUN:number = -5;
+var _RUNALL:number = -10;
 var _ClockCycle:number = 0;
 var _ContextSwitch : number = 915;
 var _FakeQueue: any[] = null;
 var _Killed : number = 89;
+var _BSOD: number = -200;
+var _KilledReset : number = -100;
+var _KilledRunAll: number = -101;
+
 
 //history of commands
 var _ConsoleHistory : any[] = null;

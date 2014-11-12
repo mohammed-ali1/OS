@@ -302,14 +302,7 @@ module TSOS {
          * Draws a blue screen over the canvas.
          */
         public shellBSOD(){
-
-           _Console.currentXPosition = 0;
-           _Console.currentYPosition = 0;
-           var image = new Image();
-           image.src = "dist/images/bsod.jpg";
-           _DrawingContext.clearRect(0, 0, 500,500);
-           _DrawingContext.drawImage(image, 0, 0,500,500);
-           _Kernel.krnShutdown();
+            _KernelInterruptQueue.enqueue(new Interrupt(_BSOD,"BSOD"));
         }
 
         /**
@@ -351,7 +344,8 @@ module TSOS {
             //Load in the Resident Queue
             _ResidentQueue.push(p);
 
-            //Push on Fake
+            //Push on Fake because Resident Queue expands and shrinks
+            //This is also my Terminated Queue!
             _FakeQueue.push(p);
 
             //Print to Console
@@ -363,8 +357,10 @@ module TSOS {
             _MemoryManager.load(base,x.toUpperCase().toString());
         }
 
+        /**
+         * Updates the Ready Queue Table
+         */
         public static updateReadyQueue(){
-
 
             var tableView = "<table>";
             tableView +="<th>PID</th>";
@@ -429,7 +425,7 @@ module TSOS {
                 }
             }
             tableView += "</table>";
-            document.getElementById("displayResident").innerHTML = tableView;
+            document.getElementById("displayReady").innerHTML = tableView;
         }
 
         /**
@@ -528,6 +524,10 @@ module TSOS {
             }
         }
 
+        /**
+         * Sets the current quantum to the argument passed
+         * @param args
+         */
         public shellQuantum(args){
             if(args.length >0){
                 if(args >0){
@@ -544,13 +544,15 @@ module TSOS {
             }
         }
 
+        /**
+         * Shows the PID of active Processes.
+         */
         public shellPs(){
 
             var nobueno:boolean = false;
 
             for(var i=0; i<_FakeQueue.length;i++){
                 var temp : TSOS.Pcb = _FakeQueue[i];
-                alert("temp pid; "+temp.getPid() + " length: "+_FakeQueue.length);
                 if(temp.getState() == "Running" || temp.getState() == "Waiting") {
                     nobueno = true;
                     if (i + 1 == _FakeQueue.length) {
@@ -580,45 +582,31 @@ module TSOS {
          */
         public shellKill(args){
 
-            if((_CurrentProcess.getPid() == args) && (_CurrentProcess.getState() == "Running") && (_ReadyQueue.getSize() == 1)){
-                alert("About to kill pid: "+_CurrentProcess.getPid()+" AND READy Queue: "+_ReadyQueue.getSize());
-                _CurrentProcess.setState(5);
-                _StdOut.putText("Killed PID: " +_CurrentProcess.getPid());
-                Shell.updateReadyQueue();
-                _CPU.reset();
+            //what if only thing running...we want to reset the CPU
+            if((_CurrentProcess.getPid() == args) && (_CurrentProcess.getState() == "Running") && (_ReadyQueue.isEmpty())){
+                _Kernel.krnInterruptHandler(_KilledReset,_CurrentProcess);
                 return;
             }
 
+            //set the current process to killed...and go to next process
             if((_CurrentProcess.getPid() == args) && (_CurrentProcess.getState() == "Running")){
-                alert("About to kill pid: "+_CurrentProcess.getPid()+" State: "+_CurrentProcess.getState());
-                _CurrentProcess.setState(5);
-                _StdOut.putText("Killed PID: " +_CurrentProcess.getPid());
-                _Kernel.krnInterruptHandler(_Killed, _CurrentProcess);
-                Shell.updateReadyQueue();
-                _ClockCycle = 0;
-                _Kernel.krnInterruptHandler(_RUN, 0);
+                _Kernel.krnInterruptHandler(_KilledRunAll,_CurrentProcess);
                 return;
             }
-
-
-
-            alert("Need to kill: "+args);
 
             for(var i=0; i<_ReadyQueue.getSize();i++){
 
                 var process:TSOS.Pcb = _ReadyQueue.q[i];
 
-                if(process.getPid() == args && (process.getState() == "Terminated" ||
-                                                process.getState() == "Killed")){
+                if(process.getPid() == args && (process.getState() == "Terminated" || process.getState() == "Killed")){
                     _StdOut.putText("I'm already dead......Why are you so mean....?");
                     return;
                 }
 
-                if(process.getState() != "Terminated" || process.getState() != "Killed"){
+                if(process.getState() != "Terminated"){
 
                     if (process.getPid() == args) {
                         process.setState(5);
-                        alert("killing pid: " + process.getPid());
                         _StdOut.putText("Killed PID: " + process.getPid());
                         _Kernel.krnInterruptHandler(_Killed, process);
                         return;
@@ -634,45 +622,28 @@ module TSOS {
          */
         public shellRun(args){
 
-//            if(_CurrentProcess.getState() == "Running"|| _CurrentProcess.getState() =="Waiting"){
-//                return;
-//            }
-
-            alert("args: "+args);
-
             if(args.length == 0 || args < 0){
                 _StdOut.putText("Load this Bitch again and RUN...!");
-                return;
             }
             else if(_StepButton){
                 _StdOut.putText("Single Step is on!");
-                return;
             }
             else if(_ResidentQueue[args].getState() == "New") {
-                alert("args: "+args);
-                _ResidentQueue[args].setState(3);
-                _ReadyQueue.enqueue(_ResidentQueue[args]); //only put what's NEW!
-//                _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
-            }else{
-                _StdOut.putText("");
+                _ResidentQueue[args].setState(3); //only put what's NEW!
+                _Kernel.krnInterruptHandler(_RUN,_ResidentQueue[args]);
             }
         }
 
-        public displayReadyQueue(p:Pcb){
-            var table = "<table>";
-                table += "<tr>";
-                table += "<td>" + p.getPid() + p.getBase() + p.getLimit() +"</td>";
-                table += "</tr>";
-            document.getElementById("readyQueue").innerHTML = table + "</table>";
-        }
-
+        /**
+         * Invokes the RUNALL case in the Kernel Interrupt Handler
+         */
         public shellRunAll(){
             for(var i=0; i<_ResidentQueue.length;i++){
                 if(_ResidentQueue[i].getState() == "New")
                 _ResidentQueue[i].setState(3);
                 _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
-            _KernelInterruptQueue.enqueue(new Interrupt(_RUN,0));
+            _KernelInterruptQueue.enqueue(new Interrupt(_RUNALL,0));
         }
     }
 }

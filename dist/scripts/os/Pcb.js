@@ -4,7 +4,7 @@
 var TSOS;
 (function (TSOS) {
     var Pcb = (function () {
-        function Pcb(b, l, location) {
+        function Pcb(b, l, using) {
             this.pid = Pcb.PID;
             this.pc = 0;
             this.acc = 0;
@@ -17,7 +17,7 @@ var TSOS;
             this.state = "?";
             this.length = 0;
             this.block = 0;
-            this.inMemory = false;
+            this.using = false;
             this.block = 0;
             this.timeArrived = 0;
             this.timeFinished = 0;
@@ -27,7 +27,7 @@ var TSOS;
             this.pc = 0;
             this.limit = l;
             this.block = (this.base / _BlockSize);
-            this.inMemory = location;
+            this.using = using;
         }
         Pcb.prototype.getPid = function () {
             return this.pid;
@@ -57,14 +57,10 @@ var TSOS;
                 default:
                     this.state = "New";
             }
-
-            if (this.state == "Terminated" || this.state == "Killed") {
-                this.inMemory = false;
-            }
         };
 
-        Pcb.prototype.getInMemory = function () {
-            return this.inMemory;
+        Pcb.prototype.getInUse = function () {
+            return this.using;
         };
 
         Pcb.prototype.getState = function () {
@@ -155,12 +151,8 @@ var TSOS;
             return this.timeFinished;
         };
 
-        Pcb.prototype.setInMemory = function (location) {
-            this.inMemory = location;
-        };
-
-        Pcb.prototype.getInMemory = function () {
-            return this.inMemory;
+        Pcb.prototype.setInUse = function (location) {
+            this.using = location;
         };
 
         Pcb.displayTimeMonitor = function () {
