@@ -227,7 +227,6 @@ var TSOS;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
-            _Mode = 1;
         };
 
         Kernel.prototype.krnTimerISR = function () {

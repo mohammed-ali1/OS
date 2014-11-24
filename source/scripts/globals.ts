@@ -98,7 +98,6 @@ var _BSOD: number = -200;
 var _KilledReset : number = -100;
 var _KilledRunAll: number = -101;
 
-
 //history of commands
 var _ConsoleHistory : any[] = null;
 

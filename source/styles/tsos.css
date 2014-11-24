@@ -244,3 +244,27 @@ h3 {
     border-radius: 5px;
     color: #ffffff;
 }
+
+ #dirDataTable{
+    border-radius: 10px;
+    table-layout: auto;
+}
+
+ #dirDataTable th{
+    text-align: center;
+    color: firebrick;
+    background-color: #FFD801;
+    width: auto;
+    border-radius: 5px;
+    border: 1px solid firebrick;
+}
+
+#dirDataTable td{
+    width: auto;
+    text-align: center;
+    border-radius: 5px;
+    color: #ffffff;
+    background-color: #E66C2C;
+    padding:5px;
+    border: 2px solid;
+}
