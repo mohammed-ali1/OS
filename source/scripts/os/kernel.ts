@@ -37,11 +37,11 @@ module TSOS {
 
             //Initialize Resident Queue
             _ResidentQueue = new Array();
-
+            _ResidentQueue = new Array();
             _CurrentScheduler = new Scheduler(0);
 
-            //
-            _Time = new Date();
+            //Initialize file system
+            _FileSystem = new FileSystem();
 
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");

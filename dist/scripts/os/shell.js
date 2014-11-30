@@ -101,6 +101,26 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellRunAll, "runall", "- Runs all the Processes in the Resident Queue.");
             this.commandList[this.commandList.length] = sc;
 
+            // format
+            sc = new TSOS.ShellCommand(this.ShellFormat, "format", "- Formats the File System.");
+            this.commandList[this.commandList.length] = sc;
+
+            // create
+            sc = new TSOS.ShellCommand(this.ShellCreate, "create", "- <string> Creates a file in the file system.");
+            this.commandList[this.commandList.length] = sc;
+
+            // write
+            sc = new TSOS.ShellCommand(this.ShellWrite, "write", "- <string> writes the contents to the filename");
+            this.commandList[this.commandList.length] = sc;
+
+            // read
+            sc = new TSOS.ShellCommand(this.ShellRead, "read", "- <string> Reads the contents of the filename");
+            this.commandList[this.commandList.length] = sc;
+
+            // ls
+            sc = new TSOS.ShellCommand(this.ShellLs, "ls", "- <string> List of the Active Files");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -592,6 +612,52 @@ var TSOS;
                 _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_RUNALL, 0));
+        };
+
+        /**
+        * Formats the FIle System.
+        */
+        Shell.prototype.ShellFormat = function () {
+            _FileSystem.format();
+            _StdOut.putText("File System Formatted!");
+        };
+
+        /**
+        * Creates a file name in the file system
+        * @param args
+        * @constructor
+        */
+        Shell.prototype.ShellCreate = function (args) {
+            _FileSystem.createFile(args.toString());
+        };
+
+        /**
+        *
+        * @param filename
+        * @param filecontents
+        * @constructor
+        */
+        Shell.prototype.ShellWrite = function (data) {
+            var file = data[0];
+            var filedata = data[1].slice(1, data[1].length - 1);
+            _FileSystem.writeToFile(file, filedata);
+        };
+
+        /**
+        * Reads the contents of the filename
+        * @param filename
+        * @constructor
+        */
+        Shell.prototype.ShellRead = function (filename) {
+            _FileSystem.read(filename);
+        };
+
+        /**
+        * List of the active files.
+        * @constructor
+        */
+        Shell.prototype.ShellLs = function () {
+            _FileSystem.fileDirectory();
         };
         return Shell;
     })();

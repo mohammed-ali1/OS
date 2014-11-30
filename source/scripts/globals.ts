@@ -113,15 +113,13 @@ var _SystemCall : number = 9;
 var _InvalidOpCode: number = 999;
 var _MemoryBoundError:number = -20;
 
-//Time
-var _Time :any = null;
-var _BeginBase : number = 0;
+//File System
+var _FileSystem : TSOS.FileSystem;
 
 // CPU Scheduling
 var _Quantum:number = 6;
 var _CurrentScheduler: TSOS.Scheduler;
 
-var _Time: number = new Date().getMilliseconds();
 
 var onDocumentLoad = function() {
 	TSOS.Control.hostInit();

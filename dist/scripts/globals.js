@@ -111,15 +111,12 @@ var _SystemCall = 9;
 var _InvalidOpCode = 999;
 var _MemoryBoundError = -20;
 
-//Time
-var _Time = null;
-var _BeginBase = 0;
+//File System
+var _FileSystem;
 
 // CPU Scheduling
 var _Quantum = 6;
 var _CurrentScheduler;
-
-var _Time = new Date().getMilliseconds();
 
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();

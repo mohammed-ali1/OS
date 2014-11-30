@@ -146,6 +146,37 @@ module TSOS {
                 "- Runs all the Processes in the Resident Queue.");
             this.commandList[this.commandList.length] = sc;
 
+            // format
+            sc = new ShellCommand(this.ShellFormat,
+                "format",
+                "- Formats the File System.");
+            this.commandList[this.commandList.length] = sc;
+
+            // create
+            sc = new ShellCommand(this.ShellCreate,
+                "create",
+                "- <string> Creates a file in the file system.");
+            this.commandList[this.commandList.length] = sc;
+
+            // write
+            sc = new ShellCommand(this.ShellWrite,
+                "write",
+                "- <string> writes the contents to the filename");
+            this.commandList[this.commandList.length] = sc;
+
+            // read
+            sc = new ShellCommand(this.ShellRead,
+                "read",
+                "- <string> Reads the contents of the filename");
+            this.commandList[this.commandList.length] = sc;
+
+
+            // ls
+            sc = new ShellCommand(this.ShellLs,
+                "ls",
+                "- <string> List of the Active Files");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -645,5 +676,63 @@ module TSOS {
             }
             _KernelInterruptQueue.enqueue(new Interrupt(_RUNALL,0));
         }
+
+        /**
+         * Formats the FIle System.
+         */
+        public ShellFormat(){
+            _FileSystem.format();
+            _StdOut.putText("File System Formatted!");
+        }
+
+        /**
+         * Creates a file name in the file system
+         * @param args
+         * @constructor
+         */
+        public ShellCreate(args){
+            _FileSystem.createFile(args.toString());
+        }
+
+        /**
+         *
+         * @param filename
+         * @param filecontents
+         * @constructor
+         */
+        public ShellWrite(data:string){
+
+            var file = data[0];
+            var filedata = data[1].slice(1,data[1].length-1);
+            _FileSystem.writeToFile(file,filedata);
+        }
+
+        /**
+         * Reads the contents of the filename
+         * @param filename
+         * @constructor
+         */
+        public ShellRead(filename){
+            _FileSystem.read(filename);
+        }
+
+        /**
+         * List of the active files.
+         * @constructor
+         */
+        public ShellLs(){
+            _FileSystem.fileDirectory();
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+

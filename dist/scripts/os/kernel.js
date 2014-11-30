@@ -35,11 +35,11 @@ var TSOS;
 
             //Initialize Resident Queue
             _ResidentQueue = new Array();
-
+            _ResidentQueue = new Array();
             _CurrentScheduler = new TSOS.Scheduler(0);
 
-            //
-            _Time = new Date();
+            //Initialize file system
+            _FileSystem = new TSOS.FileSystem();
 
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
