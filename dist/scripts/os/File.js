@@ -7,7 +7,7 @@ var TSOS;
         function File(filename, filecontents) {
             this.filename = filename;
             this.filecontents = filecontents;
-            this.fileContents = filename;
+            this.fileName = filename;
             this.fileContents = filecontents;
         }
         return File;

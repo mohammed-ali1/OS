@@ -125,7 +125,6 @@ module TSOS{
             }
             document.getElementById("dirDataTable").innerHTML = table + "</table>";
         }
-
         /**
          * Updates the FilSystem
          * @param trackSize

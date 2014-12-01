@@ -3,6 +3,16 @@
 */
 var TSOS;
 (function (TSOS) {
+    (function (Process) {
+        Process[Process["New"] = 0] = "New";
+        Process[Process["Running"] = 1] = "Running";
+        Process[Process["Terminated"] = 2] = "Terminated";
+        Process[Process["Killed"] = 3] = "Killed";
+        Process[Process["Waiting"] = 4] = "Waiting";
+    })(TSOS.Process || (TSOS.Process = {}));
+    var Process = TSOS.Process;
+    ;
+
     var Pcb = (function () {
         function Pcb(b, l, using) {
             this.pid = Pcb.PID;

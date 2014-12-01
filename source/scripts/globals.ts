@@ -76,7 +76,9 @@ var _Memory : TSOS.Memory;
 var _MemoryPartitions:number = 3;
 var _BlockSize :number = 256;
 var _MemoryErrr:number = 123;
-var _Inuse:boolean = false;
+
+//Schedules the  Algorithms
+var _SCHEDULE :number = 444;
 
 //Memory Manager
 var _MemoryManager : TSOS.MemoryManager;
@@ -119,6 +121,7 @@ var _FileSystem : TSOS.FileSystem;
 // CPU Scheduling
 var _Quantum:number = 6;
 var _CurrentScheduler: TSOS.Scheduler;
+var _CurrentSchedule :string = null;
 
 
 var onDocumentLoad = function() {

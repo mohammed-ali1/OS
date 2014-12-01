@@ -117,8 +117,20 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.ShellRead, "read", "- <string> Reads the contents of the filename");
             this.commandList[this.commandList.length] = sc;
 
+            // delete
+            sc = new TSOS.ShellCommand(this.ShellDelete, "delete", "- <string> Deletes the file and its contents");
+            this.commandList[this.commandList.length] = sc;
+
             // ls
             sc = new TSOS.ShellCommand(this.ShellLs, "ls", "- <string> List of the Active Files");
+            this.commandList[this.commandList.length] = sc;
+
+            // setschedule
+            sc = new TSOS.ShellCommand(this.ShellSetSchedule, "setschedule", "- [rr,fcfs,priority] Sets the current schedule.");
+            this.commandList[this.commandList.length] = sc;
+
+            // setschedule
+            sc = new TSOS.ShellCommand(this.ShellGetSchedule, "getschedule", "- Gets the current schedule");
             this.commandList[this.commandList.length] = sc;
 
             // processes - list the running processes and their IDs
@@ -313,28 +325,30 @@ var TSOS;
             //            Get the free block first!
             var base = _MemoryManager.getBlockAvailable();
 
-            if (base == -1)
-                return;
+            if (base != -1) {
+                //Create New PCB
+                var p = new TSOS.Pcb(base, (base + 255), true);
+                p.setLength((x.length / 2)); //set the length of the program.
+                p.setState(9999999999999999999999999); //set state "NEW"
 
-            //Create New PCB
-            var p = new TSOS.Pcb(base, (base + 255), true);
-            p.setLength((x.length / 2)); //set the length of the program.
-            p.setState(9999999999999999999999999); //set state "NEW"
+                //Load in the Resident Queue
+                _ResidentQueue.push(p);
 
-            //Load in the Resident Queue
-            _ResidentQueue.push(p);
+                //Push on Fake because Resident Queue expands and shrinks
+                //This is also my Terminated Queue!
+                _FakeQueue.push(p);
 
-            //Push on Fake because Resident Queue expands and shrinks
-            //This is also my Terminated Queue!
-            _FakeQueue.push(p);
+                //Print to Console
+                _StdOut.putText("Loaded Successfully!");
+                _Console.advanceLine();
+                _StdOut.putText("Process ID: " + p.getPid());
 
-            //Print to Console
-            _StdOut.putText("Loaded Successfully!");
-            _Console.advanceLine();
-            _StdOut.putText("Process ID: " + p.getPid());
-
-            //Finally load into Memory
-            _MemoryManager.load(base, x.toUpperCase().toString());
+                //Finally load into Memory
+                _MemoryManager.load(base, x.toUpperCase().toString());
+            } else {
+                //Base is -1 at this point.
+                //so need to swap into the file system.
+            }
         };
 
         /**
@@ -611,7 +625,9 @@ var TSOS;
                     _ResidentQueue[i].setState(3);
                 _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
-            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_RUNALL, 0));
+
+            //            _KernelInterruptQueue.enqueue(new Interrupt(_RUNALL,0));
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_SCHEDULE, 0));
         };
 
         /**
@@ -639,8 +655,22 @@ var TSOS;
         */
         Shell.prototype.ShellWrite = function (data) {
             var file = data[0];
-            var filedata = data[1].slice(1, data[1].length - 1);
-            _FileSystem.writeToFile(file, filedata);
+            var contents = data[1];
+            var count = 0;
+
+            for (var i = 0; i < contents.length; i++) {
+                if (contents.charCodeAt(i) == 34) {
+                    count++;
+                }
+            }
+            var first = contents.slice(0, 1);
+            var last = contents.slice(contents.length - 1, contents.length);
+            if (count == 2 && (first == last)) {
+                var fileContents = data[1].slice(1, data[1].length - 1);
+                _FileSystem.writeToFile(data[0], fileContents);
+            } else {
+                _StdOut.putText("Please provide file contents between \" \"");
+            }
         };
 
         /**
@@ -658,6 +688,32 @@ var TSOS;
         */
         Shell.prototype.ShellLs = function () {
             _FileSystem.fileDirectory();
+        };
+
+        Shell.prototype.ShellDelete = function (filename) {
+            _FileSystem.deleteFile(filename);
+        };
+
+        /**
+        * Sets the current schedule
+        * @param schedule
+        * @constructor
+        */
+        Shell.prototype.ShellSetSchedule = function (schedule) {
+            if (schedule == "rr" || schedule == "fcfs" || schedule == "priority") {
+                _CurrentSchedule = schedule;
+                _StdOut.putText("Current Schedule is set to: " + _CurrentSchedule);
+            } else {
+                _StdOut.putText("Invalid Schedule type!");
+            }
+        };
+
+        /**
+        * Gets the current schedule
+        * @constructor
+        */
+        Shell.prototype.ShellGetSchedule = function () {
+            _StdOut.putText("Current Schedule is: " + _CurrentSchedule);
         };
         return Shell;
     })();

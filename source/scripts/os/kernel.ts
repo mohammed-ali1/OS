@@ -38,7 +38,7 @@ module TSOS {
             //Initialize Resident Queue
             _ResidentQueue = new Array();
             _ResidentQueue = new Array();
-            _CurrentScheduler = new Scheduler(0);
+            _CurrentScheduler = new Scheduler("rr");
 
             //Initialize file system
             _FileSystem = new FileSystem();
@@ -94,15 +94,21 @@ module TSOS {
                 var interrupt = _KernelInterruptQueue.dequeue();
                 _Mode = 0;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
-            } else if (_ClockCycle >= _Quantum) { // If there are no interrupts then run one CPU cycle if there is anything being processed.
-                _Mode = 0;
-                this.krnInterruptHandler(_ContextSwitch,0);
-            }else if(_CPU.isExecuting){
+            }else if(_CPU.isExecuting && _CurrentSchedule == "fcfs"){
                 _CPU.cycle();
-                _ClockCycle++;
                 Shell.updateReadyQueue();
-            }
-            else { // If there are no interrupts and there is nothing being executed then just be idle.
+            }else if(_CPU.isExecuting && _CurrentSchedule == "rr"){
+                if(_ClockCycle >= _Quantum){
+                    _Mode = 0;
+                    this.krnInterruptHandler(_ContextSwitch,0);
+                }else{
+                    _CPU.cycle();
+                    _ClockCycle++;
+                    Shell.updateReadyQueue();
+                }
+            }else if(_CPU.isExecuting && _CurrentSchedule == "priority"){
+
+            }else { // If there are no interrupts and there is nothing being executed then just be idle.
                 this.krnTrace("Idle");
                 _Mode = 1;
             }
@@ -176,13 +182,16 @@ module TSOS {
                     Pcb.displayTimeMonitor();
                     _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateReadyQueue();
-                    _CurrentProcess.setInUse(false);
-                    _CurrentScheduler.startNewProcess();
+                    //need to know where to go from here...
+                    this.handleSchedule();
+//                    _CurrentProcess.setInUse(false);
+//                    _CurrentScheduler.startNewProcess();
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
                     break;
                 case _RUN:
+                    //need to look at current scheduler first
                     if(_CPU.isExecuting){
                         _ReadyQueue.enqueue(params);
                     }else{
@@ -191,6 +200,7 @@ module TSOS {
                     }
                     break;
                 case _RUNALL:
+                    //need to look at current scheduler first
                     _CurrentScheduler.startNewProcess();
                     break;
                 case _ContextSwitch:
@@ -227,6 +237,9 @@ module TSOS {
                     break;
                 case _BSOD:
                     this.bsod(params);
+                    break;
+                case _SCHEDULE:
+                    this.handleSchedule();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -330,6 +343,23 @@ module TSOS {
             _DrawingContext.drawText("sans",20,50,250,"Why do you think this happened?");
             _CPU.reset();
             this.krnShutdown();
+        }
+
+        /**
+         * Handles all the scheduling algorithms
+         */
+        public handleSchedule(){
+
+            if(_CurrentSchedule == "fcfs"){
+                _CurrentScheduler.fcfs();
+            }
+
+            if(_CurrentSchedule == "rr"){
+                _CurrentScheduler.startNewProcess();
+            }
+
+            if(_CurrentSchedule == "priority"){
+            }
         }
     }
 }

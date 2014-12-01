@@ -74,7 +74,9 @@ var _Memory;
 var _MemoryPartitions = 3;
 var _BlockSize = 256;
 var _MemoryErrr = 123;
-var _Inuse = false;
+
+//Schedules the  Algorithms
+var _SCHEDULE = 444;
 
 //Memory Manager
 var _MemoryManager;
@@ -117,6 +119,7 @@ var _FileSystem;
 // CPU Scheduling
 var _Quantum = 6;
 var _CurrentScheduler;
+var _CurrentSchedule = null;
 
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();

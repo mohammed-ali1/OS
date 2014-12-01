@@ -4,6 +4,8 @@
 
 module TSOS{
 
+    export enum Process {New, Running, Terminated, Killed, Waiting};
+
     export class Pcb{
 
         private static PID: number = -1;    //Start at -1 so we can start incrementing from 0!

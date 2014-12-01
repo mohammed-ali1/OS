@@ -47,7 +47,6 @@ var TSOS;
                 _StdOut.putText("Let me Terminate First.....DAmmmmm!");
             } else {
                 _StdOut.putText("Memory Wiped!");
-                _Console.advanceLine();
                 _Memory.clearMemory();
                 _ResidentQueue.splice(0, _ResidentQueue.length); // clear resident Queue as well!
             }
@@ -75,17 +74,15 @@ var TSOS;
         */
         MemoryManager.prototype.getBlockAvailable = function () {
             if (_ResidentQueue.length == 3) {
-                _StdOut.putText("Memory Full Please Clear Memory!");
                 return -1;
-            }
-
-            for (var base = 0; base <= (_BlockSize * 2); base += _BlockSize) {
-                var address = _Memory.read(base);
-                if (address == "00") {
-                    return base;
+            } else {
+                for (var base = 0; base <= (_BlockSize * 2); base += _BlockSize) {
+                    var address = _Memory.read(base);
+                    if (address == "00") {
+                        return base;
+                    }
                 }
             }
-            return -1;
         };
         return MemoryManager;
     })();

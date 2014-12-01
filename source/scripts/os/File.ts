@@ -8,24 +8,8 @@ module TSOS{
         private fileContents:string;
 
         constructor(public filename:string, public filecontents:string){
-            this.fileContents = filename;
+            this.fileName = filename;
             this.fileContents = filecontents;
         }
-
-//        public setFileName(filename){
-//            this.fileName = filename;
-//        }
-//
-//        public setFileContents(filecontents){
-//            this.fileContents = filecontents;
-//        }
-//
-//        public getFilename():string{
-//            return this.fileName;
-//        }
-//
-//        public getFileContents():string{
-//            return this.fileContents;
-//        }
     }
 }
