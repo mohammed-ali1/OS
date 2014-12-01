@@ -20,16 +20,20 @@ var TSOS;
         */
         FileSystem.prototype.format = function () {
             this.hasStorage();
-            this.fsu.format(this.trackSize, this.sectorSize, this.blockSize, this.dataSize, this.hd);
-            this.createMBR();
-            this.update();
+
+            //has support for local storage?
+            if (this.support == 1) {
+                this.fsu.format(this.trackSize, this.sectorSize, this.blockSize, this.dataSize, this.hd);
+                this.createMBR();
+                this.update();
+            }
         };
 
         /**
         * Creates the Master Boot Record
         */
         FileSystem.prototype.createMBR = function () {
-            this.fsu.createMBR(this.hd, this.dataSize);
+            this.fsu.createMBR(this.hd, this.dataSize, this.file);
         };
 
         /**
@@ -53,17 +57,17 @@ var TSOS;
                 for (var b = 0; b < this.blockSize; b++) {
                     var key = this.fsu.makeKey(t, s, b);
                     var data = this.hd.getItem(key);
-                    var fileContants = data.slice(4, data.length);
+                    var fileContents = data.slice(4, data.length);
                     var dataIndex = data.slice(1, 4);
 
-                    if (fileContants == fileData) {
+                    if (fileContents == fileData) {
                         deleted = true;
 
                         //delete found
                         //need to do error checking.
                         this.hd.setItem(key, zeroData); //set the dir to zero
                         this.hd.setItem(dataIndex, zeroData); //set the data index to zero.
-                        this.file.delete(key);
+                        this.file.delete(key); //delete from the local map
                         this.update();
                     }
                 }
@@ -80,15 +84,13 @@ var TSOS;
         * Read Active files from the Disk
         * @param str
         */
-        FileSystem.prototype.read = function (str) {
-            //            alert("size: "+this.file.size);
+        FileSystem.prototype.read = function (filename) {
             var t = 0;
             for (var s = 0; s < this.sectorSize; s++) {
                 for (var b = 0; b < this.blockSize; b++) {
-                    var key = this.fsu.makeKey(t, s, b);
                     if (this.file.has(key)) {
                         var file = this.file.get(key);
-                        if (file.filename == str) {
+                        if (file.filename == filename) {
                             _StdOut.putText(file.filecontents);
                             _Console.advanceLine();
                             return;
@@ -106,6 +108,10 @@ var TSOS;
             /**
             * Error checking needed
             */
+            //first need to make sure
+            //that "str" would fit in the file system
+            this.fsu.handleWrite(str, this.dataSize - 4);
+
             var t = 0;
 
             //convert the filename to hex
@@ -180,13 +186,13 @@ var TSOS;
             * Able to create file...
             * Need to do serious error checking!!
             */
+            //Get dirIndex and dataIndex
+            var dirIndex = this.fsu.getDirIndex(this.sectorSize, this.blockSize, this.hd);
+            var dataIndex = this.fsu.getDataIndex(this.sectorSize, this.blockSize, this.hd);
+
             if (dataIndex != "-1" || dirIndex != "-1") {
                 //convert filename to hex
                 var data = this.fsu.stringToHex(filename);
-
-                //Get dirIndex and dataIndex
-                var dirIndex = this.getDirIndex();
-                var dataIndex = this.getDataIndex();
 
                 //add padding to the filename
                 var actualData = this.fsu.padding("1" + dataIndex + data, this.dataSize);
@@ -209,40 +215,10 @@ var TSOS;
             }
         };
 
-        FileSystem.prototype.getDirIndex = function () {
-            var t = 0;
-
-            for (var s = 0; s < this.sectorSize; s++) {
-                for (var b = 0; b < this.blockSize; b++) {
-                    var key = this.fsu.makeKey(t, s, b);
-
-                    if (this.hd.getItem(key).slice(0, 4) == "0000") {
-                        return key;
-                    }
-                }
-            }
-            return "-1";
-        };
-
-        FileSystem.prototype.getDataIndex = function () {
-            var t = 1;
-
-            for (var s = 0; s < this.sectorSize; s++) {
-                for (var b = 0; b < this.blockSize; b++) {
-                    var key = this.fsu.makeKey(t, s, b);
-
-                    if (this.hd.getItem(key).slice(0, 4) == "0000") {
-                        return key;
-                    }
-                }
-            }
-            return "-1";
-        };
-
         FileSystem.prototype.hasStorage = function () {
-            if ('localStorage' in window && window['localStorage'] !== null) {
+            if ('this.hd' in window && window['this.hd'] !== null) {
                 this.support = 1;
-                this.hd = window.localStorage;
+                this.hd = localStorage;
             } else {
                 this.support = 0;
             }

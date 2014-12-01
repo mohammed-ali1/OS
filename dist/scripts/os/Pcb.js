@@ -14,7 +14,7 @@ var TSOS;
     ;
 
     var Pcb = (function () {
-        function Pcb(b, l, using) {
+        function Pcb(b, l, p) {
             this.pid = Pcb.PID;
             this.pc = 0;
             this.acc = 0;
@@ -27,7 +27,7 @@ var TSOS;
             this.state = "?";
             this.length = 0;
             this.block = 0;
-            this.using = false;
+            this.priority = 0;
             this.block = 0;
             this.timeArrived = 0;
             this.timeFinished = 0;
@@ -37,7 +37,7 @@ var TSOS;
             this.pc = 0;
             this.limit = l;
             this.block = (this.base / _BlockSize);
-            this.using = using;
+            this.priority = p;
         }
         Pcb.prototype.getPid = function () {
             return this.pid;
@@ -69,8 +69,8 @@ var TSOS;
             }
         };
 
-        Pcb.prototype.getInUse = function () {
-            return this.using;
+        Pcb.prototype.getPriority = function () {
+            return this.priority;
         };
 
         Pcb.prototype.getState = function () {
@@ -161,8 +161,8 @@ var TSOS;
             return this.timeFinished;
         };
 
-        Pcb.prototype.setInUse = function (location) {
-            this.using = location;
+        Pcb.prototype.setPriority = function (p) {
+            this.priority = p;
         };
 
         Pcb.displayTimeMonitor = function () {

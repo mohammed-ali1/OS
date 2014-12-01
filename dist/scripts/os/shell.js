@@ -302,7 +302,7 @@ var TSOS;
         * Loads the user input program if any,
         * and validates HEX (at the moment).
         */
-        Shell.prototype.shellLoad = function () {
+        Shell.prototype.shellLoad = function (args) {
             var f = document.getElementById("taProgramInput").value;
             var x = f.replace(/\s/g, '');
 
@@ -326,8 +326,12 @@ var TSOS;
             var base = _MemoryManager.getBlockAvailable();
 
             if (base != -1) {
-                //Create New PCB
-                var p = new TSOS.Pcb(base, (base + 255), true);
+                //Create New PCB and don't forget the priority
+                if (args.length == 0) {
+                    var p = new TSOS.Pcb(base, (base + 255), 0);
+                } else {
+                    var p = new TSOS.Pcb(base, (base + 255), args);
+                }
                 p.setLength((x.length / 2)); //set the length of the program.
                 p.setState(9999999999999999999999999); //set state "NEW"
 
@@ -345,9 +349,32 @@ var TSOS;
 
                 //Finally load into Memory
                 _MemoryManager.load(base, x.toUpperCase().toString());
+                alert("DOne");
             } else {
                 //Base is -1 at this point.
                 //so need to swap into the file system.
+            }
+        };
+
+        Shell.prototype.sort = function () {
+            for (var i = 0; i < _ResidentQueue.length; i++) {
+                for (var j = 0; j < _ResidentQueue.length - i; j++) {
+                    if (_ResidentQueue[j - 1].getPriority() < _ResidentQueue[j].getPriority()) {
+                        var temp = _ResidentQueue[j - 1];
+                        _ResidentQueue[j - 1] = _ResidentQueue[j];
+                        _ResidentQueue[j] = temp;
+                    }
+                }
+            }
+        };
+
+        Shell.prototype.printList = function () {
+            alert("inPrint");
+            for (var i = 0; i < _ResidentQueue.length; i++) {
+                var p = _ResidentQueue[i];
+                alert("P: " + p.getPid());
+                _StdOut.putText("" + p.getPid().toString());
+                _Console.advanceLine();
             }
         };
 
@@ -625,8 +652,6 @@ var TSOS;
                     _ResidentQueue[i].setState(3);
                 _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
-
-            //            _KernelInterruptQueue.enqueue(new Interrupt(_RUNALL,0));
             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_SCHEDULE, 0));
         };
 

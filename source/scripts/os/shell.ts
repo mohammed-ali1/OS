@@ -359,7 +359,7 @@ module TSOS {
          * Loads the user input program if any,
          * and validates HEX (at the moment).
          */
-        public shellLoad(){
+        public shellLoad(args){
 
             var f =  document.getElementById("taProgramInput").value;
             var x = f.replace(/\s/g,'');
@@ -385,14 +385,17 @@ module TSOS {
             var base = _MemoryManager.getBlockAvailable();
 
             if(base != -1) {
-                //Create New PCB
-                var p = new Pcb(base, (base + 255), true);  //Memory Size is 256...so base and limit works (for now)!
+                //Create New PCB and don't forget the priority
+                if(args.length == 0){
+                    var p = new Pcb(base, (base + 255), 0);
+                }else{
+                    var p = new Pcb(base, (base + 255), args);
+                }
                 p.setLength((x.length / 2)); //set the length of the program.
                 p.setState(9999999999999999999999999);//set state "NEW"
 
                 //Load in the Resident Queue
                 _ResidentQueue.push(p);
-
                 //Push on Fake because Resident Queue expands and shrinks
                 //This is also my Terminated Queue!
                 _FakeQueue.push(p);
@@ -404,10 +407,35 @@ module TSOS {
 
                 //Finally load into Memory
                 _MemoryManager.load(base, x.toUpperCase().toString());
+                alert("DOne");
             }else{
                 //Base is -1 at this point.
                 //so need to swap into the file system.
 
+            }
+        }
+
+        public sort(){
+
+            for(var i =0; i<_ResidentQueue.length;i++){
+                for(var j =0; j<_ResidentQueue.length-i;j++){
+                    if(_ResidentQueue[j-1].getPriority() < _ResidentQueue[j].getPriority()){
+                        var temp = _ResidentQueue[j-1];
+                        _ResidentQueue[j-1] = _ResidentQueue[j];
+                        _ResidentQueue[j] = temp;
+                    }
+                }
+            }
+        }
+
+        public printList(){
+
+            alert("inPrint");
+            for(var i=0; i<_ResidentQueue.length;i++){
+                var p:TSOS.Pcb = _ResidentQueue[i];
+                alert("P: "+p.getPid());
+                _StdOut.putText(""+p.getPid().toString());
+                _Console.advanceLine();
             }
         }
 
@@ -697,7 +725,6 @@ module TSOS {
                 _ResidentQueue[i].setState(3);
                 _ReadyQueue.enqueue(_ResidentQueue[i]);
             }
-//            _KernelInterruptQueue.enqueue(new Interrupt(_RUNALL,0));
             _KernelInterruptQueue.enqueue(new Interrupt(_SCHEDULE,0));
         }
 

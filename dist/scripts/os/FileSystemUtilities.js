@@ -30,13 +30,15 @@ var TSOS;
         * @returns {string}
         */
         FSU.prototype.hexToString = function (str) {
-            var s = "";
-            for (var i = 0; i < str.length; i++) {
-                if (str.charAt(i) != "0") {
-                    s += str.charCodeAt(i).toString(10);
-                }
+            var p;
+            var q;
+            var hexString = "";
+            for (var i = 0; i < str.length; i += 2) {
+                p = str.charAt(i);
+                q = str.charAt(i + 1);
+                hexString += String.fromCharCode(parseInt((p + q), 16)).toString();
             }
-            return s;
+            return hexString;
         };
 
         /**
@@ -80,11 +82,12 @@ var TSOS;
         * @param localStorage
         * @param size
         */
-        FSU.prototype.createMBR = function (localStorage, size) {
+        FSU.prototype.createMBR = function (localStorage, size, map) {
             var data = this.stringToHex("MBR");
             var pad = this.padding("1###" + data, size);
             var key = this.makeKey(0, 0, 0);
             localStorage.setItem(key, pad);
+            map.set(key, new TSOS.File("MBR", pad));
         };
 
         /**
@@ -131,8 +134,17 @@ var TSOS;
                         var metadata = localStorage.getItem(key);
                         var meta = metadata.slice(0, 4);
                         var data = metadata.slice(4, metadata.length);
-                        table += "<tr><td>" + t + s + b + " ";
-                        table += meta + " " + data + "</td></tr>";
+
+                        //add some colors for readability.
+                        if (meta.charAt(0) == "1") {
+                            table += "<tr><td>" + t + s + b + " </td>";
+                            table += "<td style='color: red; background-color: #ffffff;'>" + meta + " " + "</td>";
+                            table += "<td>" + data + "</td></tr>";
+                        } else {
+                            table += "<tr><td>" + t + s + b + " </td>";
+                            table += "<td style='color: green; background-color: #ffffff;'>" + meta + " " + "</td>";
+                            table += "<td>" + data + "</td></tr>";
+                        }
                     }
                 }
             }
@@ -141,6 +153,56 @@ var TSOS;
 
         FSU.prototype.makeKey = function (t, s, b) {
             return String(t) + String(s) + String(b);
+        };
+
+        /**
+        * Get Data Index
+        * @param sectorSize
+        * @param blockSize
+        * @returns {string}
+        */
+        FSU.prototype.getDataIndex = function (sectorSize, blockSize, localStorage) {
+            var t = 1;
+
+            for (var s = 0; s < sectorSize; s++) {
+                for (var b = 0; b < blockSize; b++) {
+                    var key = this.makeKey(t, s, b);
+
+                    if (localStorage.getItem(key).slice(0, 4) == "0000") {
+                        return key;
+                    }
+                }
+            }
+            return "-1";
+        };
+
+        /**
+        * GET DIR Index
+        * @param sectorSize
+        * @param blockSize
+        * @returns {string}
+        */
+        FSU.prototype.getDirIndex = function (sectorSize, blockSize, localStorage) {
+            var t = 0;
+
+            for (var s = 0; s < sectorSize; s++) {
+                for (var b = 0; b < blockSize; b++) {
+                    var key = this.makeKey(t, s, b);
+
+                    if (localStorage.getItem(key).slice(0, 4) == "0000") {
+                        return key;
+                    }
+                }
+            }
+            return "-1";
+        };
+
+        FSU.prototype.handleWrite = function (filecontents, size) {
+            var hex = this.stringToHex(filecontents);
+
+            //file contents are too big!
+            if (hex.length > size) {
+            }
         };
         return FSU;
     })();
