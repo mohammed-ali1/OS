@@ -256,7 +256,7 @@ h3 {
     background-color: #FFD801;
     width: auto;
     border-radius: 5px;
-    border: 1px solid firebrick;
+    /*border: 1px solid firebrick;*/
 }
 
 #dirDataTable td{

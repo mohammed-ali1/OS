@@ -23,7 +23,7 @@ var TSOS;
 
             //has support for local storage?
             if (this.support == 1) {
-                this.fsu.format(this.trackSize, this.sectorSize, this.blockSize, this.dataSize, this.hd);
+                this.fsu.format(this.trackSize, this.sectorSize, this.blockSize, this.dataSize, localStorage);
                 this.createMBR();
                 this.update();
             }
@@ -33,14 +33,14 @@ var TSOS;
         * Creates the Master Boot Record
         */
         FileSystem.prototype.createMBR = function () {
-            this.fsu.createMBR(this.hd, this.dataSize, this.file);
+            this.fsu.createMBR(localStorage, this.dataSize, this.file);
         };
 
         /**
         * Updates the File System Table
         */
         FileSystem.prototype.update = function () {
-            this.fsu.update(this.trackSize, this.sectorSize, this.blockSize, this.hd);
+            this.fsu.update(this.trackSize, this.sectorSize, this.blockSize, localStorage);
         };
 
         /**
@@ -56,7 +56,7 @@ var TSOS;
             for (var s = 0; s < this.sectorSize; s++) {
                 for (var b = 0; b < this.blockSize; b++) {
                     var key = this.fsu.makeKey(t, s, b);
-                    var data = this.hd.getItem(key);
+                    var data = localStorage.getItem(key);
                     var fileContents = data.slice(4, data.length);
                     var dataIndex = data.slice(1, 4);
 
@@ -65,8 +65,8 @@ var TSOS;
 
                         //delete found
                         //need to do error checking.
-                        this.hd.setItem(key, zeroData); //set the dir to zero
-                        this.hd.setItem(dataIndex, zeroData); //set the data index to zero.
+                        localStorage.setItem(key, zeroData); //set the dir to zero
+                        localStorage.setItem(dataIndex, zeroData); //set the data index to zero.
                         this.file.delete(key); //delete from the local map
                         this.update();
                     }
@@ -84,13 +84,14 @@ var TSOS;
         * Read Active files from the Disk
         * @param str
         */
-        FileSystem.prototype.read = function (filename) {
+        FileSystem.prototype.read = function (str) {
             var t = 0;
             for (var s = 0; s < this.sectorSize; s++) {
                 for (var b = 0; b < this.blockSize; b++) {
+                    var key = this.fsu.makeKey(t, s, b);
                     if (this.file.has(key)) {
                         var file = this.file.get(key);
-                        if (file.filename == filename) {
+                        if (file.filename == str) {
                             _StdOut.putText(file.filecontents);
                             _Console.advanceLine();
                             return;
@@ -104,55 +105,51 @@ var TSOS;
         * Write to the file
         * @param str
         */
-        FileSystem.prototype.writeToFile = function (filename, str) {
+        FileSystem.prototype.writeToFile = function (file, str) {
             /**
             * Error checking needed
             */
-            //first need to make sure
-            //that "str" would fit in the file system
-            this.fsu.handleWrite(str, this.dataSize - 4);
-
+            //get the address of the data
+            var hex = this.fsu.stringToHex(str);
             var t = 0;
-
-            //convert the filename to hex
-            var data = this.fsu.stringToHex(filename);
-
-            //add padding to the filename
-            var pad = this.fsu.padding(data, (this.dataSize - 4));
-
-            //convert the file contents to hex
-            var contents = this.fsu.stringToHex(str);
-
-            //add padding to the file contents
-            var padContents = this.fsu.padding(contents, (this.dataSize - 4));
-
-            var done = false;
+            var dataIndex;
+            var success = false;
+            var key;
 
             for (var s = 0; s < this.sectorSize; s++) {
                 for (var b = 0; b < this.blockSize; b++) {
-                    var key = this.fsu.makeKey(t, s, b);
-                    var file = this.hd.getItem(key);
-                    var filedata = file.slice(4, file.length);
-
-                    if (filedata == pad) {
-                        var dataIndex = file.slice(1, 4);
-                        var t1 = dataIndex.charAt(0);
-                        var t2 = dataIndex.charAt(1);
-                        var t3 = dataIndex.charAt(2);
-                        var dataKey = this.fsu.makeKey(t1, t2, t3);
-                        this.hd.setItem(dataKey, "1###" + padContents);
+                    key = this.fsu.makeKey(t, s, b);
+                    var data = this.file.get(key);
+                    if (this.file.has(key) && data.filename == file) {
+                        dataIndex = localStorage.getItem(key).slice(1, 4);
                         this.file.delete(key);
-                        this.file.set(key, new TSOS.File(filename, str));
-                        this.update();
-                        done = true;
+                        var fileData = data.filecontents;
+                        fileData += str;
+                        this.file.set(key, new TSOS.File(file, fileData));
                         break;
                     }
                 }
             }
-            if (done) {
-                _StdOut.putText("Successfully wrote to: " + filename);
+
+            //what if the contents to write is > 60 bytes
+            if (hex.length > (this.dataSize - 4)) {
+                this.handleWrite(dataIndex, file, str);
+                success = true;
+                this.update();
             } else {
-                _StdOut.putText("Cannot write to file: " + filename + ", Please format and try again!");
+                //just store it on local storage.
+                var padHex = this.fsu.padding(hex, (this.dataSize - 4));
+                localStorage.setItem(dataIndex, "1###" + padHex);
+
+                //get whats in file first so we can append.
+                success = true;
+                this.update();
+            }
+
+            if (success) {
+                _StdOut.putText("Successfully wrote to: " + file);
+            } else {
+                _StdOut.putText("Cannot write to file: " + file + ", Please format and try again!");
             }
         };
 
@@ -186,20 +183,20 @@ var TSOS;
             * Able to create file...
             * Need to do serious error checking!!
             */
-            //Get dirIndex and dataIndex
-            var dirIndex = this.fsu.getDirIndex(this.sectorSize, this.blockSize, this.hd);
-            var dataIndex = this.fsu.getDataIndex(this.sectorSize, this.blockSize, this.hd);
-
             if (dataIndex != "-1" || dirIndex != "-1") {
                 //convert filename to hex
                 var data = this.fsu.stringToHex(filename);
 
+                //Get dirIndex and dataIndex
+                var dirIndex = this.getDirIndex();
+                var dataIndex = this.getDataIndex();
+
                 //add padding to the filename
                 var actualData = this.fsu.padding("1" + dataIndex + data, this.dataSize);
-                this.hd.setItem(dirIndex, actualData); //need to add actualData
+                localStorage.setItem(dirIndex, actualData); //need to add actualData
 
                 var formatData = this.fsu.formatData((this.dataSize - 4));
-                this.hd.setItem(dataIndex, "1###" + formatData);
+                localStorage.setItem(dataIndex, "1###" + formatData);
 
                 //add to the filename to local  map
                 var zeroData = this.fsu.formatData(this.dataSize);
@@ -215,12 +212,73 @@ var TSOS;
             }
         };
 
+        FileSystem.prototype.getDirIndex = function () {
+            var t = 0;
+            for (var s = 0; s < this.sectorSize; s++) {
+                for (var b = 0; b < this.blockSize; b++) {
+                    var key = this.fsu.makeKey(t, s, b);
+
+                    if (localStorage.getItem(key).slice(0, 4) == "0000") {
+                        return key;
+                    }
+                }
+            }
+            return "-1";
+        };
+
+        FileSystem.prototype.getDataIndex = function () {
+            var t = 1;
+
+            for (var s = 0; s < this.sectorSize; s++) {
+                for (var b = 0; b < this.blockSize; b++) {
+                    var key = this.fsu.makeKey(t, s, b);
+
+                    if (localStorage.getItem(key).slice(0, 4) == "0000") {
+                        return key;
+                    }
+                }
+            }
+            return "-1";
+        };
+
         FileSystem.prototype.hasStorage = function () {
-            if ('this.hd' in window && window['this.hd'] !== null) {
+            if ('localStorage' in window && window['localStorage'] !== null) {
                 this.support = 1;
-                this.hd = localStorage;
             } else {
                 this.support = 0;
+            }
+        };
+
+        FileSystem.prototype.handleWrite = function (dataIndex, filename, fileContents) {
+            var hex = this.fsu.stringToHex(fileContents);
+            var ciel = Math.ceil(hex.length / (this.dataSize - 4));
+            var array = new Array();
+            var track = dataIndex.charAt(0);
+            var sector = dataIndex.charAt(1);
+            var block = dataIndex.charAt(2);
+            array.push(dataIndex);
+
+            for (var t = track; t < this.trackSize; t++) {
+                for (var s = sector; s < this.trackSize; s++) {
+                    for (var b = block; b < this.trackSize; b++) {
+                        if (array.length == ciel) {
+                            break;
+                        }
+                        var key = this.fsu.makeKey(t, s, b);
+                        var data = localStorage.getItem(key);
+                        var dataData = data.slice(0, 4);
+                        if (dataData == "0000") {
+                            array.push(key);
+                        }
+                    }
+                }
+            }
+
+            _StdOut.putText("Cie: " + ciel);
+            _Console.advanceLine();
+            for (var a = 0; a < array.length; a++) {
+                _StdOut.putText(array[a]);
+                _Console.advanceLine();
             }
         };
         return FileSystem;

@@ -97,23 +97,14 @@ var TSOS;
         FSU.prototype.format = function (trackSize, sectorSize, blockSize, dataSize, localStorage) {
             var storage = this.formatData(dataSize);
 
-            var table = "<table>";
-            table += "<th style='text-align: left;'>TSB MBR  Data</th>";
-
             for (var track = 0; track < trackSize; track++) {
                 for (var sector = 0; sector < sectorSize; sector++) {
                     for (var block = 0; block < blockSize; block++) {
                         var key = this.makeKey(track, sector, block);
                         localStorage.setItem(key, storage);
-                        var localData = localStorage.getItem(key);
-                        var meta = localData.slice(0, 4);
-                        var data = localData.slice(4, storage.length);
-                        table += "<tr><td>" + track + sector + block + " ";
-                        table += meta + " " + data + "</td></tr>";
                     }
                 }
             }
-            document.getElementById("dirDataTable").innerHTML = table + "</table>";
         };
 
         /**
@@ -125,7 +116,9 @@ var TSOS;
         */
         FSU.prototype.update = function (trackSize, sectorSize, blockSize, localStorage) {
             var table = "<table>";
-            table += "<th style='text-align: left;'>TSB MBR  Data</th>";
+            table += "<th style='text-align: left; background-color: transparent;'>TSB</th>";
+            table += "<th style='text-align: left; background-color: transparent;'>META</th>";
+            table += "<th style='text-align: left; background-color: transparent;'>DATA</th>";
 
             for (var t = 0; t < trackSize; t++) {
                 for (var s = 0; s < sectorSize; s++) {
@@ -197,12 +190,34 @@ var TSOS;
             return "-1";
         };
 
-        FSU.prototype.handleWrite = function (filecontents, size) {
-            var hex = this.stringToHex(filecontents);
+        FSU.prototype.getDirIndex = function (sectorSize, blockSize) {
+            var t = 0;
 
-            //file contents are too big!
-            if (hex.length > size) {
+            for (var s = 0; s < sectorSize; s++) {
+                for (var b = 0; b < blockSize; b++) {
+                    var key = this.makeKey(t, s, b);
+
+                    if (localStorage.getItem(key).slice(0, 4) == "0000") {
+                        return key;
+                    }
+                }
             }
+            return "-1";
+        };
+
+        FSU.prototype.getDataIndex = function (sectorSize, blockSize) {
+            var t = 1;
+
+            for (var s = 0; s < sectorSize; s++) {
+                for (var b = 0; b < blockSize; b++) {
+                    var key = this.makeKey(t, s, b);
+
+                    if (localStorage.getItem(key).slice(0, 4) == "0000") {
+                        return key;
+                    }
+                }
+            }
+            return "-1";
         };
         return FSU;
     })();

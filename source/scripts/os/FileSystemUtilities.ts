@@ -108,9 +108,6 @@ module TSOS{
 
             var storage = this.formatData(dataSize);
 
-            var table = "<table>";
-            table += "<th style='text-align: left;'>TSB MBR  Data</th>";
-
             for (var track = 0; track < trackSize; track++) {
 
                 for (var sector = 0; sector < sectorSize; sector++) {
@@ -119,16 +116,9 @@ module TSOS{
 
                         var key = this.makeKey(track,sector,block);
                         localStorage.setItem(key,storage);
-                        var localData = localStorage.getItem(key);
-                        var meta: string = localData.slice(0,4);
-                        var data: string = localData.slice(4,storage.length);
-                        table += "<tr><td>" + track + sector + block + " ";
-                        table +=  meta + " " + data + "</td></tr>";
-
                     }
                 }
             }
-            document.getElementById("dirDataTable").innerHTML = table + "</table>";
         }
         /**
          * Updates the FilSystem
@@ -139,7 +129,9 @@ module TSOS{
          */
         public update(trackSize,sectorSize,blockSize,localStorage){
             var table = "<table>";
-            table += "<th style='text-align: left;'>TSB MBR  Data</th>";
+            table += "<th style='text-align: left; background-color: transparent;'>TSB</th>";
+            table += "<th style='text-align: left; background-color: transparent;'>META</th>";
+            table += "<th style='text-align: left; background-color: transparent;'>DATA</th>";
 
             for(var t = 0; t< trackSize;t++){
                 for(var s =0; s<sectorSize; s++){
@@ -216,16 +208,48 @@ module TSOS{
             return "-1";
         }
 
+        public getDirIndex(sectorSize, blockSize):string{
 
-        public handleWrite(filecontents,size){
+            var t = 0;
 
-            var hex = this.stringToHex(filecontents);
-            //file contents are too big!
-            if(hex.length > size){
+            for(var s = 0; s<sectorSize;s++){
+                for(var b=0; b<blockSize;b++){
 
+                    var key = this.makeKey(t,s,b);
+
+                    if(localStorage.getItem(key).slice(0,4) == "0000"){
+                        return key;
+                    }
+                }
             }
+            return "-1";
         }
 
+        public getDataIndex(sectorSize, blockSize):string{
 
+            var t = 1;
+
+            for(var s = 0; s<sectorSize;s++){
+                for(var b = 0; b<blockSize;b++){
+
+                    var key = this.makeKey(t,s,b);
+
+                    if(localStorage.getItem(key).slice(0,4) == "0000"){
+                        return key;
+                    }
+                }
+            }
+            return "-1";
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
