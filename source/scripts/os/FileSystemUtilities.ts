@@ -12,7 +12,6 @@ module TSOS{
          */
 
         constructor(){
-
         }
 
         /**
@@ -97,7 +96,7 @@ module TSOS{
             var pad:string = this.padding("1###"+data,size);
             var key = this.makeKey(0,0,0);
             localStorage.setItem(key,pad);
-            map.set(key,new File("MBR",pad));
+            map.set(key,new File("BAD ASS OS",pad));
         }
 
         /**
@@ -109,11 +108,8 @@ module TSOS{
             var storage = this.formatData(dataSize);
 
             for (var track = 0; track < trackSize; track++) {
-
                 for (var sector = 0; sector < sectorSize; sector++) {
-
                     for (var block = 0; block < blockSize; block++) {
-
                         var key = this.makeKey(track,sector,block);
                         localStorage.setItem(key,storage);
                     }
@@ -138,11 +134,11 @@ module TSOS{
                     for(var b=0;b<blockSize;b++){
                         var key = this.makeKey(t,s,b);
                         var metadata = localStorage.getItem(key);
-                        var meta = metadata.slice(0,4);
+                        var meta = metadata.slice(0,1);
                         var data = metadata.slice(4,metadata.length);
 
                         //add some colors for readability.
-                        if(meta.charAt(0) == "1"){
+                        if(meta == "1"){
                             table += "<tr><td>" + t+s+b + " </td>";
                             table += "<td style='color: red; background-color: #ffffff;'>" + meta + " " +  "</td>";
                             table += "<td>" + data + "</td></tr>";
@@ -158,6 +154,13 @@ module TSOS{
             document.getElementById("dirDataTable").innerHTML = table + "</table>";
         }
 
+        /**
+         * Makes a new Key in the TSB
+         * @param t
+         * @param s
+         * @param b
+         * @returns {string}
+         */
         public makeKey(t,s,b){
             return String(t) + String(s) + String(b);
         }
@@ -176,48 +179,7 @@ module TSOS{
                 for(var b = 0; b<blockSize;b++){
 
                     var key = this.makeKey(t,s,b);
-
-                    if(localStorage.getItem(key).slice(0,4) == "0000"){
-                        return key;
-                    }
-                }
-            }
-            return "-1";
-        }
-
-        /**
-         * GET DIR Index
-         * @param sectorSize
-         * @param blockSize
-         * @returns {string}
-         */
-        public getDirIndex(sectorSize, blockSize,localStorage):string{
-
-            var t = 0;
-
-            for(var s = 0; s<sectorSize;s++){
-                for(var b=0; b<blockSize;b++){
-
-                    var key = this.makeKey(t,s,b);
-
-                    if(localStorage.getItem(key).slice(0,4) == "0000"){
-                        return key;
-                    }
-                }
-            }
-            return "-1";
-        }
-
-        public getDirIndex(sectorSize, blockSize):string{
-
-            var t = 0;
-
-            for(var s = 0; s<sectorSize;s++){
-                for(var b=0; b<blockSize;b++){
-
-                    var key = this.makeKey(t,s,b);
-
-                    if(localStorage.getItem(key).slice(0,4) == "0000"){
+                    if(localStorage.getItem(key).slice(0,1) == "0"){
                         return key;
                     }
                 }
@@ -233,8 +195,7 @@ module TSOS{
                 for(var b = 0; b<blockSize;b++){
 
                     var key = this.makeKey(t,s,b);
-
-                    if(localStorage.getItem(key).slice(0,4) == "0000"){
+                    if(localStorage.getItem(key).slice(0,1) == "0"){
                         return key;
                     }
                 }

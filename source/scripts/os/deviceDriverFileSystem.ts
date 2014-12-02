@@ -91,7 +91,7 @@ module TSOS{
                     }
                 }
             }
-
+            //print success or failure
             if(deleted){
                 _StdOut.putText("Deleted "+str+" Successfully!");
             }else{
@@ -164,15 +164,10 @@ module TSOS{
                     }
                 }
             }
+
             hex = this.fsu.stringToHex(str);
-//            //what if we need to append...?
-//            if(oldData == formattedData){
-//                //in other words...oldData is empty...just add the str
-//                hex = this.fsu.stringToHex(str);
-//            }else if(){
-//                //append if not empty
-//
-//            }
+            //what if we need to append...?
+            //need to think about it
 
             //what if the contents to write is > 60 bytes
             if(hex.length > (this.dataSize)){
@@ -231,25 +226,35 @@ module TSOS{
          */
         public createFile(filename:string){
 
-            var dirIndex = this.fetchDuplicate(filename);//Gets un-duplicated key
-            if(dirIndex == "-1"){
-                _StdOut.putText("File: "+filename+" already exists!");
+            //convert filename to hex
+            var data = this.fsu.stringToHex(filename.toString());
+
+            //what if the file size is > 60 bytes...?
+            if((data.length * 2) > 30){
+                _StdOut.putText("Filename must be <= "+ (this.dataSize/2)+" characters!");
                 return;
             }
 
-            //Get dirIndex and dataIndex
-//            var dirIndex:string = this.getDirIndex();
-            var dataIndex:string = this.getDataIndex();
+            //add padding to the filename
+            var hexData:string = this.fsu.padding(data,this.dataSize);
 
-            if(dataIndex != "-1" || dirIndex != "-1") {
+            //Gets un-duplicated key
+            var dirIndex = this.fetchDuplicate(hexData);
 
-                //convert filename to hex
-                var data = this.fsu.stringToHex(filename);
+            if(dirIndex == "-1"){
+                _StdOut.putText("Either "+filename+" already exists...Or not enough space!");
+                return;
+            }
 
-                //add padding to the filename
-                var actualData:string = this.fsu.padding("1"+dataIndex+data,this.metaDataSize);
-                localStorage.setItem(dirIndex, actualData);//need to add actualData
+            //Get dataIndex
+            var dataIndex:string = this.fsu.getDataIndex();
 
+            if(dataIndex != "-1") {
+
+                //store in dir address
+                localStorage.setItem(dirIndex, ("1"+dataIndex+hexData));//need to add actualData
+
+                //store "0" in data address
                 var formatData = this.fsu.formatData((this.dataSize));
                 localStorage.setItem(dataIndex,"1###"+formatData);
 
@@ -267,69 +272,32 @@ module TSOS{
             }
         }
 
+        /**
+         * Looks for a duplicate filename
+         * @param filename
+         * @returns {string}
+         */
         public fetchDuplicate(filename:string){
 
-            var found:boolean = true;
-            var hexFilename = this.fsu.stringToHex(filename.toString());
-            //what if the file size is > 60 bytes...?
-            if(hexFilename.length > (this.dataSize)){
-                _StdOut.putText("File Size must be <= "+ this.dataSize);
-                return;
-            }
-            var padHex = this.fsu.padding(hexFilename,this.dataSize);
             var t = 0;
             var key;
+
             for(var s = 0; s<this.sectorSize;s++) {
                 for (var b = 0; b < this.blockSize; b++) {
                     key = this.fsu.makeKey(t,s,b);
                     var data:string = localStorage.getItem(key);
                     var meta = data.slice(0,1);
-                    var hexData:string = data.slice(4,this.dataSize);
-                    if((padHex == hexData) && (meta == "1")){
+                    var hexData:string = data.slice(4,this.metaDataSize);
+                    if((filename == hexData) && (meta == "1")){
                         //found duplicate and in use...
-                        alert("-1: "+key);
                         return "-1";
-                    }
-                    if(meta == "0"){
-                        alert("key: "+key);
-                        return key;
-                    }
-                }
-                if(found){
-                    break;
-                }
-            }
-            if(found){
-                return key;
-            }
-        }
-
-        public getDirIndex():string{
-
-            var t = 0;
-            for(var s = 0; s<this.sectorSize;s++){
-                for(var b=0; b<this.blockSize;b++){
-                    var key = this.fsu.makeKey(t,s,b);
-                    if(localStorage.getItem(key).slice(0,4) == "0000"){
+                    }else if(meta == "0"){
+                        //not a match...return the key
                         return key;
                     }
                 }
             }
-            return "-1";
-        }
 
-        public getDataIndex():string{
-
-            var t = 1;
-            for(var s = 0; s<this.sectorSize;s++){
-                for(var b = 0; b<this.blockSize;b++){
-
-                    var key = this.fsu.makeKey(t,s,b);
-                    if(localStorage.getItem(key).slice(0,4) == "0000"){
-                        return key;
-                    }
-                }
-            }
             return "-1";
         }
 

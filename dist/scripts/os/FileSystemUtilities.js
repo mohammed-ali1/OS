@@ -87,7 +87,7 @@ var TSOS;
             var pad = this.padding("1###" + data, size);
             var key = this.makeKey(0, 0, 0);
             localStorage.setItem(key, pad);
-            map.set(key, new TSOS.File("MBR", pad));
+            map.set(key, new TSOS.File("BAD ASS OS", pad));
         };
 
         /**
@@ -125,11 +125,11 @@ var TSOS;
                     for (var b = 0; b < blockSize; b++) {
                         var key = this.makeKey(t, s, b);
                         var metadata = localStorage.getItem(key);
-                        var meta = metadata.slice(0, 4);
+                        var meta = metadata.slice(0, 1);
                         var data = metadata.slice(4, metadata.length);
 
                         //add some colors for readability.
-                        if (meta.charAt(0) == "1") {
+                        if (meta == "1") {
                             table += "<tr><td>" + t + s + b + " </td>";
                             table += "<td style='color: red; background-color: #ffffff;'>" + meta + " " + "</td>";
                             table += "<td>" + data + "</td></tr>";
@@ -144,6 +144,13 @@ var TSOS;
             document.getElementById("dirDataTable").innerHTML = table + "</table>";
         };
 
+        /**
+        * Makes a new Key in the TSB
+        * @param t
+        * @param s
+        * @param b
+        * @returns {string}
+        */
         FSU.prototype.makeKey = function (t, s, b) {
             return String(t) + String(s) + String(b);
         };
@@ -160,44 +167,7 @@ var TSOS;
             for (var s = 0; s < sectorSize; s++) {
                 for (var b = 0; b < blockSize; b++) {
                     var key = this.makeKey(t, s, b);
-
-                    if (localStorage.getItem(key).slice(0, 4) == "0000") {
-                        return key;
-                    }
-                }
-            }
-            return "-1";
-        };
-
-        /**
-        * GET DIR Index
-        * @param sectorSize
-        * @param blockSize
-        * @returns {string}
-        */
-        FSU.prototype.getDirIndex = function (sectorSize, blockSize, localStorage) {
-            var t = 0;
-
-            for (var s = 0; s < sectorSize; s++) {
-                for (var b = 0; b < blockSize; b++) {
-                    var key = this.makeKey(t, s, b);
-
-                    if (localStorage.getItem(key).slice(0, 4) == "0000") {
-                        return key;
-                    }
-                }
-            }
-            return "-1";
-        };
-
-        FSU.prototype.getDirIndex = function (sectorSize, blockSize) {
-            var t = 0;
-
-            for (var s = 0; s < sectorSize; s++) {
-                for (var b = 0; b < blockSize; b++) {
-                    var key = this.makeKey(t, s, b);
-
-                    if (localStorage.getItem(key).slice(0, 4) == "0000") {
+                    if (localStorage.getItem(key).slice(0, 1) == "0") {
                         return key;
                     }
                 }
@@ -211,8 +181,7 @@ var TSOS;
             for (var s = 0; s < sectorSize; s++) {
                 for (var b = 0; b < blockSize; b++) {
                     var key = this.makeKey(t, s, b);
-
-                    if (localStorage.getItem(key).slice(0, 4) == "0000") {
+                    if (localStorage.getItem(key).slice(0, 1) == "0") {
                         return key;
                     }
                 }
