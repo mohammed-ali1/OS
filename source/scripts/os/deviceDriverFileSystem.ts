@@ -229,14 +229,14 @@ module TSOS{
             //convert filename to hex
             var data = this.fsu.stringToHex(filename.toString());
 
-            //what if the file size is > 60 bytes...?
-            if((data.length * 2) > 30){
-                _StdOut.putText("Filename must be <= "+ (this.dataSize/2)+" characters!");
-                return;
-            }
-
             //add padding to the filename
             var hexData:string = this.fsu.padding(data,this.dataSize);
+
+            //what if the file size is > 60 bytes...?
+            if((filename.length * 2) > 30) {
+                _StdOut.putText("Filename must be <= " + (this.dataSize / 2) + " characters!");
+                return;
+            }
 
             //Gets un-duplicated key
             var dirIndex = this.fetchDuplicate(hexData);
@@ -247,7 +247,7 @@ module TSOS{
             }
 
             //Get dataIndex
-            var dataIndex:string = this.fsu.getDataIndex();
+            var dataIndex:string = this.fsu.getDataIndex(this.trackSize,this.sectorSize);
 
             if(dataIndex != "-1") {
 

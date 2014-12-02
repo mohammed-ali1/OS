@@ -217,14 +217,14 @@ var TSOS;
             //convert filename to hex
             var data = this.fsu.stringToHex(filename.toString());
 
+            //add padding to the filename
+            var hexData = this.fsu.padding(data, this.dataSize);
+
             //what if the file size is > 60 bytes...?
-            if ((data.length * 2) > 30) {
+            if ((filename.length * 2) > 30) {
                 _StdOut.putText("Filename must be <= " + (this.dataSize / 2) + " characters!");
                 return;
             }
-
-            //add padding to the filename
-            var hexData = this.fsu.padding(data, this.dataSize);
 
             //Gets un-duplicated key
             var dirIndex = this.fetchDuplicate(hexData);
@@ -235,7 +235,7 @@ var TSOS;
             }
 
             //Get dataIndex
-            var dataIndex = this.fsu.getDataIndex();
+            var dataIndex = this.fsu.getDataIndex(this.trackSize, this.sectorSize);
 
             if (dataIndex != "-1") {
                 //store in dir address

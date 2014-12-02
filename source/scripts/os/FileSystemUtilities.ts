@@ -134,11 +134,11 @@ module TSOS{
                     for(var b=0;b<blockSize;b++){
                         var key = this.makeKey(t,s,b);
                         var metadata = localStorage.getItem(key);
-                        var meta = metadata.slice(0,1);
+                        var meta = metadata.slice(0,4);
                         var data = metadata.slice(4,metadata.length);
 
                         //add some colors for readability.
-                        if(meta == "1"){
+                        if(meta.charAt(0) == "1"){
                             table += "<tr><td>" + t+s+b + " </td>";
                             table += "<td style='color: red; background-color: #ffffff;'>" + meta + " " +  "</td>";
                             table += "<td>" + data + "</td></tr>";
@@ -165,32 +165,9 @@ module TSOS{
             return String(t) + String(s) + String(b);
         }
 
-        /**
-         * Get Data Index
-         * @param sectorSize
-         * @param blockSize
-         * @returns {string}
-         */
-        public getDataIndex(sectorSize, blockSize, localStorage):string{
-
-            var t = 1;
-
-            for(var s = 0; s<sectorSize;s++){
-                for(var b = 0; b<blockSize;b++){
-
-                    var key = this.makeKey(t,s,b);
-                    if(localStorage.getItem(key).slice(0,1) == "0"){
-                        return key;
-                    }
-                }
-            }
-            return "-1";
-        }
-
         public getDataIndex(sectorSize, blockSize):string{
 
             var t = 1;
-
             for(var s = 0; s<sectorSize;s++){
                 for(var b = 0; b<blockSize;b++){
 
