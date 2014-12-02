@@ -93,7 +93,7 @@ module TSOS{
          * @param size
          */
         public createMBR(localStorage,size,map:Map){
-            var data:string = this.stringToHex("MBR");
+            var data:string = this.stringToHex("BAD ASS OS");
             var pad:string = this.padding("1###"+data,size);
             var key = this.makeKey(0,0,0);
             localStorage.setItem(key,pad);

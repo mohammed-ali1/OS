@@ -190,7 +190,7 @@ module TSOS {
                 "- [rr,fcfs,priority] Sets the current schedule.");
             this.commandList[this.commandList.length] = sc;
 
-            // setschedule
+            // getschedule
             sc = new ShellCommand(this.ShellGetSchedule,
                 "getschedule",
                 "- Gets the current schedule");
@@ -412,6 +412,15 @@ module TSOS {
                 //Base is -1 at this point.
                 //so need to swap into the file system.
 
+                //Create New PCB and don't forget the priority > 0
+                // (priority > 0 denotes...its in the file system)
+//                if(args.length == 0){
+//                    var p = new Pcb(-1,-1,10);
+//                    _FileSystem.writeToFile();
+//                }else{
+//                    var p = new Pcb(-1,-1,args);
+//                    _FileSystem.writeToFile();
+//                }
             }
         }
 
@@ -751,24 +760,63 @@ module TSOS {
          * @param filecontents
          * @constructor
          */
-        public ShellWrite(data:string){
-            var file = data[0];
-            var contents:string = data[1];
-            var count:number = 0;
+        public ShellWrite(data){
 
-            for(var i=0; i<contents.length;i++){
-                if(contents.charCodeAt(i) == 34){
-                    count ++;
+            var filename = data[0];
+            var firstArg = data[1];
+            var lastArg  = data[data.length-1];
+            var firstChar = firstArg.charAt(0);
+            var lastChar = lastArg.charAt(lastArg.length-1);
+            var firstAscii = firstChar.charCodeAt(0);
+            var lastAscii = lastChar.charCodeAt(lastChar.length-1);
+            var load:string = "";
+
+            if(data.length == 2){
+                if((firstChar == lastChar) && (firstAscii == 34) && (lastAscii == 34)){
+                    load += data[1].slice(1,(data[1].length-1));
+                    _FileSystem.writeToFile(filename,load);
+                    return;
+                }else{
+                    _StdOut.putText("File Contents must be between: \" \"");
                 }
             }
-            var first:string = contents.slice(0,1);
-            var last:string = contents.slice(contents.length-1,contents.length);
-            if(count == 2 && (first == last)){
-                var fileContents = data[1].slice(1,data[1].length-1);
-                _FileSystem.writeToFile(data[0],fileContents);
-            }else {
-                _StdOut.putText("Please provide file contents between \" \"");
+
+            if(data.length > 2){
+                if((firstChar == lastChar) && (firstAscii == 34) && (lastAscii == 34)){
+                    //ready to write...
+                    alert("In loop");
+                    load +=  data[1].slice(1,data[1].length) + " ";
+                    load += " ";
+                    for(var i = 2; i < data.length;i++){
+
+                        if((i+1) == data.length){
+                            load += lastArg.slice(0,data[i].length-1);
+                            break;
+                        }
+                        load += data[i];
+                        load += " ";
+                    }
+                    _FileSystem.writeToFile(filename,load);
+                }else{
+                    _StdOut.putText("File Contents must be between: \" \"");
+                }
             }
+//            var lastChar = data[data.length-1].charAt(data[data.length-1].char)
+//            var count:number = 0;
+//
+//            for(var i=0; i<contents.length;i++){
+//                if(contents.charCodeAt(i) == 34){
+//                    count ++;
+//                }
+//            }
+//            var first:string = contents.slice(0,1);
+//            var last:string = contents.slice(contents.length-1,contents.length);
+//            if(count == 2 && (first == last)){
+//                var fileContents = data[1].slice(1,data[1].length-1);
+//                _FileSystem.writeToFile(data[0],fileContents);
+//            }else {
+//                _StdOut.putText("Please provide file contents between \" \"");
+//            }
         }
 
         /**

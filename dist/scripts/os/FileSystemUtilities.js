@@ -83,7 +83,7 @@ var TSOS;
         * @param size
         */
         FSU.prototype.createMBR = function (localStorage, size, map) {
-            var data = this.stringToHex("MBR");
+            var data = this.stringToHex("BAD ASS OS");
             var pad = this.padding("1###" + data, size);
             var key = this.makeKey(0, 0, 0);
             localStorage.setItem(key, pad);
