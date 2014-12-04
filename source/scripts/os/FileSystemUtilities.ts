@@ -106,6 +106,8 @@ module TSOS{
         public format(trackSize,sectorSize,blockSize,dataSize, localStorage){
 
             var storage = this.formatData(dataSize);
+            var dir = 0;
+            var data = 0;
 
             for (var track = 0; track < trackSize; track++) {
                 for (var sector = 0; sector < sectorSize; sector++) {
@@ -128,6 +130,7 @@ module TSOS{
             table += "<th style='text-align: left; background-color: transparent;'>TSB</th>";
             table += "<th style='text-align: left; background-color: transparent;'>META</th>";
             table += "<th style='text-align: left; background-color: transparent;'>DATA</th>";
+            var len;
 
             for(var t = 0; t< trackSize;t++){
                 for(var s =0; s<sectorSize; s++){
@@ -135,15 +138,17 @@ module TSOS{
                         var key = this.makeKey(t,s,b);
                         var metadata = localStorage.getItem(key);
                         var meta = metadata.slice(0,4);
+                        len = meta.length;
                         var data = metadata.slice(4,metadata.length);
+                        len = data.length;
 
                         //add some colors for readability.
                         if(meta.charAt(0) == "1"){
-                            table += "<tr><td>" + t+s+b + " </td>";
+                            table += "<tr style='background-color: transparent'><td>" + t+s+b + " </td>";
                             table += "<td style='color: red; background-color: #ffffff;'>" + meta + " " +  "</td>";
                             table += "<td>" + data + "</td></tr>";
                         }else{
-                            table += "<tr><td>" + t+s+b + " </td>";
+                            table += "<tr style='background-color: transparent'><td>" + t+s+b + " </td>";
                             table += "<td style='color: green; background-color: #ffffff;'>" + meta + " " +  "</td>";
                             table += "<td>" + data + "</td></tr>";
                         }
@@ -165,19 +170,34 @@ module TSOS{
             return String(t) + String(s) + String(b);
         }
 
-        public getDataIndex(sectorSize, blockSize):string{
+        public getDataIndex(trackSize, sectorSize, blockSize):string{
 
-            var t = 1;
-            for(var s = 0; s<sectorSize;s++){
-                for(var b = 0; b<blockSize;b++){
+            for(var t = 1; t<trackSize; t++) {
+                for (var s = 0; s < sectorSize; s++) {
+                    for (var b = 0; b < blockSize; b++) {
 
-                    var key = this.makeKey(t,s,b);
-                    if(localStorage.getItem(key).slice(0,1) == "0"){
-                        return key;
+                        var key = this.makeKey(t, s, b);
+                        var data = localStorage.getItem(key);
+                        var meta = data.slice(0, 1);
+                        if (meta == "0") {
+                            return key;
+                        }
                     }
                 }
             }
             return "-1";
+        }
+
+
+        public padBlockSize(contents:string){
+
+            var str = "";
+            for(var i=contents.length; i<_BlockSize; i++){
+                    str += "0";
+            }
+            contents += str;
+
+            return contents;
         }
     }
 }

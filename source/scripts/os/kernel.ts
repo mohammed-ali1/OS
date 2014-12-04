@@ -314,6 +314,8 @@ module TSOS {
 
                 _ReadyQueue.enqueue(_CurrentProcess);//push back to ready queue
                 _CPU.displayCPU();
+
+
                 _CurrentProcess = _ReadyQueue.dequeue();
 
                 if(_CurrentProcess.getState() == "Ready"){
@@ -326,10 +328,72 @@ module TSOS {
                     this.krnInterruptHandler(_RUNALL,0);
                 }
 
+                //the current process we want to exe
+                //is sitting on the disk..
+                //go grab it from the disk and load into available block
+                //and load the block into the disk.
+                //when finished ("depending" on scheduling)...put it back
+                if(_CurrentProcess.getLocation() == "Disk"){
+
+                    //lets swap with next thing in the queue
+
+                    if(_ReadyQueue.getSize() > 0){
+
+                        //look the scheduling algorithm first
+                        if(_CurrentSchedule == "rr"){
+
+                            _CurrentProcess.setLocation("Memory");
+
+                            var nextProcess = this.getNext();
+                            if(nextProcess != null){
+                                nextProcess.setLocation("Disk");
+                                _FileSystem.rollIn(_CurrentProcess, nextProcess);
+                            }else{
+
+                            }
+                            //now swap with next process and current process
+                        }else if(_CurrentSchedule == "fcfs"){
+                            //
+                        }else{
+
+                        }
+
+
+
+                        //give me the next process to swap with
+                        //
+                    }
+                }
                 _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
                 _CurrentProcess.setState(1); //set state to running
                 _CPU.startProcessing(_CurrentProcess);
                 _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
+            }
+        }
+
+
+        /**
+         * get next process in ready queue
+         * if any, and then swap
+         */
+        public getNext(){
+
+            var process;
+            var found:boolean = false;
+            var getProcess;
+            for(var i =0 ; i<_ReadyQueue.getSize();i++){
+
+                process = _ReadyQueue.q[i];
+                if(process.getLocation() == "Memory" && process.getState() == "Waiting"){
+                    found = true;
+                    getProcess = process;
+                    break;
+                }
+            }
+            if(found){
+                return getProcess;
+            }else{
+                return null;
             }
         }
 

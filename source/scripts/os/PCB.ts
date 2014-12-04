@@ -22,7 +22,7 @@ module TSOS{
         private length:number = 0; //Length of the program
         private block : number = 0;
         private priority:number = 0;
-        private block:number = 0;
+        private location:string = "";
         private timeArrived : number = 0;
         private timeFinished: number = 0;
 
@@ -42,7 +42,7 @@ module TSOS{
         }
 
         public setLength(length:number){
-            this.length = length;
+            this.length = (this.base+length);
         }
 
         public setState(s:number){
@@ -68,6 +68,14 @@ module TSOS{
             }
         }
 
+        public setLocation(location){
+            this.location = location;
+        }
+
+        public getLocation(){
+            return this.location;
+        }
+
         public getPriority(){
             return this.priority;
         }
@@ -78,6 +86,14 @@ module TSOS{
 
         public getLimit(){
             return this.limit;
+        }
+
+        public setLimit(limit){
+            this.limit = limit;
+        }
+
+        public setBase(base){
+            this.base = base;
         }
 
         public getBase(){
@@ -106,10 +122,6 @@ module TSOS{
 
         public getAcc(){
             return this.acc;
-        }
-
-        public getBlock(){
-            return this.block;
         }
 
         public getPc(){

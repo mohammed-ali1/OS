@@ -84,6 +84,10 @@ var TSOS;
                 }
             }
         };
+
+        MemoryManager.prototype.grabProcessContents = function (process) {
+            return _Memory.grabProcessContents(process);
+        };
         return MemoryManager;
     })();
     TSOS.MemoryManager = MemoryManager;

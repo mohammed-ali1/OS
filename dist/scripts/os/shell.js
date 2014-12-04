@@ -322,6 +322,11 @@ var TSOS;
                 }
             }
 
+            if (x.toString().length > (_BlockSize * 2)) {
+                _StdOut.putText("Too big to fit into the Memory block");
+                return;
+            }
+
             //            Get the free block first!
             var base = _MemoryManager.getBlockAvailable();
 
@@ -334,6 +339,7 @@ var TSOS;
                 }
                 p.setLength((x.length / 2)); //set the length of the program.
                 p.setState(9999999999999999999999999); //set state "NEW"
+                p.setLocation("Memory");
 
                 //Load in the Resident Queue
                 _ResidentQueue.push(p);
@@ -349,19 +355,20 @@ var TSOS;
 
                 //Finally load into Memory
                 _MemoryManager.load(base, x.toUpperCase().toString());
-                alert("DOne");
             } else {
                 //Base is -1 at this point.
                 //so need to swap into the file system.
                 //Create New PCB and don't forget the priority > 0
                 // (priority > 0 denotes...its in the file system)
-                //                if(args.length == 0){
-                //                    var p = new Pcb(-1,-1,10);
-                //                    _FileSystem.writeToFile();
-                //                }else{
-                //                    var p = new Pcb(-1,-1,args);
-                //                    _FileSystem.writeToFile();
-                //                }
+                //make a filename first
+                var p = new TSOS.Pcb(-1, -1, -1);
+                p.setLocation("Disk");
+                p.setState(9999999999999999999999999); //set state "NEW"
+                p.setLength((x.length / 2));
+                var filename = ("swap" + p.getPid());
+                _FileSystem.rollOut(filename, x.toUpperCase().toString());
+                _ResidentQueue.push(p);
+                _FakeQueue.push(p);
             }
         };
 
@@ -405,7 +412,7 @@ var TSOS;
 
             for (var i = _FakeQueue.length - 1; i >= 0; i--) {
                 var s = _FakeQueue[i];
-                if (s.getState() != "New" || s.getState() != "Ready") {
+                if (s.getState() != "New") {
                     if (s.getState() == "Running") {
                         tableView += "<tr style='background-color: limegreen;'>";
                         tableView += "<td>" + s.getPid().toString() + "</td>";
@@ -418,6 +425,7 @@ var TSOS;
                         tableView += "<td>" + s.getX() + "</td>";
                         tableView += "<td>" + s.getY() + "</td>";
                         tableView += "<td>" + s.getZ() + "</td>";
+                        tableView += "<td>" + s.getLocation() + "</td>";
                         tableView += "</tr>";
                     }
                     if (s.getState() == "Terminated" || s.getState() == "Killed") {
@@ -432,10 +440,11 @@ var TSOS;
                         tableView += "<td>" + s.getX() + "</td>";
                         tableView += "<td>" + s.getY() + "</td>";
                         tableView += "<td>" + s.getZ() + "</td>";
+                        tableView += "<td>" + s.getLocation() + "</td>";
                         tableView += "</tr>";
                     }
 
-                    if (s.getState() == "Waiting" || s.getState() == "Waiting") {
+                    if (s.getState() == "Waiting") {
                         tableView += "<tr style='background-color: #FFD801;'>";
                         tableView += "<td style='color: #000000;'>" + s.getPid().toString() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
@@ -447,6 +456,23 @@ var TSOS;
                         tableView += "<td style='color: #000000;'>" + s.getX() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getLocation() + "</td>";
+                        tableView += "</tr>";
+                    }
+
+                    if (s.getState() == "Ready") {
+                        tableView += "<tr style='background-color: darkturquoise;'>";
+                        tableView += "<td style='color: #000000;'>" + s.getPid().toString() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getLimit().toString() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getState().toString() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + parseInt(s.getPc() + s.getBase()) + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getIR() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getAcc() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getX() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getLocation() + "</td>";
                         tableView += "</tr>";
                     }
                 }
@@ -700,7 +726,7 @@ var TSOS;
             if (data.length == 2) {
                 if ((firstChar == lastChar) && (firstAscii == 34) && (lastAscii == 34)) {
                     load += data[1].slice(1, (data[1].length - 1));
-                    _FileSystem.writeToFile(filename, load);
+                    _FileSystem.writeToFile(filename, load, true);
                     return;
                 } else {
                     _StdOut.putText("File Contents must be between: \" \"");
@@ -721,7 +747,7 @@ var TSOS;
                         load += data[i];
                         load += " ";
                     }
-                    _FileSystem.writeToFile(filename, load);
+                    _FileSystem.writeToFile(filename, load, true);
                 } else {
                     _StdOut.putText("File Contents must be between: \" \"");
                 }

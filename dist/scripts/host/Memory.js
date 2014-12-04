@@ -20,9 +20,9 @@ var TSOS;
                 _MainMemoryBase[i] = i.toString(16).toUpperCase();
                 if (i % 256 == 0) {
                     Memory.segment++;
-                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 12px;'>" + "[" + Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 10px;'>" + "[" + Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 } else {
-                    table += "<tr><td style='font-size: 12px;'>" + "[" + Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                    table += "<tr><td style='font-size: 10px;'>" + "[" + Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
 
                 for (var j = i; j <= i + 7; j++) {
@@ -84,9 +84,9 @@ var TSOS;
             for (var i = 0; i < _MainMemorySize; i += 8) {
                 if (i % 256 == 0) {
                     Memory.segment++;
-                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 12px;'>" + "[" + Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 11px;'>" + "[" + Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 } else {
-                    table += "<tr><td style='font-size: 12px;'>" + "[" + Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
+                    table += "<tr><td style='font-size: 11px;'>" + "[" + Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 for (var j = i; j <= i + 7; j++) {
                     table += "<td>" + _MainMemory[j] + "</td>";
@@ -113,6 +113,21 @@ var TSOS;
         */
         Memory.prototype.size = function () {
             return _MainMemorySize;
+        };
+
+        Memory.prototype.grabProcessContents = function (base) {
+            var data = "";
+            var current;
+            for (var i = base; i < (base + 256); i++) {
+                current = _MainMemory[i];
+
+                if (current.length == 2) {
+                    data += current;
+                } else {
+                    data += "0" + current;
+                }
+            }
+            return data;
         };
         Memory.segment = -1;
         return Memory;

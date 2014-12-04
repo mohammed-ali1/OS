@@ -40,38 +40,27 @@
     <!-- Uncomment this line below to enable Glados testing -->
     <!-- <script type="text/javascript" src="http://www.labouseur.com/courses/os/projects/glados.js"></script> -->
 
-<div id="top">
+<div id="top" style="border: 1px solid;">
+    <div>
+        <p id="status">
+            Status: off
+        </p>
 
-    <!--<h1 class="clock2" style="float:right;">clock</h1>-->
-    <!--<script>-->
-        <!--$(document).ready(function () {-->
-            <!--var clock; clock = $('.clock2').FlipClock({-->
-                <!--clockFace: 'TwelveHourClock',-->
-                <!--countdown: true,-->
-                <!--autoStart: true-->
-            <!--});-->
-        <!--});-->
-    <!--</script>-->
-
-    <p id="status">
-        Status: off
-    </p>
-
-    <p id="clock">
-        <script>
-            setInterval(function(){
-                document.getElementById("clock").innerHTML = "[" + new Date().toLocaleDateString() +
-                        "] [" +    new Date().toLocaleTimeString() + "]";
-            },100);
-        </script>
-        <br> <br> <br> <br>
-    </p>
+        <p id="clock" style="clear: both; border: 1px solid;">
+            <script>
+                setInterval(function(){
+                    document.getElementById("clock").innerHTML = "[" + new Date().toLocaleDateString() +
+                            "] [" +    new Date().toLocaleTimeString() + "]";
+                },100);
+            </script>
+        </p>
+    </div>
 </div>
 </head>
 
 <body onload="onDocumentLoad();">
 
-<div id="divMain" style="float: left; width:auto; white-space: nowrap;">
+<div id="divMain" style="white-space: nowrap; border: 1px solid #ffffff;">
 
     <div id="divButtonBar" style="margin:4px; width: auto;">
         <input type="button"
@@ -107,42 +96,103 @@
                 height="500px"
                 tabindex="3">
         </canvas>
+    </div>
 
-        <div id="fileSystemDiv">
-            <center><h5 style="color: firebrick;">File System</h5></center>
-            <div id="dirDataDiv" style="max-width: 500px; max-height: 300px; overflow: scroll;">
-                <table id="dirDataTable">
+    <div id="divLog" style="margin-left:2px; float: left; width: auto; height: auto;">
+        <div>
+            <center><h3 style="color: firebrick; margin-top:3%;">Host Logger</h3></center>
+            <textarea name="taHostLog"
+                      id  ="taHostLog"
+                      rows="26"
+                      cols="20"
+                    ></textarea>
+        </div>
+
+        <div>
+            <center><h3 style="color: firebrick;">User Program</h3></center>
+            <textarea name="taProgramInput"
+                      id  ="taProgramInput"
+                      rows="8"
+                      cols="40"
+                      placeholder="Enter Program to RUN"
+                    ></textarea>
+        </div>
+    </div>
+
+    <div id="memoryTable" style="margin-left:5px; height: auto;float:left;">
+
+        <div style="margin:2%;">
+            <p>
+                <center>
+                    <input id="stepButton" type="button" value="Single Step"
+                            onclick="TSOS.Control.hostStepButton_click(this);"/>
+
+                <input id="stopButton" type="button" value="Stop"
+                       onclick="TSOS.Control.hostStopButton_click(this);"
+                        style="visibility: hidden;"/>
+
+                    <input id="nextButton" type="button" value="Next"
+                           onclick="TSOS.Control.hostNextButton_click(this);"
+                            style="float:right; visibility: hidden; "/>
+                </center>
+            </p>
+
+            <p>
+                <br/>
+                <center>
+                     <h3 style="margin-top:5%;">Main Memory</h3>
+                </center>
+            </p>
+        </div>
+
+        <div id="tableID">
+            <table id="table"></table>
+        </div>
+
+        <div id="tableMemory">
+            <div>
+
+                <h4 id="instruction" style="color: firebrick; clear: both;">CPU</h4>
+
+                <table id="cpu">
+                    <tr>
+                        <th>PC</th>
+                        <th>IR</th>
+                        <th>ACC</th>
+                        <th>X</th>
+                        <th>Y</th>
+                        <th>Z</th>
+                    </tr>
+
+                    <tr>
+                        <td id="pc">007</td>
+                        <td id="ir">007</td>
+                        <td id="acc">007</td>
+                        <td id="x">007</td>
+                        <td id="y">007</td>
+                        <td id="z">007</td>
+                    </tr>
                 </table>
+
+                <div style="height: 130px; overflow: scroll; border:transparent; border-radius: 10px;">
+                    <h4 style="color: firebrick;">Processes Monitoring</h4>
+                    <table id="monitor">
+                        <tr>
+                            <th>PID</th>
+                            <th>Arrived</th>
+                             <th>Terminated</th>
+                            <th>Turnaround</th>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div id="divLog" style="margin-left:2px; float: left; width: auto; height: auto;">
 
-
-    <div>
-        <center><h3 style="color: firebrick; margin-top:3%;">Host Logger</h3></center>
-        <textarea name="taHostLog"
-                  id  ="taHostLog"
-                  rows="26"
-                  cols="20"
-                ></textarea>
-    </div>
-
-    <div>
-        <center><h3 style="color: firebrick;">User Program</h3></center>
-        <textarea name="taProgramInput"
-                  id  ="taProgramInput"
-                  rows="8"
-                  cols="40"
-                  placeholder="Enter Program to RUN"
-                ></textarea>
-    </div>
-
-    <div style="height: 150px; overflow: scroll; border: transparent; border-radius: 10px;">
+    <div style="height: 150px; overflow: scroll; border: transparent; border-radius: 10px; float: left;">
         <h4 style="color:firebrick;">Processes</h4>
-
         <div>
             <table id="displayReady">
                 <tr>
@@ -153,85 +203,25 @@
                     <th>PC</th>
                     <th>IR</th>
                     <th>Acc</th>
-                    <th>X</th>
-                    <th>Y</th>
-                    <th>Z</th>
+                    <th>XReg</th>
+                    <th>YReg</th>
+                    <th>ZFlag</th>
+                    <th>Location</th>
                 </tr>
             </table>
         </div>
     </div>
-</div>
 
-<div id="memoryTable" style="margin-left:5px; height: auto;float:left;">
 
-    <div style="margin:2%;">
-        <p>
-            <center>
-                <input id="stepButton" type="button" value="Single Step"
-                        onclick="TSOS.Control.hostStepButton_click(this);"/>
-
-            <input id="stopButton" type="button" value="Stop"
-                   onclick="TSOS.Control.hostStopButton_click(this);"
-                    style="visibility: hidden;"/>
-
-                <input id="nextButton" type="button" value="Next"
-                       onclick="TSOS.Control.hostNextButton_click(this);"
-                        style="float:right; visibility: hidden; "/>
-            </center>
-        </p>
-
-        <p>
-            <br/>
-            <center>
-                 <h3 style="margin-top:5%;">Main Memory</h3>
-            </center>
-        </p>
-    </div>
-
-    <div id="tableID">
-        <table id="table"></table>
-    </div>
-
-    <div>
-        <div>
-            <p>
-                <h4 id="instruction" style="color: firebrick; margin-bottom: 7%;">CPU</h4>
-            </p>
-
-            <table id="cpu">
-                <tr>
-                    <th>PC</th>
-                    <th>IR</th>
-                    <th>ACC</th>
-                    <th>X</th>
-                    <th>Y</th>
-                    <th>Z</th>
-                </tr>
-
-                <tr>
-                    <td id="pc">007</td>
-                    <td id="ir">007</td>
-                    <td id="acc">007</td>
-                    <td id="x">007</td>
-                    <td id="y">007</td>
-                    <td id="z">007</td>
-                </tr>
+    <div id="fileSystemDiv" style="float:left; margin-left: 2%;">
+        <center><h5 style="color: firebrick;">File System</h5></center>
+        <div id="dirDataDiv" style="max-width: 500px; max-height: 300px; overflow: scroll;">
+            <table id="dirDataTable">
             </table>
-
-            <div style="height: 130px; overflow: scroll; border:transparent; border-radius: 10px;">
-                <h4 style="color: firebrick;">Processes Monitoring</h4>
-                <table id="monitor">
-                    <tr>
-                        <th>PID</th>
-                        <th>Arrived</th>
-                         <th>Terminated</th>
-                        <th>Turnaround</th>
-                    </tr>
-                </table>
-            </div>
         </div>
     </div>
-</div>
+</body>
+
 
 <footer class="footerText" style="clear:both;">
     <br>
@@ -241,5 +231,5 @@
     Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
 </footer>
 
-</body>
+
 </html>

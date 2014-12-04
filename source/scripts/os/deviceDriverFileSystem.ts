@@ -12,6 +12,8 @@ module TSOS{
         private support:number;
         private fsu;
         private file;
+        private static DataSize:number;
+        private static DirSize:number;
 
         constructor(){
             super(this.launch, this.voidMethod);
@@ -26,6 +28,8 @@ module TSOS{
             this.dataSize = 60;
             this.support = 0;
             this.fsu = null;
+            FileSystem.DataSize = 64;
+            FileSystem.DirSize = 192;
             this.file = new Map();
             this.fsu = new FSU();
         }
@@ -106,26 +110,17 @@ module TSOS{
          */
         public read(file){
 
-            ///Just use the local map to read the file contents
-            //see how simple it is with a local map...?
-            var foundFile:boolean = true;
-            var t = 0;
-            for(var s = 0; s < this.sectorSize;s++){
-                for(var b = 0; b < this.blockSize;b++){
-                    var key = this.fsu.makeKey(t,s,b);
-                    if(this.file.has(key)) {
-                        var fileData:TSOS.File = this.file.get(key);
-                        if(fileData.filename == file){
-                            _StdOut.putText(""+fileData.filecontents);
-                            _Console.advanceLine();
-                            foundFile = false;
-                        }
-                    }
-                }
-            }
+            var filename = this.fsu.stringToHex(file.toString());
+            var pad = this.fsu.padding(filename,this.dataSize);
+            //get file index
+            var nextMeta = this.fetchFilename(pad);
 
-            if(foundFile){
-                _StdOut.putText("Cannot find the file: "+file);
+            if(nextMeta == "###"){
+                var a = localStorage.getItem(nextMeta);
+                _StdOut.putText(this.fsu.hexToString(a.slice(4,a.length).toString()));
+            }else{
+                var finalString = this.startPrinting(nextMeta);
+                return finalString;
             }
         }
 
@@ -133,51 +128,34 @@ module TSOS{
          * Write to the file
          * @param str
          */
-        public  writeToFile(file,str:string){
+        public  writeToFile(file,contents,pad:boolean){
 
             //get the address of the data
-            var hex:string;
-            var t = 0;
-            var dataIndex;
             var success:boolean = false;
-            var key;
-            var oldData:string;
-            var oldHexData:string;
-            var fileData:string;
-            var formattedData:string = this.fsu.formatData((this.dataSize));
+            var hex = this.fsu.stringToHex(file.toString());
+            var hexFile = this.fsu.padding(hex,this.dataSize);
+            var key = this.fetchDuplicate(hexFile);
+            var data = localStorage.getItem(key);
+            var dataIndex = data.slice(1,4);
+            var contentsHex;
 
-            //use the local map to grab the address of the dataIndex....
-            // you can thank me later for creating a local Map!
-            for(var s = 0; s<this.sectorSize;s++) {
-                for (var b = 0; b < this.blockSize; b++) {
-                    key = this.fsu.makeKey(t,s,b);
-                    var data:TSOS.File = this.file.get(key);
-                    if(this.file.has(key) && data.filename == file ){
-                        dataIndex = localStorage.getItem(key).slice(1,4);
-                        //read from the file system...
-                        oldData = localStorage.getItem(dataIndex).slice(4,this.metaDataSize);
-                        this.file.delete(key);
-                        fileData = data.filecontents;
-                        fileData += str;
-                        this.file.set(key,new File(file,fileData));
-                        break;
-                    }
-                }
+            //do we want to convert to hex...?
+            if(pad){
+                var conv = this.fsu.stringToHex(contents.toString());
+                contentsHex = this.fsu.padding(conv,(_BlockSize*2));
+                alert("padded:\n"+contentsHex+"\nlen: "+contentsHex.length);
+            }else{
+                contentsHex = this.fsu.stringToHex((contents.toString()));
             }
 
-            hex = this.fsu.stringToHex(str);
-            //what if we need to append...?
-            //need to think about it
-
             //what if the contents to write is > 60 bytes
-            if(hex.length > (this.dataSize)){
-                this.handleWrite(dataIndex,hex,(this.dataSize));
+            if(contentsHex.length > (this.dataSize)){
+                this.handleWrite(dataIndex,contentsHex,(this.dataSize));
                 success = true;
                 this.update();
-            }//append to the file
+            }
             else{
-                //just store it on local storage.
-                var padHex = this.fsu.padding(hex,(this.dataSize));
+                var padHex = this.fsu.padding(contentsHex,this.dataSize);
                 localStorage.setItem(dataIndex,"1###"+padHex);
                 success = true;
                 this.update();
@@ -185,35 +163,27 @@ module TSOS{
 
             if(success){
                 _StdOut.putText("Successfully wrote to: "+file);
-
             }else{
                 _StdOut.putText("Cannot write to file: "+file+", Please format and try again!");
             }
         }
-
 
         /**
          * ls command
          * Use local map to to read all the active files.
          */
         public fileDirectory(){
-
-            /**
-             * Error checking needed
-             */
-
-            if(this.file.size == 0){
-                _StdOut.putText("No files are available");
-                return;
-            }
-
-            for(var s = 0; s < this.sectorSize;s++){
-                for(var b = 0; b < this.blockSize;b++){
-                    var key = this.fsu.makeKey(0,s,b);
-                    if(this.file.has(key)) {
-                        var file :TSOS.File = this.file.get(key);
-                        var filename:string = file.filename;
-                        _StdOut.putText(key +": " + filename);
+            var t = 0;
+            var key;
+            for(var s = 0; s<this.sectorSize;s++) {
+                for (var b = 0; b < this.blockSize; b++) {
+                    key = this.fsu.makeKey(t,s,b);
+                    var data:string = localStorage.getItem(key);
+                    var meta = data.slice(0,1);
+                    var hexData:string = data.slice(4,this.metaDataSize);
+                    var stringData = this.fsu.hexToString(hexData);
+                    if(meta == "1"){
+                        _StdOut.putText(key+": "+stringData);
                         _Console.advanceLine();
                     }
                 }
@@ -226,6 +196,8 @@ module TSOS{
          */
         public createFile(filename:string){
 
+            var created: boolean = false;
+
             //convert filename to hex
             var data = this.fsu.stringToHex(filename.toString());
 
@@ -233,47 +205,80 @@ module TSOS{
             var hexData:string = this.fsu.padding(data,this.dataSize);
 
             //what if the file size is > 60 bytes...?
-            if((filename.length * 2) > 30) {
+            if((hexData.length) > this.dataSize) {
                 _StdOut.putText("Filename must be <= " + (this.dataSize / 2) + " characters!");
-                return;
+                return "-1";
             }
-
             //Gets un-duplicated key
-            var dirIndex = this.fetchDuplicate(hexData);
+            var dirIndex = this.getDirIndex();
 
             if(dirIndex == "-1"){
                 _StdOut.putText("Either "+filename+" already exists...Or not enough space!");
-                return;
+                return "-1";
             }
 
             //Get dataIndex
-            var dataIndex:string = this.fsu.getDataIndex(this.trackSize,this.sectorSize);
+            var dataIndex:string = this.fsu.getDataIndex(this.trackSize,this.sectorSize, this.blockSize);
 
             if(dataIndex != "-1") {
 
+//                alert("Creating file: dir: "+dirIndex+", dataIndex: "+dataIndex);
+
                 //store in dir address
-                localStorage.setItem(dirIndex, ("1"+dataIndex+hexData));//need to add actualData
+                localStorage.setItem(dirIndex, ("1" + dataIndex + hexData));//need to add actualData
 
                 //store "0" in data address
                 var formatData = this.fsu.formatData((this.dataSize));
-                localStorage.setItem(dataIndex,"1###"+formatData);
+                localStorage.setItem(dataIndex, "1###" + formatData);
 
                 //add to the filename to local  map
                 //var zeroData:string = this.fsu.formatData(this.metaDataSize);
-                this.file.set(dirIndex,new File(filename,""));
+                this.file.set(dirIndex, new File(filename, ""));
+
+                created = true;
 
                 //update file system
                 this.update();
-
+            }else{
+                //else data index in -1
+                _StdOut.putText("No Space available!, key "+dataIndex);
+                return "-1";
+            }
+            if(created){
                 //print success or failure
                 _StdOut.putText("Successfully created file: "+filename);
+                _Console.advanceLine();
             }else {
                 _StdOut.putText("Could not create the file: " + filename + ", Please format and try again!");
+                _Console.advanceLine();
             }
         }
 
         /**
-         * Looks for a duplicate filename
+         * Looks for availale key in DIR Block
+         * @param filename
+         * @returns {string}
+         */
+        public getDirIndex(){
+
+            var t = 0;
+            var key;
+
+            for(var s = 0; s<this.sectorSize;s++) {
+                for (var b = 0; b < this.blockSize; b++) {
+                    key = this.fsu.makeKey(t,s,b);
+                    var data:string = localStorage.getItem(key);
+                    var meta = data.slice(0,1);
+                    if(meta == "0"){
+                        return key;
+                    }
+                }
+            }
+            return "-1";
+        }
+
+        /**
+         * Looks for a duplicate filename, if any
          * @param filename
          * @returns {string}
          */
@@ -290,14 +295,37 @@ module TSOS{
                     var hexData:string = data.slice(4,this.metaDataSize);
                     if((filename == hexData) && (meta == "1")){
                         //found duplicate and in use...
-                        return "-1";
-                    }else if(meta == "0"){
-                        //not a match...return the key
                         return key;
                     }
                 }
             }
+            return "-1";
+        }
 
+        /**
+         * Looks for filename
+         * @param filename
+         * @returns {string}
+         */
+        public fetchFilename(filename:string){
+
+            var t = 0;
+            var key;
+            var zero = this.fsu.formatData(this.metaDataSize);
+            for(var s = 0; s<this.sectorSize;s++) {
+                for (var b = 0; b < this.blockSize; b++) {
+                    key = this.fsu.makeKey(t,s,b);
+                    var data:string = localStorage.getItem(key);
+                    var inUse = data.slice(0,1);
+                    var meta = data.slice(1,4);
+                    var hexData:string = data.slice(4,data.length);
+                    if((filename == hexData) && (inUse == "1")){
+                        //found what we are looking for...
+                        localStorage.setItem(key,zero);
+                        return meta;
+                    }
+                }
+            }
             return "-1";
         }
 
@@ -316,45 +344,52 @@ module TSOS{
          * @param fileContents
          * @param size
          */
-        public handleWrite(dataIndex,fileContents:string,size){
+        public  handleWrite(dataIndex,fileContents:string,size){
 
-            var ceiling = Math.ceil(fileContents.length / (this.dataSize));
+            var ceiling = Math.ceil(fileContents.length / (size));
             var array = new Array();
             var track = dataIndex.charAt(0);
             var sector = dataIndex.charAt(1);
             var block = dataIndex.charAt(2);
             var stepOut:boolean = false;
                 array.push(dataIndex);
-                block++;
+            var len = fileContents.length;
+            var chunkLen;
+//            block++;
 
-            for(var s = sector; s < this.sectorSize; s++){
-                for(var b = block; b < this.blockSize; b++){
+            for(var t = track; t < this.trackSize; t++) {
+                for (var s = sector; s < this.sectorSize; s++) {
+                    for (var b = block; b < this.blockSize; b++) {
 
-                    var key = this.fsu.makeKey(track,s,b);
-                    var data = localStorage.getItem(key);
-                    var dataData = data.slice(0,4);
-                    if(dataData == "0000"){
-                        array.push(key);
-                    }else if(dataData.slice(0,1) == "1"){
-                        ceiling++;
-                    }else if(key == "377" && array.length < ceiling){
-                        _StdOut.putText("Not Enough Space on Disk");
-                        break;
+                        var key = this.fsu.makeKey(t, s, b);
+                        var data = localStorage.getItem(key);
+                        var dataData = data.slice(0, 4);
+
+                        if (dataData == "0000") {
+                            array.push(key);
+                        }
+                        if (key == "377" && array.length < ceiling) {
+                            stepOut = true;
+                            _StdOut.putText("Not enough space");
+                            return;
+                        }
+                        if (array.length == ceiling) {
+                            stepOut = true;
+                            break;
+                        }
                     }
-                    if(array.length == ceiling){
-                        stepOut = true;
+                    if (stepOut) {
                         break;
                     }
                 }
-                if(stepOut){
+                if (stepOut) {
                     break;
                 }
             }
 
             var start:number = 0;
-            var end:number = (this.dataSize);
+            var end:number = size;
             var chunk:string = "";
-            var temp:string = "";
 
             //now have fun writing to each address in the array
             for(var a = 0; a < array.length;a++) {
@@ -364,9 +399,11 @@ module TSOS{
                 if (a + 1 < array.length) {
                     var nextKey = this.makeFreshKey(array[a + 1]);
                     localStorage.setItem(key, "1"+nextKey + chunk);
+                    chunkLen = chunk.length;
                 } else {
                     var pad = this.fsu.padding(chunk,size);
                     localStorage.setItem(key, "1###" + pad);
+                    chunkLen = pad.length;
                 }
 
                 if(end == fileContents.length){
@@ -381,7 +418,6 @@ module TSOS{
                     end = (end + size);
                 }
             }
-            this.update();
         }
 
         public makeFreshKey(key){
@@ -392,12 +428,211 @@ module TSOS{
         }
 
 
-        //go into the disk
-        public rollIn(){
+        //load this process into the disk
+        public rollOut(filename:string,contents){
+            if(contents.length > (_BlockSize*2)){
+                _StdOut.putText("Process is bigger than memory block!");
+                return;
+            }else{
+                this.createFile(filename);
+                this.writeToFile(filename, contents, true);
+            }
         }
 
-        //grab from disk
-        public rollOut(){
+        //go to disk, remove a process, store this process
+        public rollIn(currentProcess, nextProcess){
+
+            var data: string;
+            var zeroData = this.fsu.formatData(this.metaDataSize);
+            var oldContents : string;
+
+            //search for a filename
+            var filename = "swap"+currentProcess.getPid();
+            var fileHex = this.fsu.stringToHex(filename.toString());
+            var padFile = this.fsu.padding(fileHex,this.dataSize);
+            var dataIndex = this.fetchFilename(padFile);
+
+            //get the data of the swap file
+            //grab everything in hex!!!!
+            data = this.grabAllHex(dataIndex);
+            localStorage.setItem(dataIndex,zeroData);
+
+            //grab the whole memory block first
+            oldContents = _MemoryManager.grabProcessContents(nextProcess.getBase());
+
+            alert("mem: "+oldContents+ "\ndisk: "+data+"\nmem len: "+oldContents.length+", disk len: "+data.length);
+
+            //create a new file and write to it
+            var filename = "swap"+nextProcess.getPid();
+
+            //grab the base and limit
+            currentProcess.setBase(nextProcess.getBase());
+            currentProcess.setLimit(nextProcess.getLimit());
+
+            //set base limit to -1
+            nextProcess.setBase(-1);
+            nextProcess.setLimit(-1);
+
+            //now write to file
+            this.createFile(filename);
+            this.writeToFile(filename,oldContents,false);
+
+            //Now...lets load the memory in the same spot as next process
+
+            _MemoryManager.load(currentProcess.getBase(),data.toString());
+            this.update();
+        }
+
+
+        /**
+         * returns all the context starting
+         * from the index
+         * @param index
+         */
+        public grabAllHex(index){
+
+            var value = "";
+            var key;
+            var data :string;
+            var nextMeta;
+            var zeroData = this.fsu.formatData(this.metaDataSize);
+            var stepOut:boolean = false;
+            var dataData;
+            var changeHex;
+
+            for (var t = index.charAt(0); t < this.trackSize; t++) {
+                for (var s = index.charAt(1); s < this.sectorSize; s++) {
+                    for (var b = index.charAt(2); b < this.blockSize; b++) {
+
+                        key = this.fsu.makeKey(t, s, b);
+                        data = localStorage.getItem(key);
+                        nextMeta = data.slice(1, 4);
+                        dataData = data.slice(4,data.length);
+                        if (nextMeta == "###") {
+                            var len = (_BlockSize - (value.length));
+                            changeHex = dataData.slice(4,(4+len));
+//                            value += data.slice(4,(4+(len)));
+                            localStorage.setItem(key, zeroData);//replace with zeros
+                            stepOut = true;
+                            break;
+                        } else {
+                            changeHex = this.fsu.hexToString(dataData);
+                            value += changeHex;
+                            localStorage.setItem(key, zeroData);//replace with zeros
+                        }
+                    }
+                    if(stepOut){
+                        break;
+                    }
+                }
+                if(stepOut){
+                    break;
+                }
+            }
+            if(stepOut){
+                return value;
+            }
+        }
+
+
+        /**
+         * Reads all the contents from
+         * the start address
+         * @param index
+         * @returns {string}
+         */
+        public startReading(index){
+
+            var oldData = "";
+            var key;
+            var data :string;
+            var nextMeta;
+            var zeroData = this.fsu.formatData(this.metaDataSize);
+
+            for (var t = index.charAt(0); t < this.trackSize; t++) {
+                for (var s = index.charAt(1); s < this.sectorSize; s++) {
+                    for (var b = index.charAt(2); b < this.blockSize; b++) {
+
+                        key = this.fsu.makeKey(t, s, b);
+                        data = localStorage.getItem(key);
+                        nextMeta = data.slice(1, 4);
+                        if (nextMeta == "###") {
+                            oldData += data.slice(4, data.length);
+                            localStorage.setItem(key, zeroData);//replace with zeros
+                            return oldData;
+                        } else {
+                            oldData += data.slice(4, data.length);
+                            localStorage.setItem(key, zeroData);//replace with zeros
+                        }
+                    }
+                }
+            }
+        }
+
+
+        /**
+         * Look for a filename
+         * which begins with "swap"
+         * @returns {string|string[]|T[]|Blob}
+         */
+        public lookForSwapFile(){
+            var dataIndex;
+            var swap = "swap";
+            var t = 0;
+            var key;
+            var dataData;
+            var meta;
+            var data;
+            var hexString;
+            var zeroData = this.fsu.format();
+
+            for (var s = 0; s < this.sectorSize; s++) {
+                for (var b = 0; b < this.blockSize; b++) {
+                    key = this.fsu.makeKey(t,s,b);
+                    data = localStorage.getItem(key);
+                    meta = data.slice(1,4);
+                    dataData = data.slice(4,12);
+                    hexString = this.fsu.hexToString(dataData);
+                    if(hexString == swap){
+                        localStorage.setItem(key,zeroData);//replace with zeros
+                        return meta;
+                    }
+                 }
+            }
+        }
+
+        public startPrinting(index){
+
+            var oldData;
+            for (var t = index.charAt(0); t < this.trackSize; t++) {
+                for (var s = index.charAt(1); s < this.sectorSize; s++) {
+                    for (var b = index.charAt(2); b < this.blockSize; b++) {
+
+                        var key = this.fsu.makeKey(t, s, b);
+                        var data = localStorage.getItem(key);
+                        var meta = data.slice(1, 4);
+                        if (meta == "###") {
+                            oldData = data.slice(4, data.length);
+                            _StdOut.putText(this.fsu.hexToString(oldData.toString()));
+                            return;
+                        } else {
+                            oldData = data.slice(4, data.length);
+                            _StdOut.putText(this.fsu.hexToString(oldData.toString()));
+                        }
+                    }
+                }
+            }
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+

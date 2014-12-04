@@ -26,11 +26,11 @@ module TSOS {
                 _MainMemoryBase[i] = i.toString(16).toUpperCase();
                 if(i % 256 == 0){
                     Memory.segment++;
-                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 12px;'>" + "["+
+                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 10px;'>" + "["+
                         Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 else{
-                    table += "<tr><td style='font-size: 12px;'>" + "["+
+                    table += "<tr><td style='font-size: 10px;'>" + "["+
                         Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
 
@@ -96,11 +96,11 @@ module TSOS {
 
                 if(i % 256 == 0){
                     Memory.segment++;
-                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 12px;'>" + "["+
+                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 11px;'>" + "["+
                         Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 else{
-                    table += "<tr><td style='font-size: 12px;'>" + "["+
+                    table += "<tr><td style='font-size: 11px;'>" + "["+
                         Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 for(var j=i; j<=i+7;j++){
@@ -129,6 +129,21 @@ module TSOS {
          */
         public size(){
             return _MainMemorySize;
+        }
+
+        public grabProcessContents(base){
+            var data: string = "";
+            var current:string;
+            for(var i = base ; i<(base+256);i++){
+                current = _MainMemory[i];
+
+                if(current.length == 2){
+                    data += current;
+                }else{
+                    data += "0"+current;
+                }
+            }
+            return data;
         }
     }
 }

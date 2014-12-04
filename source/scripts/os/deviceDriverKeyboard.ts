@@ -71,7 +71,6 @@ module TSOS {
                     if (_Console.historyIndex < 0) {
                         _Console.historyIndex = _ConsoleHistory.length - 1;
                     }
-
                     this.pullHistory(_ConsoleHistory[_Console.historyIndex]);
 
                 }else{  //Down Arrow Key

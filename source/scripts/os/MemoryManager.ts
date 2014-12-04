@@ -91,5 +91,9 @@ module TSOS{
                 }
             }
         }
+
+        public grabProcessContents(process){
+            return _Memory.grabProcessContents(process);
+        }
     }
 }

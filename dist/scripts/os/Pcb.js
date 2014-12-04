@@ -28,7 +28,7 @@ var TSOS;
             this.length = 0;
             this.block = 0;
             this.priority = 0;
-            this.block = 0;
+            this.location = "";
             this.timeArrived = 0;
             this.timeFinished = 0;
             Pcb.PID++;
@@ -44,7 +44,7 @@ var TSOS;
         };
 
         Pcb.prototype.setLength = function (length) {
-            this.length = length;
+            this.length = (this.base + length);
         };
 
         Pcb.prototype.setState = function (s) {
@@ -69,6 +69,14 @@ var TSOS;
             }
         };
 
+        Pcb.prototype.setLocation = function (location) {
+            this.location = location;
+        };
+
+        Pcb.prototype.getLocation = function () {
+            return this.location;
+        };
+
         Pcb.prototype.getPriority = function () {
             return this.priority;
         };
@@ -79,6 +87,14 @@ var TSOS;
 
         Pcb.prototype.getLimit = function () {
             return this.limit;
+        };
+
+        Pcb.prototype.setLimit = function (limit) {
+            this.limit = limit;
+        };
+
+        Pcb.prototype.setBase = function (base) {
+            this.base = base;
         };
 
         Pcb.prototype.getBase = function () {
@@ -107,10 +123,6 @@ var TSOS;
 
         Pcb.prototype.getAcc = function () {
             return this.acc;
-        };
-
-        Pcb.prototype.getBlock = function () {
-            return this.block;
         };
 
         Pcb.prototype.getPc = function () {
