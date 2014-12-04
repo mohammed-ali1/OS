@@ -58,7 +58,6 @@ var TSOS;
 
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set _CPU.isExecuting appropriately.
-            //            alert("PC now: "+parseInt(_CPU.PC+_CurrentProcess.getBase()));
             //Read Stuff from Memory @ Program Counter
             _CPU.manageOpCodes(_MemoryManager.read(_CPU.PC));
 
@@ -87,6 +86,10 @@ var TSOS;
             }
         };
 
+        /**
+        * Execute these op codes.
+        * @param str
+        */
         Cpu.prototype.manageOpCodes = function (str) {
             str = str.toString();
 

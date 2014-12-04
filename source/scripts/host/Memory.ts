@@ -72,6 +72,7 @@ module TSOS {
             x = str.trim();
             var a = 0, b = 2;
             //Need to load carefully Here!
+            //base + (x.length / 2);
             for (var i = base; i < base + (x.length / 2); i++) {
 
                 var s = x.substring(a, b);
@@ -104,6 +105,9 @@ module TSOS {
                         Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 for(var j=i; j<=i+7;j++){
+                    if(_MainMemory[j] == ""){
+                        _MainMemory[j] = "00";
+                    }
                     table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";

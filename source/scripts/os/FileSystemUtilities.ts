@@ -92,11 +92,10 @@ module TSOS{
          * @param size
          */
         public createMBR(localStorage,size,map:Map){
-            var data:string = this.stringToHex("BAD ASS OS");
+            var data:string = this.stringToHex((APP_NAME+" "+APP_VERSION));
             var pad:string = this.padding("1###"+data,size);
             var key = this.makeKey(0,0,0);
             localStorage.setItem(key,pad);
-            map.set(key,new File("BAD ASS OS",pad));
         }
 
         /**
@@ -186,18 +185,6 @@ module TSOS{
                 }
             }
             return "-1";
-        }
-
-
-        public padBlockSize(contents:string){
-
-            var str = "";
-            for(var i=contents.length; i<_BlockSize; i++){
-                    str += "0";
-            }
-            contents += str;
-
-            return contents;
         }
     }
 }

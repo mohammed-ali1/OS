@@ -360,7 +360,6 @@ module TSOS {
          * and validates HEX (at the moment).
          */
         public shellLoad(args){
-
             var f =  document.getElementById("taProgramInput").value;
             var x = f.replace(/\s/g,'');
 
@@ -398,6 +397,7 @@ module TSOS {
                 p.setLength((x.length / 2)); //set the length of the program.
                 p.setState(9999999999999999999999999);//set state "NEW"
                 p.setLocation("Memory");
+                p.setPrintLocation("Memory");
 
                 //Load in the Resident Queue
                 _ResidentQueue.push(p);
@@ -421,6 +421,7 @@ module TSOS {
                 //make a filename first
                 var p = new Pcb(-1,-1,-1);
                 p.setLocation("Disk");
+                p.setPrintLocation("Disk");
                 p.setState(9999999999999999999999999);//set state "NEW"
                 p.setLength((x.length / 2));
                 var filename:string = ("swap"+p.getPid());
@@ -467,9 +468,10 @@ module TSOS {
             tableView +="<th>PC</th>";
             tableView +="<th>IR</th>";
             tableView +="<th>Acc</th>";
-            tableView +="<th>X</th>";
-            tableView +="<th>Y</th>";
-            tableView +="<th>Z</th>";
+            tableView +="<th>XReg</th>";
+            tableView +="<th>YReg</th>";
+            tableView +="<th>ZReg</th>";
+            tableView +="<th>Location</th>";
 
             for(var i = _FakeQueue.length-1; i>=0;i--) {
 
@@ -488,7 +490,7 @@ module TSOS {
                         tableView += "<td>" + s.getX() + "</td>";
                         tableView += "<td>" + s.getY() + "</td>";
                         tableView += "<td>" + s.getZ() + "</td>";
-                        tableView += "<td>" + s.getLocation() + "</td>";
+                        tableView += "<td>" + s.getPrintLocation() + "</td>";
                         tableView += "</tr>";
                     }
                     if (s.getState() == "Terminated" || s.getState() == "Killed"){
@@ -503,7 +505,7 @@ module TSOS {
                         tableView += "<td>" + s.getX() + "</td>";
                         tableView += "<td>" + s.getY() + "</td>";
                         tableView += "<td>" + s.getZ() + "</td>";
-                        tableView += "<td>" + s.getLocation() + "</td>";
+                        tableView += "<td>" + s.getPrintLocation() + "</td>";
                         tableView += "</tr>";
                     }
 
@@ -519,7 +521,7 @@ module TSOS {
                         tableView += "<td style='color: #000000;'>" + s.getX() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getLocation() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getPrintLocation()+ "</td>";
                         tableView += "</tr>";
                     }
 
@@ -535,7 +537,7 @@ module TSOS {
                         tableView += "<td style='color: #000000;'>" + s.getX() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
-                        tableView += "<td style='color: #000000;'>" +s.getLocation() + "</td>";
+                        tableView += "<td style='color: #000000;'>" +s.getPrintLocation() + "</td>";
                         tableView += "</tr>";
                     }
                 }

@@ -168,5 +168,11 @@ module TSOS {
             document.getElementById("nextButton").style.visibility = "hidden";
             document.getElementById("stopButton").style.visibility = "hidden";
         }
+
+        public handleScheduling(){
+            alert("submitting form");
+            _CurrentSchedule = document.getElementById("schedulingForm").submit();
+            alert("Form now: "+_CurrentSchedule);
+        }
     }
 }

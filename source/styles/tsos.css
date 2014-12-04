@@ -194,7 +194,7 @@ h3 {
     font-size: 12px;
 }
 
-#cpu, #readyQueue, #displayReady, #monitor{
+#cpu, #readyQueue,#monitor{
     border: 4px solid firebrick;
     width:350px;
     border-radius: 10px;
@@ -206,12 +206,13 @@ h3 {
 }
 
 #displayReady{
-    width:350px;
     border-radius: 10px;
     table-layout: auto;
+    border-radius: 10px;
+    border: 4px solid firebrick;
 }
 
-#cpu, #readyQueue, #displayReady, #monitor{
+#cpu, #readyQueue,#monitor{
     margin-top:-6%;
 }
 
@@ -258,4 +259,12 @@ h3 {
     background-color: #E66C2C;
     padding:5px;
     border: 2px solid;
+}
+
+#schedulingDiv{
+    background-color: cornsilk;
+    float: right;
+    border-radius: 10px;
+    font-size: 18px;
+    color: firebrick;
 }

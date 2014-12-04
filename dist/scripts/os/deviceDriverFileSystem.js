@@ -22,11 +22,8 @@ var TSOS;
             this.metaDataSize = 64;
             this.dataSize = 60;
             this.support = 0;
-            this.fsu = null;
-            FileSystem.DataSize = 64;
-            FileSystem.DirSize = 192;
-            this.file = new Map();
             this.fsu = new TSOS.FSU();
+            this.zeroData = this.fsu.formatData(this.metaDataSize);
         };
 
         FileSystem.prototype.voidMethod = function () {
@@ -51,7 +48,7 @@ var TSOS;
         * Creates the Master Boot Record
         */
         FileSystem.prototype.createMBR = function () {
-            this.fsu.createMBR(localStorage, this.metaDataSize, this.file);
+            this.fsu.createMBR(localStorage, this.metaDataSize);
         };
 
         /**
@@ -85,7 +82,6 @@ var TSOS;
                         //need to do error checking.
                         localStorage.setItem(key, zeroData); //set the dir to zero
                         localStorage.setItem(dataIndex, zeroData); //set the data index to zero.
-                        this.file.delete(key); //delete from the local map
                         this.update();
                     }
                 }
@@ -114,14 +110,15 @@ var TSOS;
                 var a = localStorage.getItem(nextMeta);
                 _StdOut.putText(this.fsu.hexToString(a.slice(4, a.length).toString()));
             } else {
-                var finalString = this.startPrinting(nextMeta);
-                return finalString;
+                this.startPrinting(nextMeta);
             }
         };
 
         /**
         * Write to the file
-        * @param str
+        * @param file
+        * @param contents
+        * @param pad
         */
         FileSystem.prototype.writeToFile = function (file, contents, pad) {
             //get the address of the data
@@ -137,7 +134,7 @@ var TSOS;
             if (pad) {
                 var conv = this.fsu.stringToHex(contents.toString());
                 contentsHex = this.fsu.padding(conv, (_BlockSize * 2));
-                alert("padded:\n" + contentsHex + "\nlen: " + contentsHex.length);
+                alert("padded:\n" + contentsHex.length + ", dif: " + (_BlockSize - conv.length));
             } else {
                 contentsHex = this.fsu.stringToHex((contents.toString()));
             }
@@ -214,17 +211,12 @@ var TSOS;
             var dataIndex = this.fsu.getDataIndex(this.trackSize, this.sectorSize, this.blockSize);
 
             if (dataIndex != "-1") {
-                //                alert("Creating file: dir: "+dirIndex+", dataIndex: "+dataIndex);
                 //store in dir address
                 localStorage.setItem(dirIndex, ("1" + dataIndex + hexData)); //need to add actualData
 
                 //store "0" in data address
                 var formatData = this.fsu.formatData((this.dataSize));
                 localStorage.setItem(dataIndex, "1###" + formatData);
-
-                //add to the filename to local  map
-                //var zeroData:string = this.fsu.formatData(this.metaDataSize);
-                this.file.set(dirIndex, new TSOS.File(filename, ""));
 
                 created = true;
 
@@ -246,8 +238,7 @@ var TSOS;
         };
 
         /**
-        * Looks for availale key in DIR Block
-        * @param filename
+        * Looks for available key in DIR Block
         * @returns {string}
         */
         FileSystem.prototype.getDirIndex = function () {
@@ -320,7 +311,6 @@ var TSOS;
         FileSystem.prototype.hasStorage = function () {
             if ('localStorage' in window && window['localStorage'] !== null) {
                 this.support = 1;
-                //                localStorage = sessionStorage;
             } else {
                 this.support = 0;
             }
@@ -340,7 +330,6 @@ var TSOS;
             var block = dataIndex.charAt(2);
             var stepOut = false;
             array.push(dataIndex);
-            var len = fileContents.length;
             var chunkLen;
 
             for (var t = track; t < this.trackSize; t++) {
@@ -415,7 +404,6 @@ var TSOS;
         FileSystem.prototype.rollOut = function (filename, contents) {
             if (contents.length > (_BlockSize * 2)) {
                 _StdOut.putText("Process is bigger than memory block!");
-                return;
             } else {
                 this.createFile(filename);
                 this.writeToFile(filename, contents, true);
@@ -455,13 +443,51 @@ var TSOS;
             nextProcess.setBase(-1);
             nextProcess.setLimit(-1);
 
-            //now write to file
+            //WRITE TO FILE AND LOAD INTO MEMORY
             this.createFile(filename);
+            alert("Writing to disk pid: " + nextProcess.getPid() + "\n" + oldContents.length);
             this.writeToFile(filename, oldContents, false);
-
-            //Now...lets load the memory in the same spot as next process
+            alert("Loading to mem pid: " + currentProcess.getPid() + "\n" + data.length);
             _MemoryManager.load(currentProcess.getBase(), data.toString());
             this.update();
+        };
+
+        /**
+        * This method just swaps from the disk and loads
+        * into the memory....fcfs
+        * @param process
+        * @param base
+        * @returns {string}
+        */
+        FileSystem.prototype.swap = function (process, base) {
+            alert("Swapping from the disk");
+            var data;
+            var zeroData = this.fsu.formatData(this.metaDataSize);
+
+            //search for a filename
+            var filename = "swap" + process.getPid();
+            var fileHex = this.fsu.stringToHex(filename.toString());
+            var padFile = this.fsu.padding(fileHex, this.dataSize);
+            var dataIndex = this.fetchFilename(padFile);
+
+            //get the data of the file
+            //grab everything in hex!!!!
+            data = this.grabAllHex(dataIndex);
+            localStorage.setItem(dataIndex, zeroData);
+
+            process.setBase(base);
+            process.setLimit(((base + (_BlockSize - 1))));
+            TSOS.Shell.updateReadyQueue();
+            alert("Clreing mem");
+            _Memory.clearMemory();
+            _Memory.updateMemory();
+            alert("Loading into mem: len: " + data.length);
+
+            //load into the mem
+            _MemoryManager.load(base, data.toString());
+            this.update();
+            alert("loading into block: " + ((base) / (_BlockSize)));
+            _MemoryManager.update();
         };
 
         /**
@@ -489,8 +515,7 @@ var TSOS;
                         if (nextMeta == "###") {
                             var len = (_BlockSize - (value.length));
                             changeHex = dataData.slice(4, (4 + len));
-
-                            //                            value += data.slice(4,(4+(len)));
+                            value += data.slice(4, (4 + (len)));
                             localStorage.setItem(key, zeroData); //replace with zeros
                             stepOut = true;
                             break;
@@ -540,37 +565,6 @@ var TSOS;
                             oldData += data.slice(4, data.length);
                             localStorage.setItem(key, zeroData); //replace with zeros
                         }
-                    }
-                }
-            }
-        };
-
-        /**
-        * Look for a filename
-        * which begins with "swap"
-        * @returns {string|string[]|T[]|Blob}
-        */
-        FileSystem.prototype.lookForSwapFile = function () {
-            var dataIndex;
-            var swap = "swap";
-            var t = 0;
-            var key;
-            var dataData;
-            var meta;
-            var data;
-            var hexString;
-            var zeroData = this.fsu.format();
-
-            for (var s = 0; s < this.sectorSize; s++) {
-                for (var b = 0; b < this.blockSize; b++) {
-                    key = this.fsu.makeKey(t, s, b);
-                    data = localStorage.getItem(key);
-                    meta = data.slice(1, 4);
-                    dataData = data.slice(4, 12);
-                    hexString = this.fsu.hexToString(dataData);
-                    if (hexString == swap) {
-                        localStorage.setItem(key, zeroData); //replace with zeros
-                        return meta;
                     }
                 }
             }

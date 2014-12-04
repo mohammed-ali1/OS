@@ -31,6 +31,7 @@ var TSOS;
             this.location = "";
             this.timeArrived = 0;
             this.timeFinished = 0;
+            this.printLocation = "";
             Pcb.PID++;
             this.pid = Pcb.PID; //Increment PID all the time!
             this.base = b;
@@ -75,6 +76,14 @@ var TSOS;
 
         Pcb.prototype.getLocation = function () {
             return this.location;
+        };
+
+        Pcb.prototype.setPrintLocation = function (location) {
+            this.printLocation = location;
+        };
+
+        Pcb.prototype.getPrintLocation = function () {
+            return this.printLocation;
         };
 
         Pcb.prototype.getPriority = function () {

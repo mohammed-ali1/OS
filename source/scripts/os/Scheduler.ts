@@ -7,7 +7,7 @@ module TSOS{
 
 
         constructor(schedule:string){
-            _CurrentSchedule = schedule;
+//            _CurrentSchedule = schedule;
         }
 
        /**
@@ -52,13 +52,35 @@ module TSOS{
                 if(_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed"){
                     this.fcfs();
                 }
-                //set state to running and process it
-                _CurrentProcess.setState(1);
-                _CPU.startProcessing(_CurrentProcess);
-                _Kernel.krnTrace("\nPROCESSING PID: "+_CurrentProcess.getPid()+"\n");
-                Shell.updateReadyQueue();
-            }else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() == "Killed") && _ReadyQueue.isEmpty()){
-                return;
+
+                if (_CurrentProcess.getLocation() == "Disk") {
+                    _CurrentProcess.setLocation("Memory");
+                    _CurrentProcess.setPrintLocation("Disk -> Memory");
+                    //load it into block 0 bc...fcfs
+                    _FileSystem.swap(_CurrentProcess, 0);
+                    _CurrentProcess.setState(1);
+                    _CPU.startProcessing(_CurrentProcess);
+                }
+
+                if(_CurrentProcess.getLocation() == "Memory"){
+                    //set state to running and process it
+                    _CurrentProcess.setState(1);
+                    _CPU.startProcessing(_CurrentProcess);
+                    _Kernel.krnTrace("\nPROCESSING PID: "+_CurrentProcess.getPid()+"\n");
+                    Shell.updateReadyQueue();
+                }
+
+            }else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() == "Killed") &&
+                _ReadyQueue.isEmpty()) {
+
+                if (_CurrentProcess.getLocation() == "Disk") {
+                    _CurrentProcess.setLocation("Memory");
+                    //load it into block 0 bc...ready queue is empty
+                    _FileSystem.swap(_CurrentProcess, 0);
+                    _CPU.startProcessing(_CurrentProcess);
+                }
+            }else if(_ReadyQueue.isEmpty()){
+                _CPU.reset();
             }
        }
     }

@@ -83,11 +83,10 @@ var TSOS;
         * @param size
         */
         FSU.prototype.createMBR = function (localStorage, size, map) {
-            var data = this.stringToHex("BAD ASS OS");
+            var data = this.stringToHex((APP_NAME + " " + APP_VERSION));
             var pad = this.padding("1###" + data, size);
             var key = this.makeKey(0, 0, 0);
             localStorage.setItem(key, pad);
-            map.set(key, new TSOS.File("BAD ASS OS", pad));
         };
 
         /**
@@ -174,16 +173,6 @@ var TSOS;
                 }
             }
             return "-1";
-        };
-
-        FSU.prototype.padBlockSize = function (contents) {
-            var str = "";
-            for (var i = contents.length; i < _BlockSize; i++) {
-                str += "0";
-            }
-            contents += str;
-
-            return contents;
         };
         return FSU;
     })();

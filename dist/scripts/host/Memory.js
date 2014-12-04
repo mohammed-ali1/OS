@@ -89,6 +89,9 @@ var TSOS;
                     table += "<tr><td style='font-size: 11px;'>" + "[" + Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 for (var j = i; j <= i + 7; j++) {
+                    if (_MainMemory[j] == "") {
+                        _MainMemory[j] = "00";
+                    }
                     table += "<td>" + _MainMemory[j] + "</td>";
                 }
                 table += "</tr>";

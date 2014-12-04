@@ -315,7 +315,6 @@ module TSOS {
                 _ReadyQueue.enqueue(_CurrentProcess);//push back to ready queue
                 _CPU.displayCPU();
 
-
                 _CurrentProcess = _ReadyQueue.dequeue();
 
                 if(_CurrentProcess.getState() == "Ready"){
@@ -323,7 +322,8 @@ module TSOS {
                     Pcb.displayTimeMonitor();
                 }
 
-                if (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed") {
+                if (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed"
+                    && _CurrentSchedule == "rr") {
                     _ClockCycle = 0;
                     this.krnInterruptHandler(_RUNALL,0);
                 }
@@ -341,11 +341,11 @@ module TSOS {
 
                         //look the scheduling algorithm first
                         if(_CurrentSchedule == "rr"){
-
+                            alert("PID: "+_CurrentProcess.getPid()+", LOC: "+_CurrentProcess.getLocation());
                             _CurrentProcess.setLocation("Memory");
-
                             var nextProcess = this.getNext();
                             if(nextProcess != null){
+                                alert("Next PID: "+nextProcess.getPid()+", LOC: "+nextProcess.getLocation());
                                 nextProcess.setLocation("Disk");
                                 _FileSystem.rollIn(_CurrentProcess, nextProcess);
                             }else{
@@ -353,15 +353,37 @@ module TSOS {
                             }
                             //now swap with next process and current process
                         }else if(_CurrentSchedule == "fcfs"){
-                            //
+                            if(_CurrentProcess.getLocation() == "Disk"){
+                                    _CurrentProcess.setLocation("Memory");
+                                //which block do we load it in...?
+
+                            }
+                        }else{
+                        }
+                    }else{
+                        //The ready Queue is empty!!!
+                        //look the scheduling algorithm first
+                        if(_CurrentSchedule == "rr"){
+                            alert("PID: "+_CurrentProcess.getPid()+", LOC: "+_CurrentProcess.getLocation());
+                            _CurrentProcess.setLocation("Memory");
+                            var nextProcess = this.getNext();
+                            if(nextProcess != null){
+                                alert("Next PID: "+nextProcess.getPid()+", LOC: "+nextProcess.getLocation());
+                                nextProcess.setLocation("Disk");
+                                _FileSystem.rollIn(_CurrentProcess, nextProcess);
+                            }else{
+
+                            }
+                            //now swap with block 0.
+                        }else if(_CurrentSchedule == "fcfs"){
+                            if(_CurrentProcess.getLocation() == "Disk"){
+                                _CurrentProcess.setLocation("Memory");
+                                //load it into block 0 bc...ready queue is empty
+                                _FileSystem.swap(_CurrentProcess,0);
+                            }
                         }else{
 
                         }
-
-
-
-                        //give me the next process to swap with
-                        //
                     }
                 }
                 _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
@@ -369,6 +391,22 @@ module TSOS {
                 _CPU.startProcessing(_CurrentProcess);
                 _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
             }
+        }
+
+
+        /**
+         * Gets the last block in th ready Queue.
+         * @returns {any}
+         */
+        public getLastBlock(){
+
+            var block;
+            if(_ReadyQueue.getSize()>0){
+                block = _ReadyQueue.q[_ReadyQueue.getSize()-1].getBlock();
+            }else{
+                block = -1;
+            }
+            return block;
         }
 
 

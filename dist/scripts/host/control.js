@@ -160,6 +160,12 @@ var TSOS;
             document.getElementById("nextButton").style.visibility = "hidden";
             document.getElementById("stopButton").style.visibility = "hidden";
         };
+
+        Control.prototype.handleScheduling = function () {
+            alert("submitting form");
+            _CurrentSchedule = document.getElementById("schedulingForm").submit();
+            alert("Form now: " + _CurrentSchedule);
+        };
         return Control;
     })();
     TSOS.Control = Control;

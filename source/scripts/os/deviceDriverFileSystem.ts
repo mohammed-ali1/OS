@@ -11,9 +11,7 @@ module TSOS{
         private metaDataSize:number;
         private support:number;
         private fsu;
-        private file;
-        private static DataSize:number;
-        private static DirSize:number;
+        private zeroData;
 
         constructor(){
             super(this.launch, this.voidMethod);
@@ -27,11 +25,8 @@ module TSOS{
             this.metaDataSize = 64;
             this.dataSize = 60;
             this.support = 0;
-            this.fsu = null;
-            FileSystem.DataSize = 64;
-            FileSystem.DirSize = 192;
-            this.file = new Map();
             this.fsu = new FSU();
+            this.zeroData = this.fsu.formatData(this.metaDataSize);
         }
 
         public voidMethod():void{
@@ -55,7 +50,7 @@ module TSOS{
          * Creates the Master Boot Record
          */
         public createMBR(){
-            this.fsu.createMBR(localStorage,this.metaDataSize,this.file);
+            this.fsu.createMBR(localStorage,this.metaDataSize);
         }
 
         /**
@@ -90,7 +85,6 @@ module TSOS{
                         //need to do error checking.
                         localStorage.setItem(key,zeroData);//set the dir to zero
                         localStorage.setItem(dataIndex,zeroData);//set the data index to zero.
-                        this.file.delete(key);//delete from the local map
                         this.update();
                     }
                 }
@@ -119,14 +113,15 @@ module TSOS{
                 var a = localStorage.getItem(nextMeta);
                 _StdOut.putText(this.fsu.hexToString(a.slice(4,a.length).toString()));
             }else{
-                var finalString = this.startPrinting(nextMeta);
-                return finalString;
+                this.startPrinting(nextMeta);
             }
         }
 
         /**
          * Write to the file
-         * @param str
+         * @param file
+         * @param contents
+         * @param pad
          */
         public  writeToFile(file,contents,pad:boolean){
 
@@ -143,7 +138,7 @@ module TSOS{
             if(pad){
                 var conv = this.fsu.stringToHex(contents.toString());
                 contentsHex = this.fsu.padding(conv,(_BlockSize*2));
-                alert("padded:\n"+contentsHex+"\nlen: "+contentsHex.length);
+                alert("padded:\n"+contentsHex.length+", dif: "+(_BlockSize-conv.length));
             }else{
                 contentsHex = this.fsu.stringToHex((contents.toString()));
             }
@@ -222,18 +217,12 @@ module TSOS{
 
             if(dataIndex != "-1") {
 
-//                alert("Creating file: dir: "+dirIndex+", dataIndex: "+dataIndex);
-
                 //store in dir address
                 localStorage.setItem(dirIndex, ("1" + dataIndex + hexData));//need to add actualData
 
                 //store "0" in data address
                 var formatData = this.fsu.formatData((this.dataSize));
                 localStorage.setItem(dataIndex, "1###" + formatData);
-
-                //add to the filename to local  map
-                //var zeroData:string = this.fsu.formatData(this.metaDataSize);
-                this.file.set(dirIndex, new File(filename, ""));
 
                 created = true;
 
@@ -255,8 +244,7 @@ module TSOS{
         }
 
         /**
-         * Looks for availale key in DIR Block
-         * @param filename
+         * Looks for available key in DIR Block
          * @returns {string}
          */
         public getDirIndex(){
@@ -332,7 +320,6 @@ module TSOS{
         public hasStorage(){
             if('localStorage' in window && window['localStorage'] !== null){
                 this.support = 1;
-//                localStorage = sessionStorage;
             }else{
                 this.support = 0;
             }
@@ -353,9 +340,7 @@ module TSOS{
             var block = dataIndex.charAt(2);
             var stepOut:boolean = false;
                 array.push(dataIndex);
-            var len = fileContents.length;
             var chunkLen;
-//            block++;
 
             for(var t = track; t < this.trackSize; t++) {
                 for (var s = sector; s < this.sectorSize; s++) {
@@ -432,7 +417,6 @@ module TSOS{
         public rollOut(filename:string,contents){
             if(contents.length > (_BlockSize*2)){
                 _StdOut.putText("Process is bigger than memory block!");
-                return;
             }else{
                 this.createFile(filename);
                 this.writeToFile(filename, contents, true);
@@ -473,14 +457,51 @@ module TSOS{
             nextProcess.setBase(-1);
             nextProcess.setLimit(-1);
 
-            //now write to file
+            //WRITE TO FILE AND LOAD INTO MEMORY
             this.createFile(filename);
+            alert("Writing to disk pid: "+nextProcess.getPid()+"\n"+oldContents.length);
             this.writeToFile(filename,oldContents,false);
-
-            //Now...lets load the memory in the same spot as next process
-
+            alert("Loading to mem pid: "+currentProcess.getPid()+"\n"+data.length);
             _MemoryManager.load(currentProcess.getBase(),data.toString());
             this.update();
+        }
+
+        /**
+         * This method just swaps from the disk and loads
+         * into the memory....fcfs
+         * @param process
+         * @param base
+         * @returns {string}
+         */
+        public swap(process,base){
+            alert("Swapping from the disk");
+            var data: string;
+            var zeroData = this.fsu.formatData(this.metaDataSize);
+
+            //search for a filename
+            var filename = "swap"+process.getPid();
+            var fileHex = this.fsu.stringToHex(filename.toString());
+            var padFile = this.fsu.padding(fileHex,this.dataSize);
+            var dataIndex = this.fetchFilename(padFile);
+
+            //get the data of the file
+            //grab everything in hex!!!!
+            data = this.grabAllHex(dataIndex);
+            localStorage.setItem(dataIndex,zeroData);
+
+            process.setBase(base);
+            process.setLimit(((base+(_BlockSize-1))));
+            Shell.updateReadyQueue();
+            alert("Clreing mem");
+            _Memory.clearMemory();
+            _Memory.updateMemory();
+            alert("Loading into mem: len: "+data.length);
+
+            //load into the mem
+            _MemoryManager.load(base,data.toString());
+            this.update();
+            alert("loading into block: "+((base)/(_BlockSize)));
+            _MemoryManager.update();
         }
 
 
@@ -511,7 +532,7 @@ module TSOS{
                         if (nextMeta == "###") {
                             var len = (_BlockSize - (value.length));
                             changeHex = dataData.slice(4,(4+len));
-//                            value += data.slice(4,(4+(len)));
+                            value += data.slice(4,(4+(len)));
                             localStorage.setItem(key, zeroData);//replace with zeros
                             stepOut = true;
                             break;
@@ -569,37 +590,6 @@ module TSOS{
             }
         }
 
-
-        /**
-         * Look for a filename
-         * which begins with "swap"
-         * @returns {string|string[]|T[]|Blob}
-         */
-        public lookForSwapFile(){
-            var dataIndex;
-            var swap = "swap";
-            var t = 0;
-            var key;
-            var dataData;
-            var meta;
-            var data;
-            var hexString;
-            var zeroData = this.fsu.format();
-
-            for (var s = 0; s < this.sectorSize; s++) {
-                for (var b = 0; b < this.blockSize; b++) {
-                    key = this.fsu.makeKey(t,s,b);
-                    data = localStorage.getItem(key);
-                    meta = data.slice(1,4);
-                    dataData = data.slice(4,12);
-                    hexString = this.fsu.hexToString(dataData);
-                    if(hexString == swap){
-                        localStorage.setItem(key,zeroData);//replace with zeros
-                        return meta;
-                    }
-                 }
-            }
-        }
 
         public startPrinting(index){
 

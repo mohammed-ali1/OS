@@ -25,6 +25,7 @@ module TSOS{
         private location:string = "";
         private timeArrived : number = 0;
         private timeFinished: number = 0;
+        private printLocation:string = "";
 
         constructor(b:number, l:number, p:number){
 
@@ -74,6 +75,14 @@ module TSOS{
 
         public getLocation(){
             return this.location;
+        }
+
+        public setPrintLocation(location){
+            this.printLocation = location;
+        }
+
+        public getPrintLocation(){
+            return this.printLocation;
         }
 
         public getPriority(){
