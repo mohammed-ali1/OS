@@ -322,7 +322,7 @@ var TSOS;
                 }
             }
 
-            if (x.toString().length > (_BlockSize * 2)) {
+            if ((x.toString().length / 2) > (_BlockSize)) {
                 _StdOut.putText("Too big to fit into the Memory block");
                 return;
             }
@@ -358,10 +358,7 @@ var TSOS;
                 _MemoryManager.load(base, x.toUpperCase().toString());
             } else {
                 //Base is -1 at this point.
-                //so need to swap into the file system.
-                //Create New PCB and don't forget the priority > 0
-                // (priority > 0 denotes...its in the file system)
-                //make a filename first
+                //so need to store into the file system.
                 var p = new TSOS.Pcb(-1, -1, -1);
                 p.setLocation("Disk");
                 p.setPrintLocation("Disk");
@@ -402,6 +399,7 @@ var TSOS;
         Shell.updateReadyQueue = function () {
             var tableView = "<table>";
             tableView += "<th>PID</th>";
+            tableView += "<th>Block</th>";
             tableView += "<th>Base</th>";
             tableView += "<th>Limit</th>";
             tableView += "<th>State</th>";
@@ -419,6 +417,7 @@ var TSOS;
                     if (s.getState() == "Running") {
                         tableView += "<tr style='background-color: limegreen;'>";
                         tableView += "<td>" + s.getPid().toString() + "</td>";
+                        tableView += "<td>" + s.getBlock().toString() + "</td>";
                         tableView += "<td>" + s.getBase().toString() + "</td>";
                         tableView += "<td>" + s.getLimit().toString() + "</td>";
                         tableView += "<td>" + s.getState().toString() + "</td>";
@@ -434,6 +433,7 @@ var TSOS;
                     if (s.getState() == "Terminated" || s.getState() == "Killed") {
                         tableView += "<tr style='background-color: red;'>";
                         tableView += "<td>" + s.getPid().toString() + "</td>";
+                        tableView += "<td>" + s.getBlock().toString() + "</td>";
                         tableView += "<td>" + s.getBase().toString() + "</td>";
                         tableView += "<td>" + s.getLimit().toString() + "</td>";
                         tableView += "<td>" + s.getState().toString() + "</td>";
@@ -450,6 +450,7 @@ var TSOS;
                     if (s.getState() == "Waiting") {
                         tableView += "<tr style='background-color: #FFD801;'>";
                         tableView += "<td style='color: #000000;'>" + s.getPid().toString() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getBlock().toString() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getLimit().toString() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getState().toString() + "</td>";
@@ -466,6 +467,7 @@ var TSOS;
                     if (s.getState() == "Ready") {
                         tableView += "<tr style='background-color: darkturquoise;'>";
                         tableView += "<td style='color: #000000;'>" + s.getPid().toString() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getBlock().toString() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getLimit().toString() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getState().toString() + "</td>";
@@ -755,22 +757,6 @@ var TSOS;
                     _StdOut.putText("File Contents must be between: \" \"");
                 }
             }
-            //            var lastChar = data[data.length-1].charAt(data[data.length-1].char)
-            //            var count:number = 0;
-            //
-            //            for(var i=0; i<contents.length;i++){
-            //                if(contents.charCodeAt(i) == 34){
-            //                    count ++;
-            //                }
-            //            }
-            //            var first:string = contents.slice(0,1);
-            //            var last:string = contents.slice(contents.length-1,contents.length);
-            //            if(count == 2 && (first == last)){
-            //                var fileContents = data[1].slice(1,data[1].length-1);
-            //                _FileSystem.writeToFile(data[0],fileContents);
-            //            }else {
-            //                _StdOut.putText("Please provide file contents between \" \"");
-            //            }
         };
 
         /**

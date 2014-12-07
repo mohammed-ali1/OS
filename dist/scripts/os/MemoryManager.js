@@ -48,7 +48,6 @@ var TSOS;
             } else {
                 _StdOut.putText("Memory Wiped!");
                 _Memory.clearMemory();
-                _ResidentQueue.splice(0, _ResidentQueue.length); // clear resident Queue as well!
             }
         };
 
@@ -73,7 +72,7 @@ var TSOS;
         * @returns {number}
         */
         MemoryManager.prototype.getBlockAvailable = function () {
-            if (_ResidentQueue.length == 3) {
+            if (_ResidentQueue.length >= 3) {
                 return -1;
             } else {
                 for (var base = 0; base <= (_BlockSize * 2); base += _BlockSize) {

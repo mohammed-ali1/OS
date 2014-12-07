@@ -34,7 +34,11 @@ module TSOS{
             this.base = b;
             this.pc = 0;
             this.limit = l;
-            this.block = (this.base / _BlockSize);
+            if(this.base == -1){
+                this.block = -1;
+            }else{
+                this.block = (this.base / _BlockSize);
+            }
             this.priority = p;
         }
 
@@ -103,6 +107,10 @@ module TSOS{
 
         public setBase(base){
             this.base = base;
+        }
+
+        public setBlock(block){
+            this.block = block;
         }
 
         public getBase(){

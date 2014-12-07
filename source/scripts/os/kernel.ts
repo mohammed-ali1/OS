@@ -37,7 +37,7 @@ module TSOS {
 
             //Initialize Resident Queue
             _ResidentQueue = new Array();
-            _CurrentScheduler = new Scheduler("rr");
+            _CurrentScheduler = new Scheduler("fcfs");
 
             //Initialize and load file system Device Driver
             _FileSystem = new FileSystem();
@@ -96,20 +96,19 @@ module TSOS {
                 var interrupt = _KernelInterruptQueue.dequeue();
                 _Mode = 0;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
-            }else if(_CPU.isExecuting && _CurrentSchedule == "fcfs"){
+            }else if(_CPU.isExecuting && (_CurrentSchedule == "fcfs" || _CurrentSchedule == "priority")){
                 _CPU.cycle();
                 Shell.updateReadyQueue();
             }else if(_CPU.isExecuting && _CurrentSchedule == "rr"){
                 if(_ClockCycle >= _Quantum){
                     _Mode = 0;
+                    _ClockCycle = 0;
                     this.krnInterruptHandler(_ContextSwitch,0);
                 }else{
                     _CPU.cycle();
                     _ClockCycle++;
                     Shell.updateReadyQueue();
                 }
-            }else if(_CPU.isExecuting && _CurrentSchedule == "priority"){
-
             }else { // If there are no interrupts and there is nothing being executed then just be idle.
                 this.krnTrace("Idle");
                 _Mode = 1;
@@ -198,15 +197,14 @@ module TSOS {
                         _ReadyQueue.enqueue(params);
                     }else{
                         _ReadyQueue.enqueue(params);
-                        _CurrentScheduler.startNewProcess();
+                        _CurrentScheduler.rr();
                     }
                     break;
                 case _RUNALL:
                     //need to look at current scheduler first
-                    _CurrentScheduler.startNewProcess();
+                    _CurrentScheduler.rr();
                     break;
                 case _ContextSwitch:
-                    _ClockCycle = 0;
                     this.contextSwitch();
                     break;
                 case _Killed:
@@ -253,7 +251,7 @@ module TSOS {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
         }
 
-        //
+
         // System Calls... that generate software interrupts via tha Application Programming Interface library routines.
         //
         // Some ideas:
@@ -301,8 +299,10 @@ module TSOS {
          */
         public contextSwitch(){
 
-            if(_ReadyQueue.isEmpty() && (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed")){
+            if(_ReadyQueue.isEmpty() && (_CurrentProcess.getState() == "Terminated" ||
+                                        _CurrentProcess.getState() == "Killed")){
                 _CPU.reset();
+
             }else {
                 _CurrentProcess.setPc(_CPU.PC);
                 _CurrentProcess.setAcc(_CPU.Acc);
@@ -312,11 +312,14 @@ module TSOS {
                 _CurrentProcess.setIr(_CPU.IR);
                 _CurrentProcess.setState(2); //set state to waiting
 
-                _ReadyQueue.enqueue(_CurrentProcess);//push back to ready queue
+                //push back onto the queue
+                _ReadyQueue.enqueue(_CurrentProcess);
                 _CPU.displayCPU();
 
+                //grab the next process
                 _CurrentProcess = _ReadyQueue.dequeue();
 
+                //record arrival time if state == ready
                 if(_CurrentProcess.getState() == "Ready"){
                     _CurrentProcess.setTimeArrived(_OSclock);
                     Pcb.displayTimeMonitor();
@@ -324,68 +327,11 @@ module TSOS {
 
                 if (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed"
                     && _CurrentSchedule == "rr") {
-                    _ClockCycle = 0;
                     this.krnInterruptHandler(_RUNALL,0);
                 }
 
-                //the current process we want to exe
-                //is sitting on the disk..
-                //go grab it from the disk and load into available block
-                //and load the block into the disk.
-                //when finished ("depending" on scheduling)...put it back
-                if(_CurrentProcess.getLocation() == "Disk"){
 
-                    //lets swap with next thing in the queue
 
-                    if(_ReadyQueue.getSize() > 0){
-
-                        //look the scheduling algorithm first
-                        if(_CurrentSchedule == "rr"){
-                            alert("PID: "+_CurrentProcess.getPid()+", LOC: "+_CurrentProcess.getLocation());
-                            _CurrentProcess.setLocation("Memory");
-                            var nextProcess = this.getNext();
-                            if(nextProcess != null){
-                                alert("Next PID: "+nextProcess.getPid()+", LOC: "+nextProcess.getLocation());
-                                nextProcess.setLocation("Disk");
-                                _FileSystem.rollIn(_CurrentProcess, nextProcess);
-                            }else{
-
-                            }
-                            //now swap with next process and current process
-                        }else if(_CurrentSchedule == "fcfs"){
-                            if(_CurrentProcess.getLocation() == "Disk"){
-                                    _CurrentProcess.setLocation("Memory");
-                                //which block do we load it in...?
-
-                            }
-                        }else{
-                        }
-                    }else{
-                        //The ready Queue is empty!!!
-                        //look the scheduling algorithm first
-                        if(_CurrentSchedule == "rr"){
-                            alert("PID: "+_CurrentProcess.getPid()+", LOC: "+_CurrentProcess.getLocation());
-                            _CurrentProcess.setLocation("Memory");
-                            var nextProcess = this.getNext();
-                            if(nextProcess != null){
-                                alert("Next PID: "+nextProcess.getPid()+", LOC: "+nextProcess.getLocation());
-                                nextProcess.setLocation("Disk");
-                                _FileSystem.rollIn(_CurrentProcess, nextProcess);
-                            }else{
-
-                            }
-                            //now swap with block 0.
-                        }else if(_CurrentSchedule == "fcfs"){
-                            if(_CurrentProcess.getLocation() == "Disk"){
-                                _CurrentProcess.setLocation("Memory");
-                                //load it into block 0 bc...ready queue is empty
-                                _FileSystem.swap(_CurrentProcess,0);
-                            }
-                        }else{
-
-                        }
-                    }
-                }
                 _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
                 _CurrentProcess.setState(1); //set state to running
                 _CPU.startProcessing(_CurrentProcess);
@@ -393,20 +339,35 @@ module TSOS {
             }
         }
 
+        /**
+         * This gets called when
+         * we need to load a process from disk
+         * NOTE: no need to store anything in the disk
+         * bc fcfs!
+         */
+        public contextSwitchDisk(){
+
+            alert("PID: "+_CurrentProcess.getPid()+", LOC: "+_CurrentProcess.getLocation());
+            _CurrentProcess.setLocation("Memory");
+            _CurrentProcess.setPrintLocation("Disk -> Memory");
+
+            //swap with the last thing in the queue
+            var nextProcess:TSOS.Pcb = this.getNext();
+            alert("Next PID: " + nextProcess.getPid() + ", LOC: " + nextProcess.getLocation());
+            nextProcess.setLocation("Disk");
+            nextProcess.setPrintLocation("Trash");
+
+            _FileSystem.swap(_CurrentProcess, nextProcess);
+            _CurrentProcess.setState(1);
+            _CPU.startProcessing(_CurrentProcess);
+        }
 
         /**
-         * Gets the last block in th ready Queue.
+         * Gets the first block in th resident Queue.
          * @returns {any}
          */
         public getLastBlock(){
-
-            var block;
-            if(_ReadyQueue.getSize()>0){
-                block = _ReadyQueue.q[_ReadyQueue.getSize()-1].getBlock();
-            }else{
-                block = -1;
-            }
-            return block;
+            return _ResidentQueue[_ResidentQueue.length-1];
         }
 
 
@@ -417,22 +378,15 @@ module TSOS {
         public getNext(){
 
             var process;
-            var found:boolean = false;
             var getProcess;
-            for(var i =0 ; i<_ReadyQueue.getSize();i++){
-
-                process = _ReadyQueue.q[i];
-                if(process.getLocation() == "Memory" && process.getState() == "Waiting"){
-                    found = true;
+            for(var i =0 ; i<_ResidentQueue.length;i++){
+                process = _ResidentQueue[i];
+                if(process.getLocation() == "Memory"){
                     getProcess = process;
                     break;
                 }
             }
-            if(found){
-                return getProcess;
-            }else{
-                return null;
-            }
+            return getProcess;
         }
 
         /**
@@ -459,10 +413,11 @@ module TSOS {
             }
 
             if(_CurrentSchedule == "rr"){
-                _CurrentScheduler.startNewProcess();
+                _CurrentScheduler.rr();
             }
 
             if(_CurrentSchedule == "priority"){
+                _CurrentScheduler.priority();
             }
         }
     }

@@ -53,7 +53,6 @@ module TSOS{
             }else{
                 _StdOut.putText("Memory Wiped!");
                 _Memory.clearMemory();
-                _ResidentQueue.splice(0,_ResidentQueue.length); // clear resident Queue as well!
             }
         }
 
@@ -79,7 +78,7 @@ module TSOS{
          */
         public getBlockAvailable(){
 
-            if(_ResidentQueue.length == 3){
+            if(_ResidentQueue.length >= 3){
                 return -1;
             }else {
 

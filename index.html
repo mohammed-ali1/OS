@@ -55,15 +55,6 @@
             </script>
         </p>
     </div>
-
-    <div id="schedulingDiv">
-        <form id="schudlingForm">
-            <input type="radio" name="rr" value="rr" >Round Robin Scheduling<br>
-            <input type="radio" name="fcfs" value="fcfs" >FCFS Scheduling<br>
-            <input type="radio" name="priority" value="priority" >Priority Scheduling<br>
-            <input type="submit"/>
-        </form>
-    </div>
 </div>
 </head>
 
@@ -201,7 +192,9 @@
 
 
     <div style="overflow: scroll; border: transparent; border-radius: 10px; float: left;">
-        <h4 style="color:firebrick;">Processes</h4>
+        <h4 id="currentScheduler" style="color:firebrick;" ></h4>
+        <h4 style="color:firebrick; display: inline;">Processes</h4>
+
         <div>
             <table id="displayReady">
                 <tr>
@@ -223,8 +216,8 @@
 
 
     <div id="fileSystemDiv" style="float:left; margin-left: 2%;">
-        <center><h5 style="color: firebrick;">File System</h5></center>
-        <div id="dirDataDiv" style="max-width: 500px; max-height: 300px; overflow: scroll;">
+        <center><h4 style="color: firebrick;">File System</h4></center>
+        <div id="dirDataDiv" style="max-height: 300px; overflow: scroll;">
             <table id="dirDataTable">
             </table>
         </div>

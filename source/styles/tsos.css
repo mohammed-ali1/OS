@@ -42,7 +42,6 @@ h1 {
 }
 
 h2 {
-    color: black;
     font-size: 20pt;
     font-weight: normal;
     font-style: normal;
@@ -208,7 +207,6 @@ h3 {
 #displayReady{
     border-radius: 10px;
     table-layout: auto;
-    border-radius: 10px;
     border: 4px solid firebrick;
 }
 
@@ -259,12 +257,4 @@ h3 {
     background-color: #E66C2C;
     padding:5px;
     border: 2px solid;
-}
-
-#schedulingDiv{
-    background-color: cornsilk;
-    float: right;
-    border-radius: 10px;
-    font-size: 18px;
-    color: firebrick;
 }

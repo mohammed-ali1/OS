@@ -37,7 +37,11 @@ var TSOS;
             this.base = b;
             this.pc = 0;
             this.limit = l;
-            this.block = (this.base / _BlockSize);
+            if (this.base == -1) {
+                this.block = -1;
+            } else {
+                this.block = (this.base / _BlockSize);
+            }
             this.priority = p;
         }
         Pcb.prototype.getPid = function () {
@@ -104,6 +108,10 @@ var TSOS;
 
         Pcb.prototype.setBase = function (base) {
             this.base = base;
+        };
+
+        Pcb.prototype.setBlock = function (block) {
+            this.block = block;
         };
 
         Pcb.prototype.getBase = function () {

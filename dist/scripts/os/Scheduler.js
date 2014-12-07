@@ -5,12 +5,13 @@ var TSOS;
 (function (TSOS) {
     var Scheduler = (function () {
         function Scheduler(schedule) {
-            //            _CurrentSchedule = schedule;
+            _CurrentSchedule = schedule;
+            document.getElementById("currentScheduler").innerHTML = "Current Schedule: " + _CurrentSchedule;
         }
         /**
         * Starts the Next Available Process int Ready Queue
         */
-        Scheduler.prototype.startNewProcess = function () {
+        Scheduler.prototype.rr = function () {
             if (_ReadyQueue.getSize() > 0) {
                 _CurrentProcess = _ReadyQueue.dequeue();
 
@@ -20,18 +21,26 @@ var TSOS;
 
                 if (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed") {
                     _ClockCycle = 0;
-                    this.startNewProcess();
+                    this.rr();
+                }
+
+                if (_CurrentProcess.getLocation() == "Disk") {
+                    _Kernel.contextSwitch();
                 }
                 _CurrentProcess.setState(1);
                 _CPU.startProcessing(_CurrentProcess);
                 _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
                 TSOS.Shell.updateReadyQueue();
-            } else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() == "Killed") && _ReadyQueue.isEmpty()) {
+            } else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() != "Killed") && _ReadyQueue.isEmpty()) {
                 _ClockCycle = 0;
+                _ResidentQueue.splice(0, _ResidentQueue.length); // clear resident Queue as well!
                 return;
             }
         };
 
+        /**
+        * FCFS Scheduling
+        */
         Scheduler.prototype.fcfs = function () {
             if (_ReadyQueue.getSize() > 0) {
                 _CurrentProcess = _ReadyQueue.dequeue();
@@ -47,32 +56,48 @@ var TSOS;
                 }
 
                 if (_CurrentProcess.getLocation() == "Disk") {
-                    _CurrentProcess.setLocation("Memory");
-                    _CurrentProcess.setPrintLocation("Disk -> Memory");
-
-                    //load it into block 0 bc...fcfs
-                    _FileSystem.swap(_CurrentProcess, 0);
-                    _CurrentProcess.setState(1);
-                    _CPU.startProcessing(_CurrentProcess);
+                    _Kernel.contextSwitchDisk();
                 }
 
                 if (_CurrentProcess.getLocation() == "Memory") {
-                    //set state to running and process it
                     _CurrentProcess.setState(1);
                     _CPU.startProcessing(_CurrentProcess);
                     _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
                     TSOS.Shell.updateReadyQueue();
                 }
-            } else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() == "Killed") && _ReadyQueue.isEmpty()) {
-                if (_CurrentProcess.getLocation() == "Disk") {
-                    _CurrentProcess.setLocation("Memory");
+            } else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() != "Killed") && _ReadyQueue.isEmpty()) {
+                _ResidentQueue.splice(0, _ResidentQueue.length); // clear resident Queue as well!
+                return;
+            }
+        };
 
-                    //load it into block 0 bc...ready queue is empty
-                    _FileSystem.swap(_CurrentProcess, 0);
-                    _CPU.startProcessing(_CurrentProcess);
+        Scheduler.prototype.priority = function () {
+            if (_ReadyQueue.getSize() > 0) {
+                _CurrentProcess = _ReadyQueue.dequeue();
+
+                //if new process, collect the arrival time
+                if (_CurrentProcess.getState() == "Ready") {
+                    _CurrentProcess.setTimeArrived(_OSclock);
                 }
-            } else if (_ReadyQueue.isEmpty()) {
-                _CPU.reset();
+
+                //if killed or terminated, get the next process
+                if (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed") {
+                    this.fcfs();
+                }
+
+                if (_CurrentProcess.getLocation() == "Disk") {
+                    _Kernel.contextSwitchDisk();
+                }
+
+                if (_CurrentProcess.getLocation() == "Memory") {
+                    _CurrentProcess.setState(1);
+                    _CPU.startProcessing(_CurrentProcess);
+                    _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
+                    TSOS.Shell.updateReadyQueue();
+                }
+            } else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() != "Killed") && _ReadyQueue.isEmpty()) {
+                _ResidentQueue.splice(0, _ResidentQueue.length); // clear resident Queue as well!
+                return;
             }
         };
         return Scheduler;
