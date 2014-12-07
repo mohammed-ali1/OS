@@ -758,9 +758,11 @@ module TSOS {
          */
         public shellRunAll(){
             for(var i=0; i<_ResidentQueue.length;i++){
-                if(_ResidentQueue[i].getState() == "New")
-                _ResidentQueue[i].setState(3);
-                _ReadyQueue.enqueue(_ResidentQueue[i]);
+                var temp: TSOS.Pcb = _ResidentQueue[i];
+                if(temp.getLocation() == "Memory"){
+                    temp.setState(3);//set state to "Ready"
+                }
+                _ReadyQueue.enqueue(temp);
             }
             _KernelInterruptQueue.enqueue(new Interrupt(_SCHEDULE,0));
         }

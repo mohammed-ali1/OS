@@ -11,7 +11,6 @@ var TSOS;
         Process[Process["Waiting"] = 4] = "Waiting";
     })(TSOS.Process || (TSOS.Process = {}));
     var Process = TSOS.Process;
-    ;
 
     var Pcb = (function () {
         function Pcb(b, l, p) {

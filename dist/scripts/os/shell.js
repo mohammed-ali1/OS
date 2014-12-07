@@ -688,9 +688,11 @@ var TSOS;
         */
         Shell.prototype.shellRunAll = function () {
             for (var i = 0; i < _ResidentQueue.length; i++) {
-                if (_ResidentQueue[i].getState() == "New")
-                    _ResidentQueue[i].setState(3);
-                _ReadyQueue.enqueue(_ResidentQueue[i]);
+                var temp = _ResidentQueue[i];
+                if (temp.getLocation() == "Memory") {
+                    temp.setState(3); //set state to "Ready"
+                }
+                _ReadyQueue.enqueue(temp);
             }
             _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_SCHEDULE, 0));
         };

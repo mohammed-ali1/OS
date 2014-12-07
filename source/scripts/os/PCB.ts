@@ -4,7 +4,7 @@
 
 module TSOS{
 
-    export enum Process {New, Running, Terminated, Killed, Waiting};
+    export enum Process {New, Running, Terminated, Killed, Waiting}
 
     export class Pcb{
 
