@@ -309,20 +309,27 @@ var TSOS;
                     _CurrentProcess.setTimeArrived(_OSclock);
                     TSOS.Pcb.displayTimeMonitor();
                 }
-                if (_CurrentProcess.getLocation() == "Disk") {
-                    this.contextSwitchDisk(true, false, false);
-                    //                    return;
+
+                if (_CurrentProcess.getLocation() == "Memory") {
+                    //keep executing
+                    _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
+                    _CurrentProcess.setState(1); //set state to running
+                    TSOS.Shell.updateReadyQueue();
+                    _CPU.startProcessing(_CurrentProcess);
+                    _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
                 }
 
-                //keep executing
-                _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
-                _CurrentProcess.setState(1); //set state to running
-                TSOS.Shell.updateReadyQueue();
-                _CPU.startProcessing(_CurrentProcess);
-                _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
+                if (_CurrentProcess.getLocation() == "Disk") {
+                    this.contextSwitchDisk(true, false, false);
+                }
             }
         };
 
+        /**
+        * Gets the next block before getting the current-process
+        * contents from the disk
+        * @returns {any}
+        */
         Kernel.prototype.getNextAvailableBlock = function () {
             var index = _ResidentQueue.indexOf(_CurrentProcess);
             index = (index - 3);
@@ -344,11 +351,8 @@ var TSOS;
         Kernel.prototype.contextSwitchDisk = function (rr, fcfs, priority) {
             if (rr) {
                 var nextProcess = this.getNextAvailableBlock();
-
-                //                alert("current pid: "+_CurrentProcess.getPid()+", loc: "+_CurrentProcess.getLocation()
-                //                +"\n next pid: "+nextProcess.getPid()+", loc: "+nextProcess.getLocation());
-                _FileSystem.rollIn(_CurrentProcess, nextProcess);
-                _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
+                _FileSystem.rollIn(_CurrentProcess, nextProcess); //swap processes and delete if "terminated"
+                _Kernel.krnTrace("\nCONTEXT SWITCH FROM TO PID: " + _CurrentProcess.getPid() + "\n");
                 TSOS.Shell.updateReadyQueue();
                 _CPU.startProcessing(_CurrentProcess);
                 _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
@@ -358,15 +362,13 @@ var TSOS;
                 _CurrentProcess.setLocation("Memory");
                 _CurrentProcess.setPrintLocation("Disk -> Memory");
 
-                //set the least running process to "TRASH"
+                //set the least process stored to "TRASH"
                 this.setToTrash();
                 _FileSystem.swap(_CurrentProcess, (_BlockSize / _BlockSize) - 1);
                 _CurrentProcess.setState(1);
                 _CPU.startProcessing(_CurrentProcess);
             }
-
-            if (priority) {
-            }
+            //priority
         };
 
         /**

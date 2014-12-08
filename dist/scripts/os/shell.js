@@ -374,13 +374,17 @@ var TSOS;
                 process.setState(9999999999999999999999999); //set state "NEW"
                 process.setLength((x.length / 2));
                 process.setLocation("Disk");
-                _StdOut.putText("Loaded Successfully!");
-                _Console.advanceLine();
-                _StdOut.putText("Process ID: " + process.getPid());
                 var filename = ("swap" + process.getPid());
-                _FileSystem.rollOut(filename, x.toUpperCase().toString());
-                _ResidentQueue.push(process);
-                _TerminatedQueue.push(process);
+                var loaded = _FileSystem.rollOut(filename, x.toUpperCase().toString());
+                if (loaded) {
+                    _StdOut.putText("Loaded Successfully!");
+                    _Console.advanceLine();
+                    _StdOut.putText("Process ID: " + process.getPid());
+                    _ResidentQueue.push(process);
+                    _TerminatedQueue.push(process);
+                } else {
+                    _StdOut.putText("Not enough space to load anymore!");
+                }
             }
         };
 

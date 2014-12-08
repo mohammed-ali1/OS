@@ -82,19 +82,18 @@ var TSOS;
         * @param localStorage
         * @param size
         */
-        FSU.prototype.createMBR = function (localStorage, size, map) {
+        FSU.prototype.createMBR = function (localStorage, size) {
             var data = this.stringToHex((APP_NAME + " " + APP_VERSION));
             var pad = this.padding("1###" + data, size);
             var key = this.makeKey(0, 0, 0);
             localStorage.setItem(key, pad);
-            map.set(key, pad);
         };
 
         /**
         * Creates a local file system.
         * Use this method when format is called.
         */
-        FSU.prototype.format = function (trackSize, sectorSize, blockSize, dataSize, localStorage, map) {
+        FSU.prototype.format = function (trackSize, sectorSize, blockSize, dataSize, localStorage) {
             var storage = this.formatData(dataSize);
             var dir = 0;
             var data = 0;
@@ -104,7 +103,6 @@ var TSOS;
                     for (var block = 0; block < blockSize; block++) {
                         var key = this.makeKey(track, sector, block);
                         localStorage.setItem(key, storage);
-                        map.set(key, storage);
                     }
                 }
             }

@@ -22,8 +22,9 @@ var TSOS;
             this.metaDataSize = 64;
             this.dataSize = 60;
             this.support = 0;
-            this.tsbArray = new Map();
-            this.fsu = new TSOS.FSU();
+            FileSystem.dirSpace = 64;
+            FileSystem.dataSpace = 192;
+            this.fsu = new TSOS.FSU(); //file system utilities
             this.zeroData = this.fsu.formatData(this.metaDataSize);
         };
 
@@ -39,7 +40,7 @@ var TSOS;
 
             //has support for local storage?
             if (this.support == 1) {
-                this.fsu.format(this.trackSize, this.sectorSize, this.blockSize, this.metaDataSize, localStorage, this.tsbArray);
+                this.fsu.format(this.trackSize, this.sectorSize, this.blockSize, this.metaDataSize, localStorage);
                 this.createMBR();
                 this.update();
             }
@@ -49,7 +50,7 @@ var TSOS;
         * Creates the Master Boot Record
         */
         FileSystem.prototype.createMBR = function () {
-            this.fsu.createMBR(localStorage, this.metaDataSize, this.tsbArray);
+            this.fsu.createMBR(localStorage, this.metaDataSize);
         };
 
         /**
@@ -99,7 +100,6 @@ var TSOS;
         /**
         * Read Active files from the Disk
         * @param file
-        * Need to refactor it!!!
         */
         FileSystem.prototype.read = function (file) {
             var filename = this.fsu.stringToHex(file.toString());
@@ -130,32 +130,36 @@ var TSOS;
             var key = this.fetchDuplicate(hexFile);
             var data = localStorage.getItem(key);
             var dataIndex = data.slice(1, 4);
-            var contentsHex;
-
-            //do we want to convert to hex...?
-            if (pad) {
-                contentsHex = this.fsu.stringToHex(contents.toString());
-            } else {
-                contentsHex = this.fsu.stringToHex((contents.toString()));
-            }
+            var contentsHex = this.fsu.stringToHex(contents.toString());
 
             //what if the contents to write is > 60 bytes
             if (contentsHex.length > (this.dataSize)) {
-                this.handleWrite(dataIndex, contentsHex, (this.dataSize));
-                success = true;
-                this.update();
+                var hasSpace = this.handleWrite(dataIndex, contentsHex, (this.dataSize));
+                if (hasSpace) {
+                    success = true;
+                } else {
+                    success = false;
+                    return success;
+                }
             } else {
                 var padHex = this.fsu.padding(contentsHex, this.dataSize);
                 localStorage.setItem(dataIndex, "1###" + padHex);
-                this.tsbArray.set(dataIndex, "1###" + padHex); //local map
                 success = true;
-                this.update();
             }
+            this.update();
 
-            if (success) {
-                //                _StdOut.putText("Successfully wrote to: "+file);
-            } else {
-                //                _StdOut.putText("Cannot write to file: "+file+", Please format and try again!");
+            var swapFile = file.slice(0, 4);
+            var swap = "swap";
+
+            //print only if its not a swap-file
+            if (success && (swap != swapFile)) {
+                if (success) {
+                    _StdOut.putText("Successfully wrote to: " + file);
+                    return success;
+                } else {
+                    _StdOut.putText("Cannot write to file: " + file + ", Please format and try again!");
+                    return success;
+                }
             }
         };
 
@@ -194,49 +198,59 @@ var TSOS;
             //add padding to the filename
             var hexData = this.fsu.padding(data, this.dataSize);
 
-            //what if the file size is > 60 bytes...?
+            //we don't want file-names of size > 60 Bytes!
             if ((hexData.length) > this.dataSize) {
                 _StdOut.putText("Filename must be <= " + (this.dataSize / 2) + " characters!");
-                return "-1";
+                return created;
             }
 
-            //Gets un-duplicated key
+            //Look for a duplicate-filename...first!
             var dirIndex = this.fetchDuplicateFilename(hexData);
 
             if (dirIndex == "-1") {
-                _StdOut.putText("Either " + filename + " already exists...Or not enough space!");
-                return "-1";
+                _StdOut.putText("Filename " + filename + " already exists...Or not enough space!");
+                return created;
             }
 
-            //Get dataIndex
+            //Get dataIndex...at this point data
             var dataIndex = this.fsu.getDataIndex(this.trackSize, this.sectorSize, this.blockSize);
 
             if (dataIndex != "-1") {
-                //store in dir address
+                //store in dir-Index
                 localStorage.setItem(dirIndex, ("1" + dataIndex + hexData)); //need to add actualData
-                this.tsbArray.set(dirIndex, ("1" + dataIndex + hexData)); //local map
 
                 //store "0" in data address
                 var formatData = this.fsu.formatData((this.dataSize));
                 localStorage.setItem(dataIndex, "1###" + formatData);
-                this.tsbArray.set(dataIndex, "1###" + formatData); //local map
 
+                //mark success
                 created = true;
 
                 //update file system
                 this.update();
             } else {
-                //else data index in -1
-                _StdOut.putText("No Space available!, key " + dataIndex);
-                return "-1";
+                //no more storage space
+                _StdOut.putText("No Space available to store file-contents!");
+                return created;
             }
+
+            var swapFile = filename.slice(0, 4);
+            var swapFilename = "swap";
+
+            //if we are creating a swap-file...we don't want to print.
+            if (created && (swapFilename == swapFile)) {
+                return created;
+            }
+
+            //print success or failure
             if (created) {
-                //print success or failure
-                //                _StdOut.putText("Successfully created file: "+filename);
-                //                _Console.advanceLine();
+                _StdOut.putText("Successfully created file: " + filename);
+                _Console.advanceLine();
+                return created;
             } else {
-                //                _StdOut.putText("Could not create the file: " + filename + ", Please format and try again!");
-                //                _Console.advanceLine();
+                _StdOut.putText("Could not create the file: " + filename + ", Please format and try again!");
+                _Console.advanceLine();
+                return created;
             }
         };
 
@@ -335,8 +349,11 @@ var TSOS;
                         var meta = data.slice(0, 1);
 
                         if ((key == "377") && (array.length < (limit))) {
-                            _StdOut.putText("Not enough space sorry!");
-                            return;
+                            //                            _StdOut.putText("Not enough space sorry!");
+                            //                            _Console.advanceLine();
+                            //                            _OsShell.putPrompt();
+                            stepOut = true;
+                            break;
                         }
                         if (meta == "0") {
                             array.push(key);
@@ -366,19 +383,20 @@ var TSOS;
         FileSystem.prototype.handleWrite = function (dataIndex, fileContents, size) {
             var ceiling = Math.ceil(fileContents.length / (size));
             var array = new Array();
-            var xx = this.makeFreshKey(dataIndex);
+            var newKey = this.makeFreshKey(dataIndex);
 
-            //get more keys starting
-            array = this.getAvailableAddresses(xx, (ceiling - 1));
+            //get more keys starting from newKey
+            array = this.getAvailableAddresses(newKey, (ceiling - 1));
+            if (array.length < (ceiling - 1)) {
+                return false;
+            }
 
-            //check for
             var keys = "";
             for (var x = 0; x < array.length; x++) {
                 keys += array[x];
                 keys += ", ";
             }
 
-            //            alert("cei: "+ceiling+", load at keys: ["+keys+"]");
             var start = 0;
             var end = size;
             var chunk = "";
@@ -390,11 +408,9 @@ var TSOS;
                 if (a + 1 < array.length) {
                     var nextKey = this.makeFreshKey(array[a + 1]);
                     localStorage.setItem(key, "1" + nextKey + chunk);
-                    this.tsbArray.set(key, "1" + nextKey + chunk); //local map
                 } else {
                     var pad = this.fsu.padding(chunk, size);
                     localStorage.setItem(key, "1###" + pad);
-                    this.tsbArray.set(key, "1###" + pad); //local map
                 }
 
                 if (end == fileContents.length) {
@@ -420,11 +436,17 @@ var TSOS;
 
         //load this process into the disk
         FileSystem.prototype.rollOut = function (filename, contents) {
-            if (contents.length > (_BlockSize * 2)) {
+            if ((contents.length / 2) > (_BlockSize)) {
                 _StdOut.putText("Process is bigger than memory block!");
             } else {
-                this.createFile(filename);
-                this.writeToFile(filename, contents, true);
+                var created;
+                created = this.createFile(filename);
+                if (created) {
+                    this.writeToFile(filename, contents, true);
+                    return created;
+                } else {
+                    return created;
+                }
             }
         };
 
@@ -462,11 +484,12 @@ var TSOS;
                 nextProcess.setPrintLocation("Memory -> Disk");
                 nextProcess.setState(2); //waiting
                 TSOS.Shell.updateReadyQueue();
-                this.createFile(filename);
-                this.writeToFile(filename, oldContents, false);
+                this.rollOut(filename, oldContents); //just call roll-out here...
+                //                this.createFile(filename);
+                //                this.writeToFile(filename,oldContents,false);
             }
 
-            //load back in to memory
+            //load back in to memory and continue...
             _MemoryManager.load(currentProcess.getBase(), data.toString());
             this.update();
         };
@@ -537,7 +560,6 @@ var TSOS;
                             sofarlen = sofar.length;
                             value += changeHex;
                             localStorage.setItem(key, zeroData); //replace with zeros
-                            this.tsbArray.set(key, zeroData); //local map
                             this.update();
                             keys += key;
 
@@ -550,7 +572,6 @@ var TSOS;
                             sofarlen = sofar.length;
                             value += changeHex;
                             localStorage.setItem(key, zeroData); //replace with zeros
-                            this.tsbArray.set(key, zeroData); //local map
                             this.update();
                             keys += key + ", ";
                         }
@@ -591,12 +612,10 @@ var TSOS;
                         if (nextMeta == "###") {
                             oldData += data.slice(4, data.length);
                             localStorage.setItem(key, zeroData); //replace with zeros
-                            this.tsbArray.set(key, zeroData); //local map
                             return oldData;
                         } else {
                             oldData += data.slice(4, data.length);
                             localStorage.setItem(key, zeroData); //replace with zeros
-                            this.tsbArray.set(key, zeroData); //local map
                         }
                         key = nextMeta;
                         index = nextMeta;

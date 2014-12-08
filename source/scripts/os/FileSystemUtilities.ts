@@ -91,19 +91,18 @@ module TSOS{
          * @param localStorage
          * @param size
          */
-        public createMBR(localStorage,size,map:Map){
+        public createMBR(localStorage,size){
             var data:string = this.stringToHex((APP_NAME+" "+APP_VERSION));
             var pad:string = this.padding("1###"+data,size);
             var key = this.makeKey(0,0,0);
             localStorage.setItem(key,pad);
-            map.set(key,pad);
         }
 
         /**
          * Creates a local file system.
          * Use this method when format is called.
          */
-        public format(trackSize,sectorSize,blockSize,dataSize, localStorage, map){
+        public format(trackSize,sectorSize,blockSize,dataSize, localStorage){
 
             var storage = this.formatData(dataSize);
             var dir = 0;
@@ -114,7 +113,6 @@ module TSOS{
                     for (var block = 0; block < blockSize; block++) {
                         var key = this.makeKey(track,sector,block);
                         localStorage.setItem(key,storage);
-                        map.set(key,storage);
                     }
                 }
             }
