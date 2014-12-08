@@ -73,9 +73,7 @@ var _MainMemory: string[] = null;
 var _MainMemorySize: number = 768;
 var _MainMemoryBase : string[] = null;
 var _Memory : TSOS.Memory;
-var _MemoryPartitions:number = 3;
 var _BlockSize :number = 256;
-var _MemoryErrr:number = 123;
 
 //Schedules the  Algorithms
 var _SCHEDULE :number = 444;
@@ -94,7 +92,7 @@ var _RUN:number = -5;
 var _RUNALL:number = -10;
 var _ClockCycle:number = 0;
 var _ContextSwitch : number = 915;
-var _FakeQueue: any[] = null;
+var _TerminatedQueue: any[] = null;
 var _Killed : number = 89;
 var _BSOD: number = -200;
 var _KilledReset : number = -100;

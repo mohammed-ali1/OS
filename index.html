@@ -194,7 +194,7 @@
 <div>
     <div style="overflow: scroll; border: transparent; border-radius: 10px; float: left;">
         <h4 id="currentScheduler" style="color:firebrick;" ></h4>
-        <h4 style="color:firebrick; display: inline;">Processes</h4>
+        <h4 style="color:firebrick; display: inline;">Active Processes</h4>
 
         <div>
             <table id="displayReady">
@@ -210,6 +210,16 @@
                     <th>YReg</th>
                     <th>ZFlag</th>
                     <th>Location</th>
+                </tr>
+            </table>
+        </div>
+
+        <div>
+            <table id="displayCpuMonitor" style="border: 1px solid;">
+                <tr>
+                    <th>Average Wait Time</th>
+                    <th>Average Turnaround Time</th>
+                    <th>AThroughout</th>
                 </tr>
             </table>
         </div>

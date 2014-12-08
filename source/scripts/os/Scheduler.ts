@@ -31,6 +31,7 @@ module TSOS{
 
                if (_CurrentProcess.getLocation() == "Disk") {
                     _Kernel.contextSwitchDisk(true,false,false);
+                   return;
                }
                _CurrentProcess.setState(1);
                _CPU.startProcessing(_CurrentProcess);
@@ -41,6 +42,7 @@ module TSOS{
                    && _ReadyQueue.isEmpty()) {
                    _ClockCycle = 0;
                    _ResidentQueue.splice(0, _ResidentQueue.length); // clear resident Queue as well!
+                    Shell.updateReadyQueue();
                }
            }
 
@@ -65,6 +67,7 @@ module TSOS{
 
                 if (_CurrentProcess.getLocation() == "Disk") {
                     _Kernel.contextSwitchDisk(false,true,false);
+                    return;
                 }
 
                 if(_CurrentProcess.getLocation() == "Memory"){
@@ -101,6 +104,7 @@ module TSOS{
 
                 if (_CurrentProcess.getLocation() == "Disk") {
                     _Kernel.contextSwitchDisk(false,false,true);
+                    return;
                 }
 
                 if(_CurrentProcess.getLocation() == "Memory"){

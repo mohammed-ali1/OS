@@ -71,9 +71,7 @@ var _MainMemory = null;
 var _MainMemorySize = 768;
 var _MainMemoryBase = null;
 var _Memory;
-var _MemoryPartitions = 3;
 var _BlockSize = 256;
-var _MemoryErrr = 123;
 
 //Schedules the  Algorithms
 var _SCHEDULE = 444;
@@ -92,7 +90,7 @@ var _RUN = -5;
 var _RUNALL = -10;
 var _ClockCycle = 0;
 var _ContextSwitch = 915;
-var _FakeQueue = null;
+var _TerminatedQueue = null;
 var _Killed = 89;
 var _BSOD = -200;
 var _KilledReset = -100;

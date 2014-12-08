@@ -33,7 +33,7 @@ module TSOS {
 
             //Initialize Ready Queue for the Processes to be loaded
             _ReadyQueue = new Queue();
-            _FakeQueue = new Array();
+            _TerminatedQueue = new Array();
 
             //Initialize Resident Queue
             _ResidentQueue = new Array();
@@ -183,8 +183,7 @@ module TSOS {
                     Pcb.displayTimeMonitor();
                     _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateReadyQueue();
-                    //delete here!
-                    _CurrentScheduler.rr();
+                    this.handleSchedule();
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
@@ -320,16 +319,18 @@ module TSOS {
                 if(_CurrentProcess.getState() == "Ready"){
                     _CurrentProcess.setTimeArrived(_OSclock);
                     Pcb.displayTimeMonitor();
-                }else if(_CurrentProcess.getLocation() == "Disk"){
+                }
+                if(_CurrentProcess.getLocation() == "Disk"){
                     this.contextSwitchDisk(true,false,false);
-                }else{
+//                    return;
+                }
                     //keep executing
                     _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
                     _CurrentProcess.setState(1); //set state to running
                     Shell.updateReadyQueue();
                     _CPU.startProcessing(_CurrentProcess);
                     _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
-                }
+
             }
         }
 
@@ -344,32 +345,39 @@ module TSOS {
             return _ResidentQueue[index];
         }
 
+
         /**
-         * This gets called when
-         * we need to load a process from disk
-         * NOTE: no need to store anything in the disk
-         * bc fcfs!
+         * This gets called whenever
+         * we need to load a process
+         * from the disk.
+         * @param rr
+         * @param fcfs
+         * @param priority
          */
         public contextSwitchDisk(rr,fcfs,priority){
 
             if(rr){
                 var nextProcess:TSOS.Pcb = this.getNextAvailableBlock();
+//                alert("current pid: "+_CurrentProcess.getPid()+", loc: "+_CurrentProcess.getLocation()
+//                +"\n next pid: "+nextProcess.getPid()+", loc: "+nextProcess.getLocation());
                 _FileSystem.rollIn(_CurrentProcess,nextProcess);
                 _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
-                _CurrentProcess.setState(1); //set state to running
                 Shell.updateReadyQueue();
                 _CPU.startProcessing(_CurrentProcess);
                 _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
-            }else if(fcfs){
+            }
+            if(fcfs){
                 alert("PID: "+_CurrentProcess.getPid()+", LOC: "+_CurrentProcess.getLocation());
                 _CurrentProcess.setLocation("Memory");
                 _CurrentProcess.setPrintLocation("Disk -> Memory");
                 //set the least running process to "TRASH"
-//            this.setToTrash();
+                this.setToTrash();
                 _FileSystem.swap(_CurrentProcess, (_BlockSize/_BlockSize)-1);
                 _CurrentProcess.setState(1);
                 _CPU.startProcessing(_CurrentProcess);
-            }else{
+            }
+
+            if(priority){
 
             }
         }
@@ -385,8 +393,8 @@ module TSOS {
             for(var i =0 ; i<_ResidentQueue.length;i++){
                 process = _ResidentQueue[i];
                 if(process.getLocation() == "Memory"){
-                    alert("Next PID: " + process.getPid() + ", LOC: " + process.getLocation());
-                    process.setPrintLocation("Trash");
+                    process.setLocation("Trash");
+                    process.setPrintLocation("Memory -> Trash");
                     break;
                 }
             }

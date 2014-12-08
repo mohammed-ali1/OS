@@ -465,13 +465,16 @@ module TSOS{
             currentProcess.setBlock(nextProcess.getBlock());
             currentProcess.setLocation("Memory");
             currentProcess.setPrintLocation("Disk -> Memory");
+            currentProcess.setState(1);//set state to running
             Shell.updateReadyQueue();
 
             if(nextProcess.getState() == "Terminated" || nextProcess.getState() == "Killed"){
                 this.deleteFile(filename);
+                nextProcess.setLocation("Disk");
+                nextProcess.setPrintLocation("Memory -> Trash");
+                Shell.updateReadyQueue();
             }else{
                 filename = "swap"+nextProcess.getPid();
-                //grab the whole memory block first
                 oldContents = _MemoryManager.copyBlock(nextProcess.getBase());
                 nextProcess.setLocation("Disk");
                 nextProcess.setPrintLocation("Memory -> Disk");
@@ -488,7 +491,7 @@ module TSOS{
         /**
          * This method just swaps from the disk and loads
          * into the memory....fcfs
-         * @param process
+         * @param processOnDisk
          * @param base
          * @returns {string}
          */
@@ -508,18 +511,16 @@ module TSOS{
             //grab everything in hex!!!!
             data = this.grabAllHex(dataIndex);
             localStorage.setItem(dataIndex,zeroData);
-            this.tsbArray.set(dataIndex,zeroData);//local map
 
             processOnDisk.setBase(base);
             processOnDisk.setLimit((base+_BlockSize));
             processOnDisk.setBlock((base/_BlockSize));
+            processOnDisk
             Shell.updateReadyQueue();
 
-//            alert("Grabbed all hex: "+data.length+"\n"+data);
             //load current process into the mem
             _MemoryManager.load(processOnDisk.getBase(),data.toString());
             this.update();
-//            alert("loading into block: "+((processOnMem.getBase())/(_BlockSize)));
             _MemoryManager.update();
         }
 

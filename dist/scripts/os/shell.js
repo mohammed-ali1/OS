@@ -333,55 +333,63 @@ var TSOS;
 
             //            Get the free block first!
             var base = _MemoryManager.getBlockAvailable();
-
+            var process;
+            var priority = args[0];
             if (base != -1) {
                 //Create New PCB and don't forget the priority
-                if (args.length == 0) {
-                    var p = new TSOS.Pcb(base, (base + 255), 0);
+                if (priority < 0) {
+                    process = new TSOS.Pcb(base, (base + 255), -1);
                 } else {
-                    var p = new TSOS.Pcb(base, (base + 255), args);
+                    process = new TSOS.Pcb(base, (base + 255), priority);
                 }
-                p.setLength((x.length / 2)); //set the length of the program.
-                p.setState(9999999999999999999999999); //set state "NEW"
-                p.setLocation("Memory");
-                p.setPrintLocation("Memory");
+                process.setLength((x.length / 2)); //set the length of the program.
+                process.setState(9999999999999999999999999); //set state "NEW"
+                process.setLocation("Memory");
+                process.setPrintLocation("Memory");
 
                 //Load in the Resident Queue
-                _ResidentQueue.push(p);
+                _ResidentQueue.push(process);
 
                 //Push on Fake because Resident Queue expands and shrinks
                 //This is also my Terminated Queue!
-                _FakeQueue.push(p);
+                _TerminatedQueue.push(process);
 
                 //Print to Console
                 _StdOut.putText("Loaded Successfully!");
                 _Console.advanceLine();
-                _StdOut.putText("Process ID: " + p.getPid());
+                _StdOut.putText("Process ID: " + process.getPid());
 
                 //Finally load into Memory
                 _MemoryManager.load(base, x.toUpperCase().toString());
             } else {
                 //Base is -1 at this point.
                 //so need to store into the file system.
-                var p = new TSOS.Pcb(-1, -1, -1);
-                p.setLocation("Disk");
-                p.setPrintLocation("Disk");
-                p.setState(9999999999999999999999999); //set state "NEW"
-                p.setLength((x.length / 2));
+                if (priority < 0) {
+                    process = new TSOS.Pcb(-1, -1, -1);
+                } else {
+                    process = new TSOS.Pcb(-1, -1, priority);
+                }
+                process.setLocation("Disk");
+                process.setPrintLocation("Disk");
+                process.setState(9999999999999999999999999); //set state "NEW"
+                process.setLength((x.length / 2));
+                process.setLocation("Disk");
                 _StdOut.putText("Loaded Successfully!");
                 _Console.advanceLine();
-                _StdOut.putText("Process ID: " + p.getPid());
-                var filename = ("swap" + p.getPid());
+                _StdOut.putText("Process ID: " + process.getPid());
+                var filename = ("swap" + process.getPid());
                 _FileSystem.rollOut(filename, x.toUpperCase().toString());
-                _ResidentQueue.push(p);
-                _FakeQueue.push(p);
+                _ResidentQueue.push(process);
+                _TerminatedQueue.push(process);
             }
         };
 
         Shell.prototype.sort = function () {
             for (var i = 0; i < _ResidentQueue.length; i++) {
-                for (var j = 0; j < _ResidentQueue.length - i; j++) {
-                    if (_ResidentQueue[j - 1].getPriority() < _ResidentQueue[j].getPriority()) {
+                for (var j = 1; j < _ResidentQueue.length - i; j++) {
+                    var first = _ResidentQueue[j - 1].getPriority();
+                    var second = _ResidentQueue[j].getPriority();
+                    if (first < second) {
                         var temp = _ResidentQueue[j - 1];
                         _ResidentQueue[j - 1] = _ResidentQueue[j];
                         _ResidentQueue[j] = temp;
@@ -418,8 +426,8 @@ var TSOS;
             tableView += "<th>ZReg</th>";
             tableView += "<th>Location</th>";
 
-            for (var i = _FakeQueue.length - 1; i >= 0; i--) {
-                var s = _FakeQueue[i];
+            for (var i = _TerminatedQueue.length - 1; i >= 0; i--) {
+                var s = _TerminatedQueue[i];
 
                 if (s.getState() == "Running") {
                     tableView += "<tr style='background-color: limegreen;'>";
@@ -630,11 +638,11 @@ var TSOS;
         Shell.prototype.shellPs = function () {
             var nobueno = false;
 
-            for (var i = 0; i < _FakeQueue.length; i++) {
-                var temp = _FakeQueue[i];
+            for (var i = 0; i < _ResidentQueue.length; i++) {
+                var temp = _ResidentQueue[i];
                 if (temp.getState() == "Running" || temp.getState() == "Waiting") {
                     nobueno = true;
-                    if (i + 1 == _FakeQueue.length) {
+                    if (i + 1 == _ResidentQueue.length) {
                         _StdOut.putText("Pid: " + temp.getPid());
                     } else {
                         _StdOut.putText("PID: " + temp.getPid() + ", ");

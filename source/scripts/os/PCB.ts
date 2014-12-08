@@ -202,8 +202,8 @@ module TSOS{
             table += "<th>Terminated</th>";
             table += "<th>Turnaround</th>";
 
-            for(var i=_FakeQueue.length-1; i>=0;i--){
-                var p:TSOS.Pcb = _FakeQueue[i];
+            for(var i=_TerminatedQueue.length-1; i>=0;i--){
+                var p:TSOS.Pcb = _TerminatedQueue[i];
                 table += "<tr>";
                 table += "<td>" + p.getPid() + "</td>";
                 table += "<td>" + p.getTimeArrived() + "</td>";
