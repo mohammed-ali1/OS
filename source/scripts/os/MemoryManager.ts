@@ -91,8 +91,8 @@ module TSOS{
             }
         }
 
-        public grabProcessContents(process){
-            return _Memory.grabProcessContents(process);
+        public copyBlock(process){
+            return _Memory.copyBlock(process);
         }
     }
 }

@@ -87,13 +87,14 @@ var TSOS;
             var pad = this.padding("1###" + data, size);
             var key = this.makeKey(0, 0, 0);
             localStorage.setItem(key, pad);
+            map.set(key, pad);
         };
 
         /**
         * Creates a local file system.
         * Use this method when format is called.
         */
-        FSU.prototype.format = function (trackSize, sectorSize, blockSize, dataSize, localStorage) {
+        FSU.prototype.format = function (trackSize, sectorSize, blockSize, dataSize, localStorage, map) {
             var storage = this.formatData(dataSize);
             var dir = 0;
             var data = 0;
@@ -103,6 +104,7 @@ var TSOS;
                     for (var block = 0; block < blockSize; block++) {
                         var key = this.makeKey(track, sector, block);
                         localStorage.setItem(key, storage);
+                        map.set(key, storage);
                     }
                 }
             }

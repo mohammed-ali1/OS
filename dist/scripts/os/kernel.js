@@ -35,7 +35,7 @@ var TSOS;
 
             //Initialize Resident Queue
             _ResidentQueue = new Array();
-            _CurrentScheduler = new TSOS.Scheduler("fcfs");
+            _CurrentScheduler = new TSOS.Scheduler("rr");
 
             //Initialize and load file system Device Driver
             _FileSystem = new TSOS.FileSystem();
@@ -96,7 +96,7 @@ var TSOS;
             } else if (_CPU.isExecuting && (_CurrentSchedule == "fcfs" || _CurrentSchedule == "priority")) {
                 _CPU.cycle();
                 TSOS.Shell.updateReadyQueue();
-            } else if (_CPU.isExecuting && _CurrentSchedule == "rr") {
+            } else if (_CPU.isExecuting && (_CurrentSchedule == "rr")) {
                 if (_ClockCycle >= _Quantum) {
                     _Mode = 0;
                     _ClockCycle = 0;
@@ -179,9 +179,8 @@ var TSOS;
                     _Kernel.krnTrace("\n\nTERMINATING PID: " + _CurrentProcess.getPid() + "\n");
                     TSOS.Shell.updateReadyQueue();
 
-                    //need to know where to go from here...
-                    this.handleSchedule();
-
+                    //delete here!
+                    _CurrentScheduler.rr();
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
@@ -303,7 +302,6 @@ var TSOS;
 
                 //push back onto the queue
                 _ReadyQueue.enqueue(_CurrentProcess);
-                _CPU.displayCPU();
 
                 //grab the next process
                 _CurrentProcess = _ReadyQueue.dequeue();
@@ -312,17 +310,27 @@ var TSOS;
                 if (_CurrentProcess.getState() == "Ready") {
                     _CurrentProcess.setTimeArrived(_OSclock);
                     TSOS.Pcb.displayTimeMonitor();
+                } else if (_CurrentProcess.getLocation() == "Disk") {
+                    this.contextSwitchDisk(true, false, false);
+                } else {
+                    //keep executing
+                    _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
+                    _CurrentProcess.setState(1); //set state to running
+                    TSOS.Shell.updateReadyQueue();
+                    _CPU.startProcessing(_CurrentProcess);
+                    _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
                 }
-
-                if (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed" && _CurrentSchedule == "rr") {
-                    this.krnInterruptHandler(_RUNALL, 0);
-                }
-
-                _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
-                _CurrentProcess.setState(1); //set state to running
-                _CPU.startProcessing(_CurrentProcess);
-                _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
             }
+        };
+
+        Kernel.prototype.getNextAvailableBlock = function () {
+            var index = _ResidentQueue.indexOf(_CurrentProcess);
+            index = (index - 3);
+            if (index < 0) {
+                var residentIndex = _ResidentQueue.indexOf(_CurrentProcess);
+                index = (_ResidentQueue.length - 3) + Math.abs(residentIndex);
+            }
+            return _ResidentQueue[index];
         };
 
         /**
@@ -331,45 +339,43 @@ var TSOS;
         * NOTE: no need to store anything in the disk
         * bc fcfs!
         */
-        Kernel.prototype.contextSwitchDisk = function () {
-            alert("PID: " + _CurrentProcess.getPid() + ", LOC: " + _CurrentProcess.getLocation());
-            _CurrentProcess.setLocation("Memory");
-            _CurrentProcess.setPrintLocation("Disk -> Memory");
+        Kernel.prototype.contextSwitchDisk = function (rr, fcfs, priority) {
+            if (rr) {
+                var nextProcess = this.getNextAvailableBlock();
+                _FileSystem.rollIn(_CurrentProcess, nextProcess);
+                _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
+                _CurrentProcess.setState(1); //set state to running
+                TSOS.Shell.updateReadyQueue();
+                _CPU.startProcessing(_CurrentProcess);
+                _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
+            } else if (fcfs) {
+                alert("PID: " + _CurrentProcess.getPid() + ", LOC: " + _CurrentProcess.getLocation());
+                _CurrentProcess.setLocation("Memory");
+                _CurrentProcess.setPrintLocation("Disk -> Memory");
 
-            //swap with the last thing in the queue
-            var nextProcess = this.getNext();
-            alert("Next PID: " + nextProcess.getPid() + ", LOC: " + nextProcess.getLocation());
-            nextProcess.setLocation("Disk");
-            nextProcess.setPrintLocation("Trash");
-
-            _FileSystem.swap(_CurrentProcess, nextProcess);
-            _CurrentProcess.setState(1);
-            _CPU.startProcessing(_CurrentProcess);
+                //set the least running process to "TRASH"
+                //            this.setToTrash();
+                _FileSystem.swap(_CurrentProcess, (_BlockSize / _BlockSize) - 1);
+                _CurrentProcess.setState(1);
+                _CPU.startProcessing(_CurrentProcess);
+            } else {
+            }
         };
 
         /**
-        * Gets the first block in th resident Queue.
-        * @returns {any}
+        * Finds next process in ready queue whose state == "Memory"
+        * and sets the state to "Trash"
         */
-        Kernel.prototype.getLastBlock = function () {
-            return _ResidentQueue[_ResidentQueue.length - 1];
-        };
-
-        /**
-        * get next process in ready queue
-        * if any, and then swap
-        */
-        Kernel.prototype.getNext = function () {
+        Kernel.prototype.setToTrash = function () {
             var process;
-            var getProcess;
             for (var i = 0; i < _ResidentQueue.length; i++) {
                 process = _ResidentQueue[i];
                 if (process.getLocation() == "Memory") {
-                    getProcess = process;
+                    alert("Next PID: " + process.getPid() + ", LOC: " + process.getLocation());
+                    process.setPrintLocation("Trash");
                     break;
                 }
             }
-            return getProcess;
         };
 
         /**

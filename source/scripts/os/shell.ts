@@ -196,6 +196,12 @@ module TSOS {
                 "- Gets the current schedule");
             this.commandList[this.commandList.length] = sc;
 
+            // copy
+            sc = new ShellCommand(this.ShellCopy,
+                "copy",
+                "- Gets the current schedule");
+            this.commandList[this.commandList.length] = sc;
+
             // processes - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -409,7 +415,6 @@ module TSOS {
                 _StdOut.putText("Loaded Successfully!");
                 _Console.advanceLine();
                 _StdOut.putText("Process ID: " + p.getPid());
-
                 //Finally load into Memory
                 _MemoryManager.load(base, x.toUpperCase().toString());
             }else{
@@ -420,6 +425,9 @@ module TSOS {
                 p.setPrintLocation("Disk");
                 p.setState(9999999999999999999999999);//set state "NEW"
                 p.setLength((x.length / 2));
+                _StdOut.putText("Loaded Successfully!");
+                _Console.advanceLine();
+                _StdOut.putText("Process ID: " + p.getPid());
                 var filename:string = ("swap"+p.getPid());
                 _FileSystem.rollOut(filename,x.toUpperCase().toString());
                 _ResidentQueue.push(p);
@@ -473,74 +481,89 @@ module TSOS {
             for(var i = _FakeQueue.length-1; i>=0;i--) {
 
                 var s:TSOS.Pcb = _FakeQueue[i];
-                if(s.getState() != "New") {
 
-                    if(s.getState() == "Running") {
-                        tableView += "<tr style='background-color: limegreen;'>";
-                        tableView += "<td>" + s.getPid().toString() + "</td>";
-                        tableView += "<td>" + s.getBlock().toString() + "</td>";
-                        tableView += "<td>" + s.getBase().toString() + "</td>";
-                        tableView += "<td>" + s.getLimit().toString() + "</td>";
-                        tableView += "<td>" + s.getState().toString() + "</td>";
-                        tableView += "<td>" + parseInt(s.getPc() + s.getBase()) + "</td>";
-                        tableView += "<td>" + s.getIR() + "</td>";
-                        tableView += "<td>" + s.getAcc() + "</td>";
-                        tableView += "<td>" + s.getX() + "</td>";
-                        tableView += "<td>" + s.getY() + "</td>";
-                        tableView += "<td>" + s.getZ() + "</td>";
-                        tableView += "<td>" + s.getPrintLocation() + "</td>";
-                        tableView += "</tr>";
-                    }
-                    if (s.getState() == "Terminated" || s.getState() == "Killed"){
-                        tableView += "<tr style='background-color: red;'>";
-                        tableView += "<td>" + s.getPid().toString() + "</td>";
-                        tableView += "<td>" + s.getBlock().toString() + "</td>";
-                        tableView += "<td>" + s.getBase().toString() + "</td>";
-                        tableView += "<td>" + s.getLimit().toString() + "</td>";
-                        tableView += "<td>" + s.getState().toString() + "</td>";
-                        tableView += "<td>" + parseInt(s.getPc() + s.getBase()) + "</td>";
-                        tableView += "<td>" + s.getIR() + "</td>";
-                        tableView += "<td>" + s.getAcc() + "</td>";
-                        tableView += "<td>" + s.getX() + "</td>";
-                        tableView += "<td>" + s.getY() + "</td>";
-                        tableView += "<td>" + s.getZ() + "</td>";
-                        tableView += "<td>" + s.getPrintLocation() + "</td>";
-                        tableView += "</tr>";
-                    }
+                if(s.getState() == "Running") {
+                    tableView += "<tr style='background-color: limegreen;'>";
+                    tableView += "<td>" + s.getPid().toString() + "</td>";
+                    tableView += "<td>" + s.getBlock().toString() + "</td>";
+                    tableView += "<td>" + s.getBase().toString() + "</td>";
+                    tableView += "<td>" + s.getLimit().toString() + "</td>";
+                    tableView += "<td>" + s.getState().toString() + "</td>";
+                    tableView += "<td>" + parseInt(s.getPc() + s.getBase()) + "</td>";
+                    tableView += "<td>" + s.getIR() + "</td>";
+                    tableView += "<td>" + s.getAcc() + "</td>";
+                    tableView += "<td>" + s.getX() + "</td>";
+                    tableView += "<td>" + s.getY() + "</td>";
+                    tableView += "<td>" + s.getZ() + "</td>";
+                    tableView += "<td>" + s.getPrintLocation() + "</td>";
+                    tableView += "</tr>";
+                }
+                if (s.getState() == "Terminated" || s.getState() == "Killed"){
+                    tableView += "<tr style='background-color: red;'>";
+                    tableView += "<td>" + s.getPid().toString() + "</td>";
+                    tableView += "<td>" + s.getBlock().toString() + "</td>";
+                    tableView += "<td>" + s.getBase().toString() + "</td>";
+                    tableView += "<td>" + s.getLimit().toString() + "</td>";
+                    tableView += "<td>" + s.getState().toString() + "</td>";
+                    tableView += "<td>" + parseInt(s.getPc() + s.getBase()) + "</td>";
+                    tableView += "<td>" + s.getIR() + "</td>";
+                    tableView += "<td>" + s.getAcc() + "</td>";
+                    tableView += "<td>" + s.getX() + "</td>";
+                    tableView += "<td>" + s.getY() + "</td>";
+                    tableView += "<td>" + s.getZ() + "</td>";
+                    tableView += "<td>" + s.getPrintLocation() + "</td>";
+                    tableView += "</tr>";
+                }
 
-                    if (s.getState() == "Waiting"){
-                        tableView += "<tr style='background-color: #FFD801;'>";
-                        tableView += "<td style='color: #000000;'>" + s.getPid().toString() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getBlock().toString() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getLimit().toString() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getState().toString() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + parseInt(s.getPc() + s.getBase()) + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getIR() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getAcc() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getX() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getPrintLocation()+ "</td>";
-                        tableView += "</tr>";
-                    }
+                if (s.getState() == "Waiting"){
+                    tableView += "<tr style='background-color: #FFD801;'>";
+                    tableView += "<td style='color: #000000;'>" + s.getPid().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getBlock().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getLimit().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getState().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + parseInt(s.getPc() + s.getBase()) + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getIR() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getAcc() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getX() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getPrintLocation()+ "</td>";
+                    tableView += "</tr>";
+                }
 
-                    if (s.getState() == "Ready"){
-                        tableView += "<tr style='background-color: darkturquoise;'>";
-                        tableView += "<td style='color: #000000;'>" + s.getPid().toString() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getBlock().toString() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getLimit().toString() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getState().toString() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + parseInt(s.getPc() + s.getBase()) + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getIR() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getAcc() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getX() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
-                        tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
-                        tableView += "<td style='color: #000000;'>" +s.getPrintLocation() + "</td>";
-                        tableView += "</tr>";
-                    }
+                if (s.getState() == "Ready"){
+                    tableView += "<tr style='background-color: darkturquoise;'>";
+                    tableView += "<td style='color: #000000;'>" + s.getPid().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getBlock().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getLimit().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getState().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + parseInt(s.getPc() + s.getBase()) + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getIR() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getAcc() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getX() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
+                    tableView += "<td style='color: #000000;'>" +s.getPrintLocation() + "</td>";
+                    tableView += "</tr>";
+                }
+
+                if (s.getState() == "New"){
+                    tableView += "<tr style='background-color: darkturquoise;'>";
+                    tableView += "<td style='color: #000000;'>" + s.getPid().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getBlock().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getLimit().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getState().toString() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + parseInt(s.getPc() + s.getBase()) + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getIR() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getAcc() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getX() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
+                    tableView += "<td style='color: #000000;'>" +s.getPrintLocation() + "</td>";
+                    tableView += "</tr>";
                 }
             }
             tableView += "</table>";
@@ -875,6 +898,15 @@ module TSOS {
          */
         public ShellGetSchedule(){
             _StdOut.putText("Current Schedule is: "+_CurrentSchedule);
+        }
+
+        public ShellCopy(args){
+            var base = args[0];
+            var data = "";
+            for(var i = base; i < (base+256);i++){
+                data += _MainMemory[i];
+            }
+            _StdOut.putText("total: "+data.length);
         }
     }
 }

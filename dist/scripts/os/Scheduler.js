@@ -9,23 +9,24 @@ var TSOS;
             document.getElementById("currentScheduler").innerHTML = "Current Schedule: " + _CurrentSchedule;
         }
         /**
-        * Starts the Next Available Process int Ready Queue
+        * Handles Round Robin Scheduling
         */
         Scheduler.prototype.rr = function () {
             if (_ReadyQueue.getSize() > 0) {
+                _ClockCycle = 0;
+
                 _CurrentProcess = _ReadyQueue.dequeue();
 
                 if (_CurrentProcess.getState() == "Ready") {
                     _CurrentProcess.setTimeArrived(_OSclock);
                 }
 
-                if (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed") {
-                    _ClockCycle = 0;
+                if (_CurrentProcess.getState() == "Memory" && (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed")) {
                     this.rr();
                 }
 
                 if (_CurrentProcess.getLocation() == "Disk") {
-                    _Kernel.contextSwitch();
+                    _Kernel.contextSwitchDisk(true, false, false);
                 }
                 _CurrentProcess.setState(1);
                 _CPU.startProcessing(_CurrentProcess);
@@ -34,12 +35,11 @@ var TSOS;
             } else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() != "Killed") && _ReadyQueue.isEmpty()) {
                 _ClockCycle = 0;
                 _ResidentQueue.splice(0, _ResidentQueue.length); // clear resident Queue as well!
-                return;
             }
         };
 
         /**
-        * FCFS Scheduling
+        * Handles FCFS Scheduling
         */
         Scheduler.prototype.fcfs = function () {
             if (_ReadyQueue.getSize() > 0) {
@@ -56,7 +56,7 @@ var TSOS;
                 }
 
                 if (_CurrentProcess.getLocation() == "Disk") {
-                    _Kernel.contextSwitchDisk();
+                    _Kernel.contextSwitchDisk(false, true, false);
                 }
 
                 if (_CurrentProcess.getLocation() == "Memory") {
@@ -67,10 +67,12 @@ var TSOS;
                 }
             } else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() != "Killed") && _ReadyQueue.isEmpty()) {
                 _ResidentQueue.splice(0, _ResidentQueue.length); // clear resident Queue as well!
-                return;
             }
         };
 
+        /**
+        * Handle Priority Scheduling
+        */
         Scheduler.prototype.priority = function () {
             if (_ReadyQueue.getSize() > 0) {
                 _CurrentProcess = _ReadyQueue.dequeue();
@@ -86,7 +88,7 @@ var TSOS;
                 }
 
                 if (_CurrentProcess.getLocation() == "Disk") {
-                    _Kernel.contextSwitchDisk();
+                    _Kernel.contextSwitchDisk(false, false, true);
                 }
 
                 if (_CurrentProcess.getLocation() == "Memory") {
@@ -97,7 +99,6 @@ var TSOS;
                 }
             } else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() != "Killed") && _ReadyQueue.isEmpty()) {
                 _ResidentQueue.splice(0, _ResidentQueue.length); // clear resident Queue as well!
-                return;
             }
         };
         return Scheduler;

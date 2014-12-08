@@ -84,8 +84,8 @@ var TSOS;
             }
         };
 
-        MemoryManager.prototype.grabProcessContents = function (process) {
-            return _Memory.grabProcessContents(process);
+        MemoryManager.prototype.copyBlock = function (process) {
+            return _Memory.copyBlock(process);
         };
         return MemoryManager;
     })();

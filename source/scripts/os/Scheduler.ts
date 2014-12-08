@@ -11,41 +11,42 @@ module TSOS{
         }
 
        /**
-        * Starts the Next Available Process int Ready Queue
+        * Handles Round Robin Scheduling
         */
-       public rr(){
+       public rr() {
 
-           if(_ReadyQueue.getSize()>0) {
+           if (_ReadyQueue.getSize() > 0) {
+               _ClockCycle = 0;
 
                _CurrentProcess = _ReadyQueue.dequeue();
 
-               if(_CurrentProcess.getState() == "Ready"){
+               if (_CurrentProcess.getState() == "Ready") {
                    _CurrentProcess.setTimeArrived(_OSclock);
                }
 
-               if(_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed"){
-                   _ClockCycle = 0;
-                   this.rr();
+               if(_CurrentProcess.getState() == "Memory" && (_CurrentProcess.getState() == "Terminated"
+                                                    || _CurrentProcess.getState() == "Killed")){
+                    this.rr();
                }
 
-               if(_CurrentProcess.getLocation() == "Disk"){
-                    _Kernel.contextSwitch();
+               if (_CurrentProcess.getLocation() == "Disk") {
+                    _Kernel.contextSwitchDisk(true,false,false);
                }
                _CurrentProcess.setState(1);
                _CPU.startProcessing(_CurrentProcess);
-               _Kernel.krnTrace("\nPROCESSING PID: "+_CurrentProcess.getPid()+"\n");
+               _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
                Shell.updateReadyQueue();
-           }else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() != "Killed")
-               && _ReadyQueue.isEmpty()){
-               _ClockCycle = 0;
-               _ResidentQueue.splice(0,_ResidentQueue.length); // clear resident Queue as well!
-               return;
+
+               } else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() != "Killed")
+                   && _ReadyQueue.isEmpty()) {
+                   _ClockCycle = 0;
+                   _ResidentQueue.splice(0, _ResidentQueue.length); // clear resident Queue as well!
+               }
            }
-       }
 
 
        /**
-        * FCFS Scheduling
+        * Handles FCFS Scheduling
         */
        public fcfs(){
 
@@ -63,7 +64,7 @@ module TSOS{
                 }
 
                 if (_CurrentProcess.getLocation() == "Disk") {
-                    _Kernel.contextSwitchDisk();
+                    _Kernel.contextSwitchDisk(false,true,false);
                 }
 
                 if(_CurrentProcess.getLocation() == "Memory"){
@@ -76,11 +77,13 @@ module TSOS{
             }else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() != "Killed") &&
                 _ReadyQueue.isEmpty()) {
                 _ResidentQueue.splice(0,_ResidentQueue.length); // clear resident Queue as well!
-                return;
             }
        }
 
 
+       /**
+        * Handle Priority Scheduling
+        */
        public priority(){
 
             if(_ReadyQueue.getSize() > 0){
@@ -97,7 +100,7 @@ module TSOS{
                 }
 
                 if (_CurrentProcess.getLocation() == "Disk") {
-                    _Kernel.contextSwitchDisk();
+                    _Kernel.contextSwitchDisk(false,false,true);
                 }
 
                 if(_CurrentProcess.getLocation() == "Memory"){
@@ -110,7 +113,6 @@ module TSOS{
             }else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() != "Killed") &&
                 _ReadyQueue.isEmpty()) {
                 _ResidentQueue.splice(0,_ResidentQueue.length); // clear resident Queue as well!
-                return;
             }
        }
     }
