@@ -488,7 +488,7 @@ module TSOS{
             currentProcess.setLimit(nextProcess.getLimit());
             currentProcess.setBlock(nextProcess.getBlock());
             currentProcess.setLocation("Memory");
-            currentProcess.setPrintLocation("Disk -> Memory");
+            currentProcess.setPrintLocation("Memory");
             currentProcess.setState(1);//set state to running
             Shell.updateReadyQueue();
 
@@ -505,8 +505,6 @@ module TSOS{
                 nextProcess.setState(2);//waiting
                 Shell.updateReadyQueue();
                 this.rollOut(filename,oldContents);//just call roll-out here...
-//                this.createFile(filename);
-//                this.writeToFile(filename,oldContents,false);
             }
             //load back in to memory and continue...
             _MemoryManager.load(currentProcess.getBase(),data.toString());
@@ -522,7 +520,6 @@ module TSOS{
          */
         public swap(processOnDisk,base){
 
-            alert("Swapping from the disk");
             var data: string;
             var zeroData = this.fsu.formatData(this.metaDataSize);
 
@@ -540,7 +537,6 @@ module TSOS{
             processOnDisk.setBase(base);
             processOnDisk.setLimit((base+_BlockSize));
             processOnDisk.setBlock((base/_BlockSize));
-            processOnDisk
             Shell.updateReadyQueue();
 
             //load current process into the mem

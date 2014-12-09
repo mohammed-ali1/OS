@@ -35,7 +35,7 @@ var TSOS;
 
             //Initialize Resident Queue
             _ResidentQueue = new Array();
-            _CurrentScheduler = new TSOS.Scheduler("rr");
+            _CurrentScheduler = new TSOS.Scheduler("priority");
 
             //Initialize and load file system Device Driver
             _FileSystem = new TSOS.FileSystem();
@@ -178,7 +178,7 @@ var TSOS;
                     TSOS.Pcb.displayTimeMonitor();
                     _Kernel.krnTrace("\n\nTERMINATING PID: " + _CurrentProcess.getPid() + "\n");
                     TSOS.Shell.updateReadyQueue();
-                    this.handleSchedule();
+                    _CurrentScheduler.startProcess();
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
@@ -189,12 +189,11 @@ var TSOS;
                         _ReadyQueue.enqueue(params);
                     } else {
                         _ReadyQueue.enqueue(params);
-                        _CurrentScheduler.rr();
+                        _CurrentScheduler.startProcess();
                     }
                     break;
                 case _RUNALL:
-                    //need to look at current scheduler first
-                    _CurrentScheduler.rr();
+                    _CurrentScheduler.startProcess();
                     break;
                 case _ContextSwitch:
                     this.contextSwitch();
@@ -230,9 +229,6 @@ var TSOS;
                     break;
                 case _BSOD:
                     this.bsod(params);
-                    break;
-                case _SCHEDULE:
-                    this.handleSchedule();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -358,7 +354,6 @@ var TSOS;
                 _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
             }
             if (fcfs) {
-                alert("PID: " + _CurrentProcess.getPid() + ", LOC: " + _CurrentProcess.getLocation());
                 _CurrentProcess.setLocation("Memory");
                 _CurrentProcess.setPrintLocation("Disk -> Memory");
 
@@ -367,8 +362,19 @@ var TSOS;
                 _FileSystem.swap(_CurrentProcess, (_BlockSize / _BlockSize) - 1);
                 _CurrentProcess.setState(1);
                 _CPU.startProcessing(_CurrentProcess);
+                TSOS.Shell.updateReadyQueue();
             }
-            //priority
+            if (priority) {
+                _CurrentProcess.setLocation("Memory");
+                _CurrentProcess.setPrintLocation("Disk -> Memory");
+
+                //set the least process stored to "TRASH"
+                this.setToTrash();
+                _FileSystem.swap(_CurrentProcess, (_BlockSize / _BlockSize) - 1);
+                _CurrentProcess.setState(1);
+                _CPU.startProcessing(_CurrentProcess);
+                TSOS.Shell.updateReadyQueue();
+            }
         };
 
         /**
@@ -379,7 +385,7 @@ var TSOS;
             var process;
             for (var i = 0; i < _ResidentQueue.length; i++) {
                 process = _ResidentQueue[i];
-                if (process.getLocation() == "Memory") {
+                if (process.getLocation() == "Memory" && process.getState() == "Terminated") {
                     process.setLocation("Trash");
                     process.setPrintLocation("Memory -> Trash");
                     break;
@@ -398,23 +404,6 @@ var TSOS;
             _DrawingContext.drawText("sans", 20, 50, 250, "Why do you think this happened?");
             _CPU.reset();
             this.krnShutdown();
-        };
-
-        /**
-        * Handles all the scheduling algorithms
-        */
-        Kernel.prototype.handleSchedule = function () {
-            if (_CurrentSchedule == "fcfs") {
-                _CurrentScheduler.fcfs();
-            }
-
-            if (_CurrentSchedule == "rr") {
-                _CurrentScheduler.rr();
-            }
-
-            if (_CurrentSchedule == "priority") {
-                _CurrentScheduler.priority();
-            }
         };
         return Kernel;
     })();

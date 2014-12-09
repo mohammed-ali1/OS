@@ -59,7 +59,7 @@ module TSOS {
             //load
             sc = new ShellCommand(this.shellLoad,
                 "load",
-                "- Validates the User Program Input.");
+                "<string> -  Validates the User Program Input.");
             this.commandList[this.commandList.length] = sc;
 
             //status
@@ -393,7 +393,19 @@ module TSOS {
 //            Get the free block first!
             var base = _MemoryManager.getBlockAvailable();
             var process;
-            var priority = args[0];
+            var pro = args[0];
+            var priority:number;
+
+           if(pro.indexOf(".") == -1){
+               priority = pro;
+           }else{
+                _StdOut.putText("Priority must be a whole number");
+               return;
+           }
+
+            if(priority < 0){
+                priority = 0;
+            }
             if(base != -1) {
                 //Create New PCB and don't forget the priority
                 if(priority < 0){
@@ -443,32 +455,13 @@ module TSOS {
                     _StdOut.putText("Not enough space to load anymore!");
                 }
             }
-        }
-
-        public sort(){
-
-            for(var i = 0; i<_ResidentQueue.length;i++){
-                for(var j = 1; j<_ResidentQueue.length-i;j++){
-                    var first = _ResidentQueue[j-1].getPriority();
-                    var second = _ResidentQueue[j].getPriority();
-                    if(first < second){
-                        var temp:TSOS.Pcb = _ResidentQueue[j-1];
-                        _ResidentQueue[j-1] = _ResidentQueue[j];
-                        _ResidentQueue[j] = temp;
-                    }
-                }
-            }
-        }
-
-        public printList(){
-
-            alert("inPrint");
-            for(var i=0; i<_ResidentQueue.length;i++){
-                var p:TSOS.Pcb = _ResidentQueue[i];
-                alert("P: "+p.getPid());
-                _StdOut.putText(""+p.getPid().toString());
-                _Console.advanceLine();
-            }
+            _Console.advanceLine();
+//            for(var i=0; i<_ResidentQueue.length;i++){
+//                var p:TSOS.Pcb = _ResidentQueue[i];
+//                alert("P: "+p.getPid());
+//                _StdOut.putText("pid: "+p.getPid()+", pro: "+p.getPriority());
+//                _Console.advanceLine();
+//            }
         }
 
         /**
@@ -489,6 +482,7 @@ module TSOS {
             tableView +="<th>YReg</th>";
             tableView +="<th>ZReg</th>";
             tableView +="<th>Location</th>";
+            tableView +="<th>Priority</th>";
 
             for(var i = _TerminatedQueue.length-1; i>=0;i--) {
 
@@ -508,6 +502,7 @@ module TSOS {
                     tableView += "<td>" + s.getY() + "</td>";
                     tableView += "<td>" + s.getZ() + "</td>";
                     tableView += "<td>" + s.getPrintLocation() + "</td>";
+                    tableView += "<td>" + s.getPriority() + "</td>";
                     tableView += "</tr>";
                 }
                 if (s.getState() == "Terminated" || s.getState() == "Killed"){
@@ -524,6 +519,7 @@ module TSOS {
                     tableView += "<td>" + s.getY() + "</td>";
                     tableView += "<td>" + s.getZ() + "</td>";
                     tableView += "<td>" + s.getPrintLocation() + "</td>";
+                    tableView += "<td>" + s.getPriority() + "</td>";
                     tableView += "</tr>";
                 }
 
@@ -541,6 +537,7 @@ module TSOS {
                     tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getPrintLocation()+ "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getPriority()+ "</td>";
                     tableView += "</tr>";
                 }
 
@@ -558,6 +555,7 @@ module TSOS {
                     tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
                     tableView += "<td style='color: #000000;'>" +s.getPrintLocation() + "</td>";
+                    tableView += "<td style='color: #000000;'>" +s.getPriority() + "</td>";
                     tableView += "</tr>";
                 }
 
@@ -575,6 +573,7 @@ module TSOS {
                     tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
                     tableView += "<td style='color: #000000;'>" +s.getPrintLocation() + "</td>";
+                    tableView += "<td style='color: #000000;'>" +s.getPriority() + "</td>";
                     tableView += "</tr>";
                 }
             }
@@ -792,6 +791,23 @@ module TSOS {
          * Invokes the RUNALL case in the Kernel Interrupt Handler
          */
         public shellRunAll(){
+
+            if(_CurrentSchedule == "priority"){
+                for(var i = 0; i<_ResidentQueue.length;i++){
+                    for(var j = 1; j<_ResidentQueue.length-i;j++){
+                        var first = _ResidentQueue[j-1].getPriority();
+                        var second = _ResidentQueue[j].getPriority();
+                        if(first > second){
+                            var temp:TSOS.Pcb = _ResidentQueue[j-1];
+                            _ResidentQueue[j-1] = _ResidentQueue[j];
+                            _ResidentQueue[j] = temp;
+
+                            _TerminatedQueue[j-1] = _TerminatedQueue[j];
+                            _TerminatedQueue[j] = temp;
+                        }
+                    }
+                }
+            }
             for(var i=0; i<_ResidentQueue.length;i++){
                 var temp: TSOS.Pcb = _ResidentQueue[i];
                 if(temp.getLocation() == "Memory"){
@@ -799,7 +815,7 @@ module TSOS {
                 }
                 _ReadyQueue.enqueue(temp);
             }
-            _KernelInterruptQueue.enqueue(new Interrupt(_SCHEDULE,0));
+            _KernelInterruptQueue.enqueue(new Interrupt(_RUNALL,0));
         }
 
         /**
@@ -902,6 +918,7 @@ module TSOS {
             }else{
                 _StdOut.putText("Invalid Schedule type!");
             }
+            document.getElementById("currentScheduler").innerHTML = "Current Schedule: " + _CurrentSchedule;
         }
 
         /**

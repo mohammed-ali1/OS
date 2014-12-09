@@ -468,7 +468,7 @@ var TSOS;
             currentProcess.setLimit(nextProcess.getLimit());
             currentProcess.setBlock(nextProcess.getBlock());
             currentProcess.setLocation("Memory");
-            currentProcess.setPrintLocation("Disk -> Memory");
+            currentProcess.setPrintLocation("Memory");
             currentProcess.setState(1); //set state to running
             TSOS.Shell.updateReadyQueue();
 
@@ -485,8 +485,6 @@ var TSOS;
                 nextProcess.setState(2); //waiting
                 TSOS.Shell.updateReadyQueue();
                 this.rollOut(filename, oldContents); //just call roll-out here...
-                //                this.createFile(filename);
-                //                this.writeToFile(filename,oldContents,false);
             }
 
             //load back in to memory and continue...
@@ -502,7 +500,6 @@ var TSOS;
         * @returns {string}
         */
         FileSystem.prototype.swap = function (processOnDisk, base) {
-            alert("Swapping from the disk");
             var data;
             var zeroData = this.fsu.formatData(this.metaDataSize);
 
@@ -520,7 +517,6 @@ var TSOS;
             processOnDisk.setBase(base);
             processOnDisk.setLimit((base + _BlockSize));
             processOnDisk.setBlock((base / _BlockSize));
-            processOnDisk;
             TSOS.Shell.updateReadyQueue();
 
             //load current process into the mem
