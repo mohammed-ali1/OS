@@ -79,21 +79,21 @@ var TSOS;
         /**
         * Creates the MBR and adds it to the
         * local storage.
-        * @param localStorage
+        * @param sessionStorage
         * @param size
         */
-        FSU.prototype.createMBR = function (localStorage, size) {
+        FSU.prototype.createMBR = function (sessionStorage, size) {
             var data = this.stringToHex((APP_NAME + " " + APP_VERSION));
             var pad = this.padding("1###" + data, size);
             var key = this.makeKey(0, 0, 0);
-            localStorage.setItem(key, pad);
+            sessionStorage.setItem(key, pad);
         };
 
         /**
         * Creates a local file system.
         * Use this method when format is called.
         */
-        FSU.prototype.format = function (trackSize, sectorSize, blockSize, dataSize, localStorage) {
+        FSU.prototype.format = function (trackSize, sectorSize, blockSize, dataSize, sessionStorage) {
             var storage = this.formatData(dataSize);
             var dir = 0;
             var data = 0;
@@ -102,7 +102,7 @@ var TSOS;
                 for (var sector = 0; sector < sectorSize; sector++) {
                     for (var block = 0; block < blockSize; block++) {
                         var key = this.makeKey(track, sector, block);
-                        localStorage.setItem(key, storage);
+                        sessionStorage.setItem(key, storage);
                     }
                 }
             }
@@ -113,9 +113,9 @@ var TSOS;
         * @param trackSize
         * @param sectorSize
         * @param blockSize
-        * @param localStorage
+        * @param sessionStorage
         */
-        FSU.prototype.update = function (trackSize, sectorSize, blockSize, localStorage) {
+        FSU.prototype.update = function (trackSize, sectorSize, blockSize, sessionStorage) {
             var table = "<table>";
             table += "<th style='text-align: left; background-color: transparent;'>TSB</th>";
             table += "<th style='text-align: left; background-color: transparent;'>META</th>";
@@ -126,7 +126,7 @@ var TSOS;
                 for (var s = 0; s < sectorSize; s++) {
                     for (var b = 0; b < blockSize; b++) {
                         var key = this.makeKey(t, s, b);
-                        var metadata = localStorage.getItem(key);
+                        var metadata = sessionStorage.getItem(key);
                         var meta = metadata.slice(0, 4);
                         len = meta.length;
                         var data = metadata.slice(4, metadata.length);
@@ -164,7 +164,7 @@ var TSOS;
                 for (var s = 0; s < sectorSize; s++) {
                     for (var b = 0; b < blockSize; b++) {
                         var key = this.makeKey(t, s, b);
-                        var data = localStorage.getItem(key);
+                        var data = sessionStorage.getItem(key);
                         var meta = data.slice(0, 1);
                         if (meta == "0") {
                             return key;

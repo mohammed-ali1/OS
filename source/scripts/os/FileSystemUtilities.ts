@@ -88,21 +88,21 @@ module TSOS{
         /**
          * Creates the MBR and adds it to the
          * local storage.
-         * @param localStorage
+         * @param sessionStorage
          * @param size
          */
-        public createMBR(localStorage,size){
+        public createMBR(sessionStorage,size){
             var data:string = this.stringToHex((APP_NAME+" "+APP_VERSION));
             var pad:string = this.padding("1###"+data,size);
             var key = this.makeKey(0,0,0);
-            localStorage.setItem(key,pad);
+            sessionStorage.setItem(key,pad);
         }
 
         /**
          * Creates a local file system.
          * Use this method when format is called.
          */
-        public format(trackSize,sectorSize,blockSize,dataSize, localStorage){
+        public format(trackSize,sectorSize,blockSize,dataSize, sessionStorage){
 
             var storage = this.formatData(dataSize);
             var dir = 0;
@@ -112,7 +112,7 @@ module TSOS{
                 for (var sector = 0; sector < sectorSize; sector++) {
                     for (var block = 0; block < blockSize; block++) {
                         var key = this.makeKey(track,sector,block);
-                        localStorage.setItem(key,storage);
+                        sessionStorage.setItem(key,storage);
                     }
                 }
             }
@@ -122,9 +122,9 @@ module TSOS{
          * @param trackSize
          * @param sectorSize
          * @param blockSize
-         * @param localStorage
+         * @param sessionStorage
          */
-        public update(trackSize,sectorSize,blockSize,localStorage){
+        public update(trackSize,sectorSize,blockSize,sessionStorage){
             var table = "<table>";
             table += "<th style='text-align: left; background-color: transparent;'>TSB</th>";
             table += "<th style='text-align: left; background-color: transparent;'>META</th>";
@@ -135,7 +135,7 @@ module TSOS{
                 for(var s =0; s<sectorSize; s++){
                     for(var b=0;b<blockSize;b++){
                         var key = this.makeKey(t,s,b);
-                        var metadata = localStorage.getItem(key);
+                        var metadata = sessionStorage.getItem(key);
                         var meta = metadata.slice(0,4);
                         len = meta.length;
                         var data = metadata.slice(4,metadata.length);
@@ -176,7 +176,7 @@ module TSOS{
                     for (var b = 0; b < blockSize; b++) {
 
                         var key = this.makeKey(t, s, b);
-                        var data = localStorage.getItem(key);
+                        var data = sessionStorage.getItem(key);
                         var meta = data.slice(0, 1);
                         if (meta == "0") {
                             return key;

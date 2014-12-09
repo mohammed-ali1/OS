@@ -42,7 +42,7 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
 
             //load
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", "<string> -  Validates the User Program Input.");
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "<string> - Loads a program in hex into the system.");
             this.commandList[this.commandList.length] = sc;
 
             //status
@@ -335,18 +335,14 @@ var TSOS;
             var base = _MemoryManager.getBlockAvailable();
             var process;
             var pro = args[0];
-            var priority;
+            var priority = args[0];
 
-            if (pro.indexOf(".") == -1) {
-                priority = pro;
-            } else {
-                _StdOut.putText("Priority must be a whole number");
-                return;
-            }
-
-            if (priority < 0) {
+            if (pro == "") {
+                priority = 0;
+            } else if (priority < 0) {
                 priority = 0;
             }
+
             if (base != -1) {
                 //Create New PCB and don't forget the priority
                 if (priority < 0) {

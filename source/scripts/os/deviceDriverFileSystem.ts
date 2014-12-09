@@ -44,7 +44,7 @@ module TSOS{
              this.hasStorage();
             //has support for local storage?
             if(this.support == 1) {
-                this.fsu.format(this.trackSize, this.sectorSize, this.blockSize, this.metaDataSize, localStorage);
+                this.fsu.format(this.trackSize, this.sectorSize, this.blockSize, this.metaDataSize, sessionStorage);
                 this.createMBR();
                 this.update();
             }
@@ -54,14 +54,14 @@ module TSOS{
          * Creates the Master Boot Record
          */
         public createMBR(){
-            this.fsu.createMBR(localStorage,this.metaDataSize);
+            this.fsu.createMBR(sessionStorage,this.metaDataSize);
         }
 
         /**
          * Updates the File System Table
          */
         public update(){
-            this.fsu.update(this.trackSize,this.sectorSize,this.blockSize,localStorage);
+            this.fsu.update(this.trackSize,this.sectorSize,this.blockSize,sessionStorage);
         }
 
         /**
@@ -76,7 +76,7 @@ module TSOS{
             var zero = this.fsu.formatData(this.metaDataSize);
 
             if(dataIndex == "###"){
-                var a = localStorage.setItem(dataIndex,zero);
+                sessionStorage.setItem(dataIndex,zero);
             }else{
                 this.startDeleting(dataIndex,zero);
             }
@@ -89,13 +89,13 @@ module TSOS{
                     for (var b = index.charAt(2); b < this.blockSize; b++) {
 
                         var key = this.fsu.makeKey(t, s, b);
-                        var data = localStorage.getItem(key);
+                        var data = sessionStorage.getItem(key);
                         var nextKey = data.slice(1, 4);
                         if (nextKey == "###") {
-                            localStorage.setItem(key,zero);
+                            sessionStorage.setItem(key,zero);
                             return;
                         } else {
-                            localStorage.setItem(key,zero);
+                            sessionStorage.setItem(key,zero);
                         }
                         key = nextKey;
                         index = nextKey;
@@ -117,7 +117,7 @@ module TSOS{
             var nextMeta = this.getFileContents(pad);
 
             if(nextMeta == "###"){
-                var a = localStorage.getItem(nextMeta);
+                var a = sessionStorage.getItem(nextMeta);
                 _StdOut.putText(this.fsu.hexToString(a.slice(4,a.length).toString()));
             }else{
                 this.startPrinting(nextMeta);
@@ -130,14 +130,14 @@ module TSOS{
          * @param contents
          * @param pad
          */
-        public  writeToFile(file,contents,pad:boolean){
+        public  writeToFile(file,contents){
 
             //get the address of the data
             var success:boolean = false;
             var hex = this.fsu.stringToHex(file.toString());
             var hexFile = this.fsu.padding(hex,this.dataSize);
             var key = this.fetchDuplicate(hexFile);
-            var data = localStorage.getItem(key);
+            var data = sessionStorage.getItem(key);
             var dataIndex = data.slice(1,4);
             var contentsHex = this.fsu.stringToHex(contents.toString());
 
@@ -153,7 +153,7 @@ module TSOS{
             }
             else{
                 var padHex = this.fsu.padding(contentsHex,this.dataSize);
-                localStorage.setItem(dataIndex,"1###"+padHex);
+                sessionStorage.setItem(dataIndex,"1###"+padHex);
                 success = true;
             }
             this.update();
@@ -183,7 +183,7 @@ module TSOS{
             for(var s = 0; s<this.sectorSize;s++) {
                 for (var b = 0; b < this.blockSize; b++) {
                     key = this.fsu.makeKey(t,s,b);
-                    var data:string = localStorage.getItem(key);
+                    var data:string = sessionStorage.getItem(key);
                     var meta = data.slice(0,1);
                     var hexData:string = data.slice(4,this.metaDataSize);
                     var stringData = this.fsu.hexToString(hexData);
@@ -228,11 +228,11 @@ module TSOS{
             if(dataIndex != "-1") {
 
                 //store in dir-Index
-                localStorage.setItem(dirIndex, ("1" + dataIndex + hexData));//need to add actualData
+                sessionStorage.setItem(dirIndex, ("1" + dataIndex + hexData));//need to add actualData
 
                 //store "0" in data address
                 var formatData = this.fsu.formatData((this.dataSize));
-                localStorage.setItem(dataIndex, "1###" + formatData);
+                sessionStorage.setItem(dataIndex, "1###" + formatData);
 
                 //mark success
                 created = true;
@@ -277,7 +277,7 @@ module TSOS{
             for(var s = 0; s<this.sectorSize;s++) {
                 for (var b = 0; b < this.blockSize; b++) {
                     key = this.fsu.makeKey(t,s,b);
-                    var data:string = localStorage.getItem(key);
+                    var data:string = sessionStorage.getItem(key);
                     var meta = data.slice(0,1);
                     var dataData = data.slice(4,data.length);
                     if(meta == "1" && (dataData == filename)){
@@ -304,7 +304,7 @@ module TSOS{
             for(var s = 0; s<this.sectorSize;s++) {
                 for (var b = 0; b < this.blockSize; b++) {
                     key = this.fsu.makeKey(t,s,b);
-                    var data:string = localStorage.getItem(key);
+                    var data:string = sessionStorage.getItem(key);
                     var meta = data.slice(0,1);
                     var hexData:string = data.slice(4,this.metaDataSize);
                     if((filename == hexData) && (meta == "1")){
@@ -329,13 +329,13 @@ module TSOS{
             for(var s = 0; s<this.sectorSize;s++) {
                 for (var b = 0; b < this.blockSize; b++) {
                     key = this.fsu.makeKey(t,s,b);
-                    var data:string = localStorage.getItem(key);
+                    var data:string = sessionStorage.getItem(key);
                     var inUse = data.slice(0,1);
                     var meta = data.slice(1,4);
                     var hexData:string = data.slice(4,data.length);
                     if((filename == hexData) && (inUse == "1")){
                         //found what we are looking for...
-                        localStorage.setItem(key,zero);//delete the contents
+                        sessionStorage.setItem(key,zero);//delete the contents
                         return meta;
                     }
                 }
@@ -344,7 +344,7 @@ module TSOS{
         }
 
         public hasStorage(){
-            if('localStorage' in window && window['localStorage'] !== null){
+            if('sessionStorage' in window && window['sessionStorage'] !== null){
                 this.support = 1;
             }else{
                 this.support = 0;
@@ -361,7 +361,7 @@ module TSOS{
                     for (var b = 0; b < this.blockSize; b++) {
 
                         var key = this.fsu.makeKey(t, s, b);
-                        var data = localStorage.getItem(key);
+                        var data = sessionStorage.getItem(key);
                         var meta = data.slice(0, 1);
 
                         if((key == "377") && (array.length < (limit))){
@@ -425,10 +425,10 @@ module TSOS{
 
                 if (a + 1 < array.length) {
                     var nextKey = this.makeFreshKey(array[a + 1]);
-                    localStorage.setItem(key, "1"+nextKey + chunk);
+                    sessionStorage.setItem(key, "1"+nextKey + chunk);
                 } else {
                     var pad = this.fsu.padding(chunk,size);
-                    localStorage.setItem(key, "1###" + pad);
+                    sessionStorage.setItem(key, "1###" + pad);
                 }
 
                 if(end == fileContents.length){
@@ -461,7 +461,7 @@ module TSOS{
                 var created:boolean;
                     created = this.createFile(filename);
                 if(created){
-                    this.writeToFile(filename,contents,true);
+                    this.writeToFile(filename,contents);
                     return created;
                 }else{
                     return created;
@@ -473,7 +473,6 @@ module TSOS{
         public rollIn(currentProcess, nextProcess){
 
             var data: string;
-            var zeroData = this.fsu.formatData(this.metaDataSize);
             var oldContents : string;
 
             //search for a filename
@@ -483,7 +482,6 @@ module TSOS{
             var dataIndex = this.getFileContents(padFile);
                 data = this.grabAllHex(dataIndex); //read current process contents
 
-            localStorage.setItem(dataIndex,zeroData);
             currentProcess.setBase(nextProcess.getBase());
             currentProcess.setLimit(nextProcess.getLimit());
             currentProcess.setBlock(nextProcess.getBlock());
@@ -492,19 +490,19 @@ module TSOS{
             currentProcess.setState(1);//set state to running
             Shell.updateReadyQueue();
 
-            if(nextProcess.getState() == "Terminated" || nextProcess.getState() == "Killed"){
-                this.deleteFile(filename);
-                nextProcess.setLocation("Disk");
-                nextProcess.setPrintLocation("Memory -> Trash");
-                Shell.updateReadyQueue();
-            }else{
+            if(nextProcess.getState() != "Terminated" && nextProcess.getState() != "Killed"){
                 filename = "swap"+nextProcess.getPid();
                 oldContents = _MemoryManager.copyBlock(nextProcess.getBase());
                 nextProcess.setLocation("Disk");
                 nextProcess.setPrintLocation("Memory -> Disk");
                 nextProcess.setState(2);//waiting
+                this.createFile(filename);
+                this.writeToFile(filename,oldContents);
                 Shell.updateReadyQueue();
-                this.rollOut(filename,oldContents);//just call roll-out here...
+            }else{
+                nextProcess.setLocation("Memory");
+                nextProcess.setPrintLocation("Memory -> Trash");
+                Shell.updateReadyQueue();
             }
             //load back in to memory and continue...
             _MemoryManager.load(currentProcess.getBase(),data.toString());
@@ -532,7 +530,7 @@ module TSOS{
             //get the data of the file
             //grab everything in hex!!!!
             data = this.grabAllHex(dataIndex);
-            localStorage.setItem(dataIndex,zeroData);
+            sessionStorage.setItem(dataIndex,zeroData);
 
             processOnDisk.setBase(base);
             processOnDisk.setLimit((base+_BlockSize));
@@ -561,8 +559,6 @@ module TSOS{
             var stepOut:boolean = false;
             var dataData;
             var changeHex;
-            var sofar;
-            var sofarlen;
             var keys = "";
 
             for (var t:number = index.charAt(0); t < this.trackSize; t++) {
@@ -570,29 +566,25 @@ module TSOS{
                     for (var b:number = index.charAt(2); b < this.blockSize; b++) {
 
                         key = this.makeFreshKey(index);
-                        data = localStorage.getItem(key);
+                        data = sessionStorage.getItem(key);
                         nextKey = data.slice(1, 4);
                         dataData = data.slice(4,data.length);
                         if (nextKey == "###") {
                             changeHex = this.fsu.hexToString(dataData);
-                            sofar = changeHex;
-                            sofarlen = sofar.length;
                             value += changeHex;
-                            localStorage.setItem(key, zeroData);//replace with zeros
+                            sessionStorage.setItem(key, zeroData);//replace with zeros
                             this.update();
                             keys += key;
-//                            alert("read at keys: "+keys);
                             stepOut = true;
                             break;
                         } else {
                             changeHex = this.fsu.hexToString(dataData);
-                            sofar = changeHex;
-                            sofarlen = sofar.length;
                             value += changeHex;
-                            localStorage.setItem(key, zeroData);//replace with zeros
+                            sessionStorage.setItem(key, zeroData);//replace with zeros
                             this.update();
                             keys += key +", ";
                         }
+                        key = nextKey;
                         index = nextKey;
                     }
                     if(stepOut){
@@ -628,15 +620,15 @@ module TSOS{
                     for (var b = index.charAt(2); b < this.blockSize; b++) {
 
                         key = this.fsu.makeKey(t, s, b);
-                        data = localStorage.getItem(key);
+                        data = sessionStorage.getItem(key);
                         nextMeta = data.slice(1, 4);
                         if (nextMeta == "###") {
                             oldData += data.slice(4, data.length);
-                            localStorage.setItem(key, zeroData);//replace with zeros
+                            sessionStorage.setItem(key, zeroData);//replace with zeros
                             return oldData;
                         } else {
                             oldData += data.slice(4, data.length);
-                            localStorage.setItem(key, zeroData);//replace with zeros
+                            sessionStorage.setItem(key, zeroData);//replace with zeros
                         }
                         key = nextMeta;
                         index = nextMeta;
@@ -656,7 +648,7 @@ module TSOS{
                     for (var b = index.charAt(2); b < this.blockSize; b++) {
 
                         var key = this.fsu.makeKey(t, s, b);
-                        var data = localStorage.getItem(key);
+                        var data = sessionStorage.getItem(key);
                         var nextKey = data.slice(1, 4);
                         if (nextKey == "###") {
                             oldData = data.slice(4, data.length);

@@ -37,7 +37,7 @@ module TSOS {
 
             //Initialize Resident Queue
             _ResidentQueue = new Array();
-            _CurrentScheduler = new Scheduler("priority");
+            _CurrentScheduler = new Scheduler("rr");
 
             //Initialize and load file system Device Driver
             _FileSystem = new FileSystem();
@@ -183,7 +183,7 @@ module TSOS {
                     Pcb.displayTimeMonitor();
                     _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateReadyQueue();
-                    _CurrentScheduler.startProcess();
+                    this.handleScheduling();
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
@@ -194,11 +194,11 @@ module TSOS {
                         _ReadyQueue.enqueue(params);
                     }else{
                         _ReadyQueue.enqueue(params);
-                        _CurrentScheduler.startProcess();
+                        this.handleScheduling();
                     }
                     break;
                 case _RUNALL:
-                    _CurrentScheduler.startProcess();
+                    this.handleScheduling();
                     break;
                 case _ContextSwitch:
                     this.contextSwitch();
@@ -311,24 +311,28 @@ module TSOS {
                 //grab the next process
                 _CurrentProcess = _ReadyQueue.dequeue();
 
+                if(_CurrentProcess.getLocation() == "Disk"){
+                    this.contextSwitchDisk(true,false,false);
+                    return;
+                }
+
                 //record arrival time if state == ready
                 if(_CurrentProcess.getState() == "Ready"){
                     _CurrentProcess.setTimeArrived(_OSclock);
                     Pcb.displayTimeMonitor();
                 }
 
-                if(_CurrentProcess.getLocation() == "Memory"){
-                    //keep executing
-                    _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
-                    _CurrentProcess.setState(1); //set state to running
-                    Shell.updateReadyQueue();
-                    _CPU.startProcessing(_CurrentProcess);
-                    _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
+                if(_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed"){
+                    _CurrentScheduler.roundRobin();
+                    return;
                 }
 
-                if(_CurrentProcess.getLocation() == "Disk"){
-                    this.contextSwitchDisk(true,false,false);
-                }
+                //keep executing
+                _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
+                _CurrentProcess.setState(1); //set state to running
+                Shell.updateReadyQueue();
+                _CPU.startProcessing(_CurrentProcess);
+                _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
             }
         }
 
@@ -340,12 +344,21 @@ module TSOS {
          */
         public getNextAvailableBlock(){
             var index:number = _ResidentQueue.indexOf(_CurrentProcess);
-            index =  (index - 3);
+            index--;
             if(index < 0){
-                var residentIndex:number = _ResidentQueue.indexOf(_CurrentProcess);
-                index = (_ResidentQueue.length-3) + Math.abs(residentIndex);
+                index = _ResidentQueue.length-1;
             }
             return _ResidentQueue[index];
+//            index =  (index - 3);
+////            if(index < 0){
+////                var i = _ResidentQueue.indexOf(_CurrentProcess);
+////                if(_ResidentQueue.length % 2 == 0){
+////                    index = ((_ResidentQueue.length-4) + Math.abs(i));
+////                }else{
+////                    index = ((_ResidentQueue.length-3) + Math.abs(i));
+////                }
+////            }
+////            return _ResidentQueue[index];
         }
 
 
@@ -372,7 +385,7 @@ module TSOS {
                 _CurrentProcess.setPrintLocation("Disk -> Memory");
                 //set the least process stored to "TRASH"
                 this.setToTrash();
-                _FileSystem.swap(_CurrentProcess, (_BlockSize/_BlockSize)-1);
+                _FileSystem.swap(_CurrentProcess,(_BlockSize/_BlockSize)-1);
                 _CurrentProcess.setState(1);
                 _CPU.startProcessing(_CurrentProcess);
                 Shell.updateReadyQueue();
@@ -386,6 +399,22 @@ module TSOS {
                 _CurrentProcess.setState(1);
                 _CPU.startProcessing(_CurrentProcess);
                 Shell.updateReadyQueue();
+                Shell.updateReadyQueue();
+            }
+        }
+
+        /**
+         * Handle Scheduling Algorithms.
+         */
+        public handleScheduling(){
+            if(_CurrentSchedule == "rr"){
+                _CurrentScheduler.roundRobin();
+            }
+            if(_CurrentSchedule == "fcfs"){
+                _CurrentScheduler.firstComeFirstServed();
+            }
+            if(_CurrentSchedule == "priority"){
+                _CurrentScheduler.priority();
             }
         }
 
@@ -411,7 +440,6 @@ module TSOS {
          * Throws a BSOD Error.
          */
         public bsod(message1):void{
-
             _DrawingContext.clearRect(0,0,_Canvas.width,_Canvas.height);
             _DrawingContext.fillStyle = "blue";
             _DrawingContext.fillRect(0,0,_Canvas.width,_Canvas.height);

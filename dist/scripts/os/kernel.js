@@ -35,7 +35,7 @@ var TSOS;
 
             //Initialize Resident Queue
             _ResidentQueue = new Array();
-            _CurrentScheduler = new TSOS.Scheduler("priority");
+            _CurrentScheduler = new TSOS.Scheduler("rr");
 
             //Initialize and load file system Device Driver
             _FileSystem = new TSOS.FileSystem();
@@ -178,7 +178,7 @@ var TSOS;
                     TSOS.Pcb.displayTimeMonitor();
                     _Kernel.krnTrace("\n\nTERMINATING PID: " + _CurrentProcess.getPid() + "\n");
                     TSOS.Shell.updateReadyQueue();
-                    _CurrentScheduler.startProcess();
+                    this.handleScheduling();
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
@@ -189,11 +189,11 @@ var TSOS;
                         _ReadyQueue.enqueue(params);
                     } else {
                         _ReadyQueue.enqueue(params);
-                        _CurrentScheduler.startProcess();
+                        this.handleScheduling();
                     }
                     break;
                 case _RUNALL:
-                    _CurrentScheduler.startProcess();
+                    this.handleScheduling();
                     break;
                 case _ContextSwitch:
                     this.contextSwitch();
@@ -300,24 +300,28 @@ var TSOS;
                 //grab the next process
                 _CurrentProcess = _ReadyQueue.dequeue();
 
+                if (_CurrentProcess.getLocation() == "Disk") {
+                    this.contextSwitchDisk(true, false, false);
+                    return;
+                }
+
                 //record arrival time if state == ready
                 if (_CurrentProcess.getState() == "Ready") {
                     _CurrentProcess.setTimeArrived(_OSclock);
                     TSOS.Pcb.displayTimeMonitor();
                 }
 
-                if (_CurrentProcess.getLocation() == "Memory") {
-                    //keep executing
-                    _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
-                    _CurrentProcess.setState(1); //set state to running
-                    TSOS.Shell.updateReadyQueue();
-                    _CPU.startProcessing(_CurrentProcess);
-                    _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
+                if (_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed") {
+                    _CurrentScheduler.roundRobin();
+                    return;
                 }
 
-                if (_CurrentProcess.getLocation() == "Disk") {
-                    this.contextSwitchDisk(true, false, false);
-                }
+                //keep executing
+                _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
+                _CurrentProcess.setState(1); //set state to running
+                TSOS.Shell.updateReadyQueue();
+                _CPU.startProcessing(_CurrentProcess);
+                _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
             }
         };
 
@@ -328,12 +332,21 @@ var TSOS;
         */
         Kernel.prototype.getNextAvailableBlock = function () {
             var index = _ResidentQueue.indexOf(_CurrentProcess);
-            index = (index - 3);
+            index--;
             if (index < 0) {
-                var residentIndex = _ResidentQueue.indexOf(_CurrentProcess);
-                index = (_ResidentQueue.length - 3) + Math.abs(residentIndex);
+                index = _ResidentQueue.length - 1;
             }
             return _ResidentQueue[index];
+            //            index =  (index - 3);
+            ////            if(index < 0){
+            ////                var i = _ResidentQueue.indexOf(_CurrentProcess);
+            ////                if(_ResidentQueue.length % 2 == 0){
+            ////                    index = ((_ResidentQueue.length-4) + Math.abs(i));
+            ////                }else{
+            ////                    index = ((_ResidentQueue.length-3) + Math.abs(i));
+            ////                }
+            ////            }
+            ////            return _ResidentQueue[index];
         };
 
         /**
@@ -374,6 +387,22 @@ var TSOS;
                 _CurrentProcess.setState(1);
                 _CPU.startProcessing(_CurrentProcess);
                 TSOS.Shell.updateReadyQueue();
+                TSOS.Shell.updateReadyQueue();
+            }
+        };
+
+        /**
+        * Handle Scheduling Algorithms.
+        */
+        Kernel.prototype.handleScheduling = function () {
+            if (_CurrentSchedule == "rr") {
+                _CurrentScheduler.roundRobin();
+            }
+            if (_CurrentSchedule == "fcfs") {
+                _CurrentScheduler.firstComeFirstServed();
+            }
+            if (_CurrentSchedule == "priority") {
+                _CurrentScheduler.priority();
             }
         };
 

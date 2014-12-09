@@ -59,7 +59,7 @@ module TSOS {
             //load
             sc = new ShellCommand(this.shellLoad,
                 "load",
-                "<string> -  Validates the User Program Input.");
+                "<string> - Loads a program in hex into the system.");
             this.commandList[this.commandList.length] = sc;
 
             //status
@@ -393,19 +393,15 @@ module TSOS {
 //            Get the free block first!
             var base = _MemoryManager.getBlockAvailable();
             var process;
-            var pro = args[0];
-            var priority:number;
+            var pro:string = args[0];
+            var priority:number = args[0];
 
-           if(pro.indexOf(".") == -1){
-               priority = pro;
-           }else{
-                _StdOut.putText("Priority must be a whole number");
-               return;
-           }
-
-            if(priority < 0){
+            if(pro == ""){
+                priority = 0;
+            }else if(priority <0){
                 priority = 0;
             }
+
             if(base != -1) {
                 //Create New PCB and don't forget the priority
                 if(priority < 0){

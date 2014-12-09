@@ -123,13 +123,6 @@ var TSOS;
             var current;
             for (var i = base; i < (base + 256); i++) {
                 current = _MainMemory[i];
-
-                //                if(!isNaN(parseInt(current)) && current.length<2){
-                //                    current = "0" + current;
-                //                }
-                //                if(current.length == 1){
-                //                    current = "0" + current;
-                //                }
                 if (current.length == 1) {
                     data += "0" + current;
                 } else {
