@@ -84,6 +84,10 @@ var TSOS;
             }
         };
 
+        MemoryManager.prototype.clearBlock = function (base) {
+            _Memory.clearBlock(base);
+        };
+
         MemoryManager.prototype.copyBlock = function (process) {
             return _Memory.copyBlock(process);
         };

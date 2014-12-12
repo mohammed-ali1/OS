@@ -91,6 +91,10 @@ module TSOS{
             }
         }
 
+        public clearBlock(base){
+            _Memory.clearBlock(base);
+        }
+
         public copyBlock(process){
             return _Memory.copyBlock(process);
         }

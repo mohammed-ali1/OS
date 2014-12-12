@@ -3,24 +3,20 @@
 /* Heading */
 #top{
     width: 100%;
-    height: 70px;
-}
-
-#status{
     float: left;
-    color: firebrick;
-    font-size: 24px;
+    border: 1px solid;
+    display: inline-block;
 }
-
-#clock{
+#top p{
+    font-size:25px;
+    color: #000000;
+    margin-left: 1%;
     float: left;
-    font-size: 25px;
-    color:firebrick;
 }
 
+/* Body */
 body {
-    /*background: #909193 url(../images/linen.png) repeat;*/
-    background-color: rgba(122, 122, 122, 0.40);
+    background-color: rgba(208, 247, 255, 0.40);
     font-family: Helvetica, Verdana, Arial, sans-serif;
     font-size: 12pt;
     font-weight: normal;
@@ -30,11 +26,11 @@ body {
 #divMain{
     width:100%;
     float: left;
-    height: auto;
-    clear: both;
+    white-space: nowrap;
+    border: 1px solid #ffffff;
 }
 
-h1 {
+h1{
     color: black;
     font-size: 24pt;
     font-weight: normal;
@@ -45,7 +41,7 @@ h2 {
     font-size: 20pt;
     font-weight: normal;
     font-style: normal;
-    color: firebrick;
+    color: #000000;
 }
 
 h3 {
@@ -53,13 +49,60 @@ h3 {
     font-size: 16pt;
     font-weight: normal;
     font-style: normal;
-    color: firebrick;
+    color: #000000;
     text-align: center;
+}
+/* Buttons */
+#divButtonBar{
+    padding-top: 1%;
+    border: 1px solid;
+    margin:4px;
+    width: auto;
+}
+
+#btnStartOS{
+    background-color: #ffa199;
+    font-size: 20px;
+    border-radius: 10px;
+    width: 150px;
+}
+
+#btnHaltOS{
+    background-color: #eeeec6;
+    font-size: 20px;
+    border-radius: 10px;
+    width: 150px;
+}
+
+#btnReset{
+    background-color: #40e0d0;
+    font-size: 20px;
+    border-radius: 10px;
+    width: 150px;
+}
+
+#stepButton, #stopButton, #nextButton{
+    width: 100px;
+    height: 30px;
+    border-radius: 10px;
+    float: left;
+    font-size: 15px;
+    background-color: floralwhite;
+}
+
+#nextButton{
+    background-color: #eeeec6;
+    color: #000000;
+}
+
+#stopButton{
+    background-color: red;
+    color: #ffffff;
 }
 
 #display {
-    background-color: #E78A61;
-    border: 2px solid red;
+    background-color: #E3E4FA;
+    border: 2px solid #028064;
     cursor: default;
     border-radius: 5px;
 }
@@ -75,33 +118,6 @@ h3 {
     text-align: center;
 }
 
-#divButtonBar{
-    padding-top: 10px;
-}
-
-#btnStartOS{
-    background-color: lawngreen;
-    font-size: 20px;
-    border-radius: 5px;
-    -webkit-border-radius: 10px;
-    width: 150px;
-}
-
-#btnHaltOS{
-    background-color: palegoldenrod;
-    font-size: 20px;
-    border-radius: 5px;
-    -webkit-border-radius: 10px;
-    width: 150px;
-}
-
-#btnReset{
-    background-color: gold;
-    font-size: 20px;
-    border-radius: 5px;
-    -webkit-border-radius: 10px;
-    width: 150px;
-}
 
 #taHostLog, #taProgramInput{
     border: transparent;
@@ -113,13 +129,13 @@ h3 {
     border-radius: 10px;
     width: 350px;
     height: 70px;
-    color: firebrick;
+    color: #000000;
     border: 2px solid;
     font-size: 14px;
 }
 
 #taHostLog{
-    color:#E66C2C;
+    color: #000000;
     resize:none;
     width:350px;
     height:200px;
@@ -157,31 +173,13 @@ h3 {
     font-weight: bold;
 }
 
-#stepButton, #stopButton, #nextButton{
-    background-color: ghostwhite;
-    width: 100px;
-    height: 30px;
-    border-radius: 10px;
-    float: left;
-    font-size: 15px;
-    background-color: floralwhite;
-}
-
-#nextButton{
-    background-color: lawngreen;
-    color: #000000;
-}
-
-#stopButton{
-    background-color: red;
-    color: #ffffff;
-}
-
 #tableID tr:nth-child(odd) {
-    background-color: #FFD801;
+    background-color: #E3E4FA;
+    /*FFD801*/
 }
 #tableID tr:nth-child(even) {
-    background-color:  #E66C2C;
+    background-color:#40E0D0;
+    /*E66C2C*/
 }
 
 #tableID td:hover{
@@ -194,20 +192,20 @@ h3 {
 }
 
 #cpu, #readyQueue,#monitor{
-    border: 4px solid firebrick;
+    border: 4px solid #201477;
     width:350px;
     border-radius: 10px;
     table-layout: auto;
 }
 
 #displayReady th{
-    border: 1px solid firebrick;
+    border: 1px solid #201477;
 }
 
 #displayReady{
     border-radius: 10px;
     table-layout: auto;
-    border: 4px solid firebrick;
+    border: 4px solid #201477;
 }
 
 #cpu, #readyQueue,#monitor{
@@ -216,8 +214,8 @@ h3 {
 
 #cpu th, #readyQueue th, #displayReady th, #monitor th{
     text-align: center;
-    color: firebrick;
-    background-color: #FFD801;
+    color: #ffffff;
+    background-color: #028064;
     width: auto;
 }
 
@@ -226,7 +224,7 @@ h3 {
     text-align: center;
     border-radius: 5px;
     color: #ffffff;
-    background-color: #E66C2C;
+    background-color: #40e0d0;
 }
 
 #displayReady td{
@@ -253,8 +251,8 @@ h3 {
     width: auto;
     text-align: center;
     border-radius: 5px;
-    color: #ffffff;
-    background-color: #E66C2C;
+    /*color: #ffffff;*/
+    /*background-color: #E66C2C;*/
     padding:5px;
-    border: 2px solid;
+    /*border: 2px solid;*/
 }

@@ -34,7 +34,7 @@ var TSOS;
         Cpu.prototype.reset = function () {
             _CPU.PC = 0;
             _CPU.Acc = 0;
-            _CPU.IR = "???";
+            _CPU.IR = "0";
             _CPU.INS = "CPU [ ]";
             _CPU.Xreg = 0;
             _CPU.Yreg = 0;
@@ -72,7 +72,7 @@ var TSOS;
         };
 
         Cpu.prototype.displayCPU = function () {
-            document.getElementById("pc").innerHTML = parseInt(_CPU.PC + _CurrentProcess.getBase()).toString(); //Off by one IDK why!
+            document.getElementById("pc").innerHTML = _CPU.PC.toString(); //Off by one IDK why!
             document.getElementById("acc").innerHTML = _CPU.Acc.toString();
             document.getElementById("ir").innerHTML = _CPU.IR;
             document.getElementById("x").innerHTML = _CPU.Xreg.toString();

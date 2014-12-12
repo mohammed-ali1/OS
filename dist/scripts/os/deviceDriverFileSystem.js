@@ -22,8 +22,7 @@ var TSOS;
             this.metaDataSize = 64;
             this.dataSize = 60;
             this.support = 0;
-            FileSystem.dirSpace = 64;
-            FileSystem.dataSpace = 192;
+            this.formatted = false;
             this.fsu = new TSOS.FSU(); //file system utilities
             this.zeroData = this.fsu.formatData(this.metaDataSize);
         };
@@ -43,6 +42,7 @@ var TSOS;
                 this.fsu.format(this.trackSize, this.sectorSize, this.blockSize, this.metaDataSize, sessionStorage);
                 this.createMBR();
                 this.update();
+                this.formatted = true;
             }
         };
 
@@ -65,16 +65,30 @@ var TSOS;
         * @param str
         */
         FileSystem.prototype.deleteFile = function (str) {
+            //can't delete program files!
+            var swapFile = str.slice(0, 4);
+            if ((_ProgramFile == swapFile)) {
+                _StdOut.putText("No!");
+                return;
+            }
+
             var hexData = this.fsu.stringToHex(str.toString());
             var fileData = this.fsu.padding(hexData, (this.dataSize));
             var dataIndex = this.getFileContents(fileData);
             var zero = this.fsu.formatData(this.metaDataSize);
 
-            if (dataIndex == "###") {
-                sessionStorage.setItem(dataIndex, zero);
+            if (dataIndex == "-1") {
+                _StdOut.putText("Cannot find the file: " + str);
             } else {
-                this.startDeleting(dataIndex, zero);
+                var data = sessionStorage.getItem(dataIndex);
+                var key = data.slice(1, 4);
+                if (key == "###") {
+                    sessionStorage.setItem(dataIndex, zero);
+                } else {
+                    this.startDeleting(key, zero);
+                }
             }
+            this.update();
         };
 
         FileSystem.prototype.startDeleting = function (index, zero) {
@@ -90,7 +104,6 @@ var TSOS;
                         } else {
                             sessionStorage.setItem(key, zero);
                         }
-                        key = nextKey;
                         index = nextKey;
                     }
                 }
@@ -106,13 +119,22 @@ var TSOS;
             var pad = this.fsu.padding(filename, this.dataSize);
 
             //get file index
-            var nextMeta = this.getFileContents(pad);
+            var key = this.fetchDuplicate(pad);
 
-            if (nextMeta == "###") {
-                var a = sessionStorage.getItem(nextMeta);
+            //if not found...then return
+            if (key == "-1") {
+                _StdOut.putText("Cannot find the file: " + file);
+                return;
+            }
+
+            var data = sessionStorage.getItem(key);
+            var meta = data.slice(1, 4);
+
+            if (meta == "###") {
+                var a = sessionStorage.getItem(meta);
                 _StdOut.putText(this.fsu.hexToString(a.slice(4, a.length).toString()));
             } else {
-                this.startPrinting(nextMeta);
+                this.startPrinting(meta);
             }
         };
 
@@ -128,6 +150,11 @@ var TSOS;
             var hex = this.fsu.stringToHex(file.toString());
             var hexFile = this.fsu.padding(hex, this.dataSize);
             var key = this.fetchDuplicate(hexFile);
+            if (key == "-1") {
+                _StdOut.putText("Cannot find the file: " + file);
+                return;
+            }
+
             var data = sessionStorage.getItem(key);
             var dataIndex = data.slice(1, 4);
             var contentsHex = this.fsu.stringToHex(contents.toString());
@@ -149,10 +176,9 @@ var TSOS;
             this.update();
 
             var swapFile = file.slice(0, 4);
-            var swap = "swap";
 
             //print only if its not a swap-file
-            if (success && (swap != swapFile)) {
+            if (success && (_ProgramFile != swapFile)) {
                 if (success) {
                     _StdOut.putText("Successfully wrote to: " + file);
                     return success;
@@ -169,16 +195,15 @@ var TSOS;
         */
         FileSystem.prototype.fileDirectory = function () {
             var t = 0;
-            var key;
             for (var s = 0; s < this.sectorSize; s++) {
                 for (var b = 0; b < this.blockSize; b++) {
-                    key = this.fsu.makeKey(t, s, b);
+                    var key = this.fsu.makeKey(t, s, b);
                     var data = sessionStorage.getItem(key);
                     var meta = data.slice(0, 1);
-                    var hexData = data.slice(4, this.metaDataSize);
+                    var hexData = data.slice(4, data.length);
                     var stringData = this.fsu.hexToString(hexData);
                     if (meta == "1") {
-                        _StdOut.putText(key + ": " + stringData);
+                        _StdOut.putText(key + ": " + stringData.toString());
                         _Console.advanceLine();
                     }
                 }
@@ -235,10 +260,9 @@ var TSOS;
             }
 
             var swapFile = filename.slice(0, 4);
-            var swapFilename = "swap";
 
             //if we are creating a swap-file...we don't want to print.
-            if (created && (swapFilename == swapFile)) {
+            if (created && (_ProgramFile == swapFile)) {
                 return created;
             }
 
@@ -252,6 +276,10 @@ var TSOS;
                 _Console.advanceLine();
                 return created;
             }
+        };
+
+        FileSystem.prototype.isFormatted = function () {
+            return this.formatted;
         };
 
         /**
@@ -476,17 +504,25 @@ var TSOS;
                 nextProcess.setLocation("Disk");
                 nextProcess.setPrintLocation("Memory -> Disk");
                 nextProcess.setState(2); //waiting
+                nextProcess.setBase(-1);
+                nextProcess.setLimit(-1);
+                nextProcess.setBlock(-1);
                 this.createFile(filename);
                 this.writeToFile(filename, oldContents);
                 TSOS.Shell.updateReadyQueue();
             } else {
-                nextProcess.setLocation("Memory");
+                //even though it won't be in the disk
+                //we need to set the location to disk here
+                //because when we kill or swap...we can still swap
+                //in order
+                nextProcess.setLocation("Disk");
                 nextProcess.setPrintLocation("Memory -> Trash");
                 TSOS.Shell.updateReadyQueue();
             }
 
             //load back in to memory and continue...
             _MemoryManager.load(currentProcess.getBase(), data.toString());
+            _MemoryManager.update();
             this.update();
         };
 
@@ -561,7 +597,6 @@ var TSOS;
                             this.update();
                             keys += key + ", ";
                         }
-                        key = nextKey;
                         index = nextKey;
                     }
                     if (stepOut) {
@@ -604,7 +639,6 @@ var TSOS;
                             oldData += data.slice(4, data.length);
                             sessionStorage.setItem(key, zeroData); //replace with zeros
                         }
-                        key = nextMeta;
                         index = nextMeta;
                     }
                 }
@@ -632,7 +666,6 @@ var TSOS;
                             len += oldData;
                             _StdOut.putText(this.fsu.hexToString(oldData.toString()));
                         }
-                        key = nextKey;
                         index = nextKey;
                     }
                 }

@@ -195,17 +195,7 @@ module TSOS {
                 "getschedule",
                 "- Gets the current schedule");
             this.commandList[this.commandList.length] = sc;
-
-            // copy
-            sc = new ShellCommand(this.ShellCopy,
-                "copy",
-                "- Gets the current schedule");
-            this.commandList[this.commandList.length] = sc;
-
             // processes - list the running processes and their IDs
-            // kill <id> - kills the specified process id.
-
-            //
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -351,7 +341,7 @@ module TSOS {
          * Prints the location.
          */
         public shellWhereami(){
-            _StdOut.putText("I'm stuck in a loop....");
+            _StdOut.putText("Why don't you turn around.");
         }
 
         /**
@@ -396,21 +386,17 @@ module TSOS {
             var pro:string = args[0];
             var priority:number = args[0];
 
-            if(pro == ""){
-                priority = 0;
+            if(pro == undefined || pro < 0){
+                priority = 10;
             }else if(priority <0){
                 priority = 0;
             }
 
             if(base != -1) {
                 //Create New PCB and don't forget the priority
-                if(priority < 0){
-                    process = new Pcb(base, (base + 255), -1);
-                }else{
-                    process = new Pcb(base, (base + 255), priority);
-                }
+                process = new Pcb(base, (base + 255), priority);
                 process.setLength((x.length / 2)); //set the length of the program.
-                process.setState(9999999999999999999999999);//set state "NEW"
+                process.setState(007);//set state "NEW"
                 process.setLocation("Memory");
                 process.setPrintLocation("Memory");
 
@@ -429,35 +415,29 @@ module TSOS {
             }else{
                 //Base is -1 at this point.
                 //so need to store into the file system.
-                if(priority < 0){
-                    process = new Pcb(-1,-1,-1);
-                }else{
+                //check..formatted first!
+                if(_FileSystem.isFormatted()){
                     process = new Pcb(-1,-1,priority);
-                }
-                process.setLocation("Disk");
-                process.setPrintLocation("Disk");
-                process.setState(9999999999999999999999999);//set state "NEW"
-                process.setLength((x.length / 2));
-                process.setLocation("Disk");
-                var filename:string = ("swap"+process.getPid());
-                var loaded : boolean =  _FileSystem.rollOut(filename,x.toUpperCase().toString());
-                if(loaded){
-                    _StdOut.putText("Loaded Successfully!");
-                    _Console.advanceLine();
-                    _StdOut.putText("Process ID: " + process.getPid());
-                    _ResidentQueue.push(process);
-                    _TerminatedQueue.push(process);
+                    process.setLocation("Disk");
+                    process.setPrintLocation("Disk");
+                    process.setState(007);//set state "NEW"
+                    process.setLength((x.length / 2));
+                    process.setLocation("Disk");
+                    var filename:string = ("swap"+process.getPid());
+                    var loaded : boolean =  _FileSystem.rollOut(filename,x.toUpperCase().toString());
+                    if(loaded){
+                        _StdOut.putText("Loaded Successfully!");
+                        _Console.advanceLine();
+                        _StdOut.putText("Process ID: " + process.getPid());
+                        _ResidentQueue.push(process);
+                        _TerminatedQueue.push(process);
+                    }else{
+                        _StdOut.putText("Not enough space to load anymore!");
+                    }
                 }else{
-                    _StdOut.putText("Not enough space to load anymore!");
+                    _StdOut.putText("File System not Formatted!");
                 }
             }
-            _Console.advanceLine();
-//            for(var i=0; i<_ResidentQueue.length;i++){
-//                var p:TSOS.Pcb = _ResidentQueue[i];
-//                alert("P: "+p.getPid());
-//                _StdOut.putText("pid: "+p.getPid()+", pro: "+p.getPriority());
-//                _Console.advanceLine();
-//            }
         }
 
         /**
@@ -491,7 +471,7 @@ module TSOS {
                     tableView += "<td>" + s.getBase().toString() + "</td>";
                     tableView += "<td>" + s.getLimit().toString() + "</td>";
                     tableView += "<td>" + s.getState().toString() + "</td>";
-                    tableView += "<td>" + parseInt(s.getPc() + s.getBase()) + "</td>";
+                    tableView += "<td>" + s.getPc()+ "</td>";
                     tableView += "<td>" + s.getIR() + "</td>";
                     tableView += "<td>" + s.getAcc() + "</td>";
                     tableView += "<td>" + s.getX() + "</td>";
@@ -508,7 +488,7 @@ module TSOS {
                     tableView += "<td>" + s.getBase().toString() + "</td>";
                     tableView += "<td>" + s.getLimit().toString() + "</td>";
                     tableView += "<td>" + s.getState().toString() + "</td>";
-                    tableView += "<td>" + parseInt(s.getPc() + s.getBase()) + "</td>";
+                    tableView += "<td>" + s.getPc() + "</td>";
                     tableView += "<td>" + s.getIR() + "</td>";
                     tableView += "<td>" + s.getAcc() + "</td>";
                     tableView += "<td>" + s.getX() + "</td>";
@@ -520,21 +500,41 @@ module TSOS {
                 }
 
                 if (s.getState() == "Waiting"){
-                    tableView += "<tr style='background-color: #FFD801;'>";
-                    tableView += "<td style='color: #000000;'>" + s.getPid().toString() + "</td>";
-                    tableView += "<td style='color: #000000;'>" + s.getBlock().toString() + "</td>";
-                    tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
-                    tableView += "<td style='color: #000000;'>" + s.getLimit().toString() + "</td>";
-                    tableView += "<td style='color: #000000;'>" + s.getState().toString() + "</td>";
-                    tableView += "<td style='color: #000000;'>" + parseInt(s.getPc() + s.getBase()) + "</td>";
-                    tableView += "<td style='color: #000000;'>" + s.getIR() + "</td>";
-                    tableView += "<td style='color: #000000;'>" + s.getAcc() + "</td>";
-                    tableView += "<td style='color: #000000;'>" + s.getX() + "</td>";
-                    tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
-                    tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
-                    tableView += "<td style='color: #000000;'>" + s.getPrintLocation()+ "</td>";
-                    tableView += "<td style='color: #000000;'>" + s.getPriority()+ "</td>";
-                    tableView += "</tr>";
+
+                    if(s.getLocation() == "Memory"){
+                        tableView += "<tr style='background-color: #FFD801;'>";
+                        tableView += "<td style='color: #000000;'>" + s.getPid().toString() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getBlock().toString() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getLimit().toString() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getState().toString() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getPc() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getIR() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getAcc() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getX() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getY() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getZ() + "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getPrintLocation()+ "</td>";
+                        tableView += "<td style='color: #000000;'>" + s.getPriority()+ "</td>";
+                        tableView += "</tr>";
+                    }else{
+                        tableView += "<tr style='background-color: #FFD801;'>";
+                        tableView += "<td style='color: firebrick;'>" + s.getPid().toString() + "</td>";
+                        tableView += "<td style='color: firebrick;'>" + s.getBlock().toString() + "</td>";
+                        tableView += "<td style='color: firebrick;'>" + s.getBase().toString() + "</td>";
+                        tableView += "<td style='color: firebrick;'>" + s.getLimit().toString() + "</td>";
+                        tableView += "<td style='color: firebrick;'>" + s.getState().toString() + "</td>";
+                        tableView += "<td style='color: firebrick;'>" + s.getPc() + "</td>";
+                        tableView += "<td style='color: firebrick;'>" + s.getIR() + "</td>";
+                        tableView += "<td style='color: firebrick;'>" + s.getAcc() + "</td>";
+                        tableView += "<td style='color: firebrick;'>" + s.getX() + "</td>";
+                        tableView += "<td style='color: firebrick;'>" + s.getY() + "</td>";
+                        tableView += "<td style='color: firebrick;'>" + s.getZ() + "</td>";
+                        tableView += "<td style='color: firebrick;'>" + s.getPrintLocation()+ "</td>";
+                        tableView += "<td style='color: firebrick;'>" + s.getPriority()+ "</td>";
+                        tableView += "</tr>";
+                    }
+
                 }
 
                 if (s.getState() == "Ready"){
@@ -544,7 +544,7 @@ module TSOS {
                     tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getLimit().toString() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getState().toString() + "</td>";
-                    tableView += "<td style='color: #000000;'>" + parseInt(s.getPc() + s.getBase()) + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getPc() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getIR() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getAcc() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getX() + "</td>";
@@ -562,7 +562,7 @@ module TSOS {
                     tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getLimit().toString() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getState().toString() + "</td>";
-                    tableView += "<td style='color: #000000;'>" + parseInt(s.getPc() + s.getBase()) + "</td>";
+                    tableView += "<td style='color: #000000;'>" + s.getPc() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getIR() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getAcc() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getX() + "</td>";
@@ -678,8 +678,8 @@ module TSOS {
          * @param args
          */
         public shellQuantum(args){
-            if(args.length >0){
-                if(args >0){
+            if(args[0].length >0){
+                if(args[0] >0){
                     _Quantum = args;
                     _StdOut.putText("Current Quantum: " +_Quantum);
                 }else {
@@ -711,11 +711,9 @@ module TSOS {
                     }
                 }
             }
-
             if(nobueno == false){
                 _StdOut.putText("noo procesos en ejecución !");
             }
-
         }
 
         /**
@@ -731,38 +729,89 @@ module TSOS {
          */
         public shellKill(args){
 
-            //what if only thing running...we want to reset the CPU
-            if((_CurrentProcess.getPid() == args) && (_CurrentProcess.getState() == "Running") && (_ReadyQueue.isEmpty())){
-                _Kernel.krnInterruptHandler(_KilledReset,_CurrentProcess);
-                return;
+            if(_CurrentProcess.getPid() == args){
+                _CurrentProcess.setState(5);
+                Shell.updateReadyQueue();
+                _Kernel.startScheduler();
             }
 
-            //set the current process to killed...and go to next process
-            if((_CurrentProcess.getPid() == args) && (_CurrentProcess.getState() == "Running")){
-                _Kernel.krnInterruptHandler(_KilledRunAll,_CurrentProcess);
-                return;
-            }
-
-            for(var i=0; i<_ReadyQueue.getSize();i++){
-
+            for(var i =0; i<_ReadyQueue.getSize();i++){
                 var process:TSOS.Pcb = _ReadyQueue.q[i];
 
-                if(process.getPid() == args && (process.getState() == "Terminated" || process.getState() == "Killed")){
-                    _StdOut.putText("I'm already dead......Why are you so mean....?");
-                    return;
-                }
-
-                if(process.getState() != "Terminated"){
-
-                    if (process.getPid() == args) {
+                if(process.getPid() == args){
+                    if(process.getLocation() == "Disk"){
+                        _FileSystem.deleteFile(_ProgramFile+process.getPid());
                         process.setState(5);
-                        _StdOut.putText("Killed PID: " + process.getPid());
-                        _Kernel.krnInterruptHandler(_Killed, process);
-                        return;
+                        _ReadyQueue.q.splice(i,1);
+//                        var index = _ResidentQueue.indexOf(process);
+//                        _ResidentQueue.splice(index,1);
+                        _Kernel.startScheduler();
+                        break;
+                    }
+                    if(process.getLocation() == "Memory"){
+                        process.setState(5);
+                        _ReadyQueue.q.splice(i,1);
+//                        var index = _ResidentQueue.indexOf(process);
+//                        _ResidentQueue.splice(index,1);
+//                        _Kernel.startScheduler();
+                        break;
                     }
                 }
             }
-            _StdOut.putText("Why do you wanna KILL me....?");
+
+//            if(args[0] < 0){
+//                _StdOut.putText("You said kill what...?");
+//                return;
+//            }
+//
+//            //what if only thing running...we want to reset the CPU
+//            if((_CurrentProcess.getPid() == args) &&  (_ReadyQueue.isEmpty())){
+//                Shell.updateReadyQueue();
+//                _Kernel.krnInterruptHandler(_KilledReset,_CurrentProcess);
+//                return;
+//            }
+//
+//            //kill the current process...so move on to the next process
+//            if((_CurrentProcess.getPid() == args) && _ReadyQueue.getSize() > 0){
+//                _CurrentProcess.setState(5);
+//                Shell.updateReadyQueue();
+//                _Kernel.startScheduler();
+//                return;
+//            }
+//
+//            //set the current process to killed...and go to next process
+//            if((_CurrentProcess.getPid() == args) && (_CurrentProcess.getState() == "Running")){
+//                _Kernel.krnInterruptHandler(_KilledRunAll,_CurrentProcess);
+//                return;
+//            }
+//
+//            for(var i=0; i<_ResidentQueue.length;i++){
+//
+//                var process:TSOS.Pcb = _ResidentQueue[i];
+//
+//                if(process.getPid() == args && (process.getState() == "Terminated" || process.getState() == "Killed")){
+//                    _StdOut.putText("I'm already dead......Why are you so mean....?");
+//                    return;
+//                }
+//
+//                if (process.getPid() == args && process.getLocation() == "Memory") {
+//                    process.setState(5);
+//                    process.setPrintLocation("Memory -> Trash");
+//                    _StdOut.putText("Killed PID: " + process.getPid());
+//                    _Kernel.krnInterruptHandler(_Killed, process);
+//                    _ResidentQueue.splice(i,1);
+//                    Shell.updateReadyQueue();
+//                    return;
+//                }
+//                if (process.getPid() == args  &&
+//                    (process.getState() != "Terminated" && process.getLocation() == "Disk")){
+//                    process.setState(5);
+//                    _Kernel.krnInterruptHandler(_Killed, process);
+//                    _ResidentQueue.splice(i,1);
+//                    return;
+//                }
+//            }
+//            _StdOut.putText("Why do you wanna KILL me....?");
         }
 
         /**
@@ -789,20 +838,7 @@ module TSOS {
         public shellRunAll(){
 
             if(_CurrentSchedule == "priority"){
-                for(var i = 0; i<_ResidentQueue.length;i++){
-                    for(var j = 1; j<_ResidentQueue.length-i;j++){
-                        var first = _ResidentQueue[j-1].getPriority();
-                        var second = _ResidentQueue[j].getPriority();
-                        if(first > second){
-                            var temp:TSOS.Pcb = _ResidentQueue[j-1];
-                            _ResidentQueue[j-1] = _ResidentQueue[j];
-                            _ResidentQueue[j] = temp;
-
-                            _TerminatedQueue[j-1] = _TerminatedQueue[j];
-                            _TerminatedQueue[j] = temp;
-                        }
-                    }
-                }
+                _CurrentScheduler.sort();
             }
             for(var i=0; i<_ResidentQueue.length;i++){
                 var temp: TSOS.Pcb = _ResidentQueue[i];
@@ -828,7 +864,17 @@ module TSOS {
          * @constructor
          */
         public ShellCreate(args){
-            _FileSystem.createFile(args.toString());
+            if(_FileSystem.isFormatted()){
+                var swapFile = args[0].slice(0,4);
+                if((_ProgramFile == swapFile)){
+                    _StdOut.putText("Cannot create program files, Think of a better name!!");
+                    _Console.advanceLine();
+                    return;
+                }
+                _FileSystem.createFile(args.toString());
+            }else{
+                _StdOut.putText("File System not Formatted!");
+            }
         }
 
         /**
@@ -839,45 +885,54 @@ module TSOS {
          */
         public ShellWrite(data){
 
-            var filename = data[0];
-            var firstArg = data[1];
-            var lastArg  = data[data.length-1];
-            var firstChar = firstArg.charAt(0);
-            var lastChar = lastArg.charAt(lastArg.length-1);
-            var firstAscii = firstChar.charCodeAt(0);
-            var lastAscii = lastChar.charCodeAt(lastChar.length-1);
-            var load:string = "";
-
-            if(data.length == 2){
-                if((firstChar == lastChar) && (firstAscii == 34) && (lastAscii == 34)){
-                    load += data[1].slice(1,(data[1].length-1));
-                    _FileSystem.writeToFile(filename,load,true);
-                    return;
-                }else{
-                    _StdOut.putText("File Contents must be between: \" \"");
-                }
+            if(data.length < 2){
+                _StdOut.putText("Did you type anything..?");
+                return;
             }
 
-            if(data.length > 2){
-                if((firstChar == lastChar) && (firstAscii == 34) && (lastAscii == 34)){
-                    //ready to write...
-                    alert("In loop");
-                    load +=  data[1].slice(1,data[1].length) + " ";
-                    load += " ";
-                    for(var i = 2; i < data.length;i++){
+            if(_FileSystem.isFormatted()){
+                var filename = data[0];
+                var firstArg = data[1];
+                var lastArg  = data[data.length-1];
+                var firstChar = firstArg.charAt(0);
+                var lastChar = lastArg.charAt(lastArg.length-1);
+                var firstAscii = firstChar.charCodeAt(0);
+                var lastAscii = lastChar.charCodeAt(lastChar.length-1);
+                var load:string = "";
 
-                        if((i+1) == data.length){
-                            load += lastArg.slice(0,data[i].length-1);
-                            break;
-                        }
-                        load += data[i];
-                        load += " ";
+                if(data.length == 2){
+                    if((firstChar == lastChar) && (firstAscii == 34) && (lastAscii == 34)){
+                        load += data[1].slice(1,(data[1].length-1));
+                        _FileSystem.writeToFile(filename,load);
+                        return;
+                    }else{
+                        _StdOut.putText("File Contents must be between: \" \"");
                     }
-                    _FileSystem.writeToFile(filename,load,true);
-                }else{
-                    _StdOut.putText("File Contents must be between: \" \"");
                 }
+
+                if(data.length > 2){
+                    if((firstChar == lastChar) && (firstAscii == 34) && (lastAscii == 34)){
+                        //ready to write...
+                        load +=  data[1].slice(1,data[1].length) + " ";
+                        load += " ";
+                        for(var i = 2; i < data.length;i++){
+
+                            if((i+1) == data.length){
+                                load += lastArg.slice(0,data[i].length-1);
+                                break;
+                            }
+                            load += data[i];
+                            load += " ";
+                        }
+                        _FileSystem.writeToFile(filename,load);
+                    }else{
+                        _StdOut.putText("File Contents must be between: \" \"");
+                    }
+                }
+            }else{
+                _StdOut.putText("File System not Formatted!");
             }
+
         }
 
         /**
@@ -886,7 +941,11 @@ module TSOS {
          * @constructor
          */
         public ShellRead(filename){
-            _FileSystem.read(filename);
+            if(_FileSystem.isFormatted()){
+                _FileSystem.read(filename);
+            }else{
+                _StdOut.putText("File System not Formatted!");
+            }
         }
 
         /**
@@ -894,11 +953,19 @@ module TSOS {
          * @constructor
          */
         public ShellLs(){
-            _FileSystem.fileDirectory();
+            if(_FileSystem.isFormatted()){
+                _FileSystem.fileDirectory();
+            }else{
+                _StdOut.putText("File System not Formatted!");
+            }
         }
 
         public ShellDelete(filename:string){
-            _FileSystem.deleteFile(filename);
+            if(_FileSystem.isFormatted()){
+                _FileSystem.deleteFile(filename);
+            }else{
+                _StdOut.putText("File System not Formatted!");
+            }
         }
 
         /**
@@ -910,11 +977,11 @@ module TSOS {
 
             if(schedule == "rr" || schedule == "fcfs" || schedule == "priority"){
                 _CurrentSchedule = schedule;
-                _StdOut.putText("Current Schedule is set to: "+_CurrentSchedule);
+                _StdOut.putText("Current Schedule: "+_CurrentSchedule);
             }else{
                 _StdOut.putText("Invalid Schedule type!");
             }
-            document.getElementById("currentScheduler").innerHTML = "Current Schedule: " + _CurrentSchedule;
+            _CurrentScheduler.updateSchedule(_CurrentSchedule);
         }
 
         /**
@@ -922,16 +989,7 @@ module TSOS {
          * @constructor
          */
         public ShellGetSchedule(){
-            _StdOut.putText("Current Schedule is: "+_CurrentSchedule);
-        }
-
-        public ShellCopy(args){
-            var base = args[0];
-            var data = "";
-            for(var i = base; i < (base+256);i++){
-                data += _MainMemory[i];
-            }
-            _StdOut.putText("total: "+data.length);
+            _StdOut.putText("Current Schedule: "+_CurrentSchedule);
         }
     }
 }

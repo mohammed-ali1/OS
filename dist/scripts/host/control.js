@@ -63,15 +63,16 @@ var TSOS;
             // Update the log console.
             var taLog = document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
-            //            if(_FancyColor % 2 == 0){
-            //                document.getElementById("taHostLog").style.color = "#FFD801";
-            //                document.getElementById("taHostLog").style.border = "3px solid #E66C2C";
-            //            }else{
-            //                document.getElementById("taHostLog").style.color = "#E66C2C";
-            //                document.getElementById("taHostLog").style.border = "3px solid #FFD801";
-            //            }
-            //IF YOU LIKE COLORS UN-COMMENT THIS!
-            //            taLog.style.color = "#" + Math.floor(Math.random()*16777215).toString(16); //YOU LIKE COLORS?
+
+            //            IF YOU LIKE COLORS UN-COMMENT THIS!
+            if (_FancyColor % 2 == 0) {
+                document.getElementById("taHostLog").style.color = "#FFD801";
+                document.getElementById("taHostLog").style.border = "3px solid #E66C2C";
+            } else {
+                document.getElementById("taHostLog").style.color = "#E66C2C";
+                document.getElementById("taHostLog").style.border = "3px solid #FFD801";
+            }
+            taLog.style.color = "#" + Math.floor(Math.random() * 16777215).toString(16); //YOU LIKE COLORS?
             // Optionally update a log database or some streaming service.
             //            _CPU.init(); // THIS ONE GOT ME IN TROUBLE....CPU WAS GOING FOR ONLY 1 CYCLE!
         };
@@ -102,10 +103,8 @@ var TSOS;
             _Kernel.krnBootstrap();
 
             //Display System Status...
-            document.getElementById("status").innerHTML = "Status: Running...";
-
-            //Initialize the Memory Manager
-            _MemoryManager = new TSOS.MemoryManager();
+            document.getElementById("status").innerHTML = "Running...";
+            document.getElementById("status").style.color = "green";
 
             //Display clock here!
             _Console.renderDate();

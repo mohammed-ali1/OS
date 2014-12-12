@@ -110,6 +110,13 @@ var TSOS;
             this.updateMemory();
         };
 
+        Memory.prototype.clearBlock = function (base) {
+            for (var i = base; i < (base + 256); i++) {
+                _MainMemory[i] = "00";
+            }
+            this.updateMemory();
+        };
+
         /**
         * Returns the size of the Memory.
         * @returns {number}

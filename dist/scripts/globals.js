@@ -12,7 +12,7 @@ Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 
 var APP_NAME = "BAD ASS OS";
 var APP_VERSION = "9.1.5";
 
-var CPU_CLOCK_INTERVAL = 100;
+var CPU_CLOCK_INTERVAL = 10;
 
 var TIMER_IRQ = 0;
 
@@ -118,6 +118,9 @@ var _FileSystem;
 var _Quantum = 6;
 var _CurrentScheduler;
 var _CurrentSchedule = null;
+
+var _ProgramFile = "swap";
+var _ProcessActivity;
 
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();

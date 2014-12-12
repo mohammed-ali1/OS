@@ -120,7 +120,6 @@ var TSOS;
             table += "<th style='text-align: left; background-color: transparent;'>TSB</th>";
             table += "<th style='text-align: left; background-color: transparent;'>META</th>";
             table += "<th style='text-align: left; background-color: transparent;'>DATA</th>";
-            var len;
 
             for (var t = 0; t < trackSize; t++) {
                 for (var s = 0; s < sectorSize; s++) {
@@ -128,24 +127,35 @@ var TSOS;
                         var key = this.makeKey(t, s, b);
                         var metadata = sessionStorage.getItem(key);
                         var meta = metadata.slice(0, 4);
-                        len = meta.length;
                         var data = metadata.slice(4, metadata.length);
-                        len = data.length;
 
                         //add some colors for readability.
-                        if (meta.charAt(0) == "1") {
-                            table += "<tr style='background-color: transparent'><td>" + t + s + b + " </td>";
-                            table += "<td style='color: red; background-color: #ffffff;'>" + meta + " " + "</td>";
-                            table += "<td>" + data + "</td></tr>";
+                        if (key.charAt(0) == "0") {
+                            if (meta.charAt(0) == "1") {
+                                table += "<tr style='background-color: #40e0d0'><td>" + t + s + b + " </td>";
+                                table += "<td style='color: red; background-color: #ffffff;'>" + meta + " " + "</td>";
+                                table += "<td>" + data + "</td></tr>";
+                            } else {
+                                table += "<tr style='background-color: #40e0d0'><td>" + t + s + b + " </td>";
+                                table += "<td style='color: #028064; background-color: #ffffff;'>" + meta + " " + "</td>";
+                                table += "<td>" + data + "</td></tr>";
+                            }
                         } else {
-                            table += "<tr style='background-color: transparent'><td>" + t + s + b + " </td>";
-                            table += "<td style='color: green; background-color: #ffffff;'>" + meta + " " + "</td>";
-                            table += "<td>" + data + "</td></tr>";
+                            if (meta.charAt(0) == "1") {
+                                table += "<tr style='background-color: orange'><td>" + t + s + b + " </td>";
+                                table += "<td style='color: red; background-color: #ffffff;'>" + meta + " " + "</td>";
+                                table += "<td>" + data + "</td></tr>";
+                            } else {
+                                table += "<tr style='background-color: orange'><td>" + t + s + b + " </td>";
+                                table += "<td style='color: #028064; background-color: #ffffff;'>" + meta + " " + "</td>";
+                                table += "<td>" + data + "</td></tr>";
+                            }
                         }
                     }
                 }
             }
             document.getElementById("dirDataTable").innerHTML = table + "</table>";
+            document.getElementById("fileSystemDiv").style.visibility = "visible";
         };
 
         /**

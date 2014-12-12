@@ -12,8 +12,7 @@ module TSOS{
         private support:number;
         private fsu;
         private zeroData;
-        private static dirSpace:number;
-        private static dataSpace:number;
+        private formatted:boolean;
 
         constructor(){
             super(this.launch, this.voidMethod);
@@ -27,8 +26,7 @@ module TSOS{
             this.metaDataSize = 64;
             this.dataSize = 60;
             this.support = 0;
-            FileSystem.dirSpace = 64;
-            FileSystem.dataSpace = 192;
+            this.formatted = false;
             this.fsu = new FSU();//file system utilities
             this.zeroData = this.fsu.formatData(this.metaDataSize);
         }
@@ -47,6 +45,7 @@ module TSOS{
                 this.fsu.format(this.trackSize, this.sectorSize, this.blockSize, this.metaDataSize, sessionStorage);
                 this.createMBR();
                 this.update();
+                this.formatted = true;
             }
         }
 
@@ -70,16 +69,30 @@ module TSOS{
          */
         public deleteFile(str:string){
 
+            //can't delete program files!
+            var swapFile = str.slice(0,4);
+            if((_ProgramFile == swapFile)){
+                _StdOut.putText("No!");
+                return;
+            }
+
             var hexData = this.fsu.stringToHex(str.toString());
             var fileData = this.fsu.padding(hexData,(this.dataSize));
             var dataIndex = this.getFileContents(fileData);
             var zero = this.fsu.formatData(this.metaDataSize);
 
-            if(dataIndex == "###"){
-                sessionStorage.setItem(dataIndex,zero);
+            if(dataIndex == "-1"){
+                _StdOut.putText("Cannot find the file: "+str);
             }else{
-                this.startDeleting(dataIndex,zero);
+                var data = sessionStorage.getItem(dataIndex);
+                var key = data.slice(1,4);
+                if(key == "###"){
+                    sessionStorage.setItem(dataIndex,zero);
+                }else{
+                    this.startDeleting(key,zero);
+                }
             }
+            this.update();
         }
 
         public startDeleting(index,zero){
@@ -97,13 +110,11 @@ module TSOS{
                         } else {
                             sessionStorage.setItem(key,zero);
                         }
-                        key = nextKey;
                         index = nextKey;
                     }
                 }
             }
         }
-
 
         /**
          * Read Active files from the Disk
@@ -114,13 +125,21 @@ module TSOS{
             var filename = this.fsu.stringToHex(file.toString());
             var pad = this.fsu.padding(filename,this.dataSize);
             //get file index
-            var nextMeta = this.getFileContents(pad);
+            var key = this.fetchDuplicate(pad);
+            //if not found...then return
+            if(key == "-1"){
+                _StdOut.putText("Cannot find the file: "+file);
+                return;
+            }
 
-            if(nextMeta == "###"){
-                var a = sessionStorage.getItem(nextMeta);
+            var data = sessionStorage.getItem(key);
+            var meta = data.slice(1,4);
+
+            if(meta == "###"){
+                var a = sessionStorage.getItem(meta);
                 _StdOut.putText(this.fsu.hexToString(a.slice(4,a.length).toString()));
             }else{
-                this.startPrinting(nextMeta);
+                this.startPrinting(meta);
             }
         }
 
@@ -137,6 +156,11 @@ module TSOS{
             var hex = this.fsu.stringToHex(file.toString());
             var hexFile = this.fsu.padding(hex,this.dataSize);
             var key = this.fetchDuplicate(hexFile);
+            if(key == "-1"){
+                _StdOut.putText("Cannot find the file: "+file);
+                return;
+            }
+
             var data = sessionStorage.getItem(key);
             var dataIndex = data.slice(1,4);
             var contentsHex = this.fsu.stringToHex(contents.toString());
@@ -159,10 +183,9 @@ module TSOS{
             this.update();
 
             var swapFile = file.slice(0,4);
-            var swap = "swap";
 
             //print only if its not a swap-file
-            if(success && (swap != swapFile)){
+            if(success && (_ProgramFile != swapFile)){
                 if(success){
                 _StdOut.putText("Successfully wrote to: "+file);
                     return success;
@@ -179,16 +202,15 @@ module TSOS{
          */
         public fileDirectory(){
             var t = 0;
-            var key;
             for(var s = 0; s<this.sectorSize;s++) {
                 for (var b = 0; b < this.blockSize; b++) {
-                    key = this.fsu.makeKey(t,s,b);
+                    var key = this.fsu.makeKey(t,s,b);
                     var data:string = sessionStorage.getItem(key);
                     var meta = data.slice(0,1);
-                    var hexData:string = data.slice(4,this.metaDataSize);
+                    var hexData:string = data.slice(4,data.length);
                     var stringData = this.fsu.hexToString(hexData);
                     if(meta == "1"){
-                        _StdOut.putText(key+": "+stringData);
+                        _StdOut.putText(key+": "+stringData.toString());
                         _Console.advanceLine();
                     }
                 }
@@ -201,68 +223,70 @@ module TSOS{
          */
         public createFile(filename:string){
 
-            var created: boolean = false;
+                var created: boolean = false;
+                //convert filename to hex
+                var data = this.fsu.stringToHex(filename.toString());
+                //add padding to the filename
+                var hexData:string = this.fsu.padding(data,this.dataSize);
 
-            //convert filename to hex
-            var data = this.fsu.stringToHex(filename.toString());
-            //add padding to the filename
-            var hexData:string = this.fsu.padding(data,this.dataSize);
+                //we don't want file-names of size > 60 Bytes!
+                if((hexData.length) > this.dataSize) {
+                    _StdOut.putText("Filename must be <= " + (this.dataSize / 2) + " characters!");
+                    return created;
+                }
 
-            //we don't want file-names of size > 60 Bytes!
-            if((hexData.length) > this.dataSize) {
-                _StdOut.putText("Filename must be <= " + (this.dataSize / 2) + " characters!");
-                return created;
-            }
+                //Look for a duplicate-filename...first!
+                var dirIndex = this.fetchDuplicateFilename(hexData);
 
-            //Look for a duplicate-filename...first!
-            var dirIndex = this.fetchDuplicateFilename(hexData);
+                if(dirIndex == "-1"){
+                    _StdOut.putText("Filename "+filename+" already exists...Or not enough space!");
+                    return created;
+                }
 
-            if(dirIndex == "-1"){
-                _StdOut.putText("Filename "+filename+" already exists...Or not enough space!");
-                return created;
-            }
+                //Get dataIndex...at this point data
+                var dataIndex:string = this.fsu.getDataIndex(this.trackSize,this.sectorSize, this.blockSize);
 
-            //Get dataIndex...at this point data
-            var dataIndex:string = this.fsu.getDataIndex(this.trackSize,this.sectorSize, this.blockSize);
+                if(dataIndex != "-1") {
 
-            if(dataIndex != "-1") {
+                    //store in dir-Index
+                    sessionStorage.setItem(dirIndex, ("1" + dataIndex + hexData));//need to add actualData
 
-                //store in dir-Index
-                sessionStorage.setItem(dirIndex, ("1" + dataIndex + hexData));//need to add actualData
+                    //store "0" in data address
+                    var formatData = this.fsu.formatData((this.dataSize));
+                    sessionStorage.setItem(dataIndex, "1###" + formatData);
 
-                //store "0" in data address
-                var formatData = this.fsu.formatData((this.dataSize));
-                sessionStorage.setItem(dataIndex, "1###" + formatData);
+                    //mark success
+                    created = true;
 
-                //mark success
-                created = true;
+                    //update file system
+                    this.update();
+                }else{
+                    //no more storage space
+                    _StdOut.putText("No Space available to store file-contents!");
+                    return created;
+                }
 
-                //update file system
-                this.update();
-            }else{
-                //no more storage space
-                _StdOut.putText("No Space available to store file-contents!");
-                return created;
-            }
+                var swapFile = filename.slice(0,4);
 
-            var swapFile = filename.slice(0,4);
-            var swapFilename = "swap";
+                //if we are creating a swap-file...we don't want to print.
+                if(created && (_ProgramFile == swapFile)){
+                    return created;
+                }
 
-            //if we are creating a swap-file...we don't want to print.
-            if(created && (swapFilename == swapFile)){
-                return created;
-            }
+                //print success or failure
+                if(created){
+                    _StdOut.putText("Successfully created file: "+filename);
+                    _Console.advanceLine();
+                    return created;
+                }else {
+                    _StdOut.putText("Could not create the file: " + filename + ", Please format and try again!");
+                    _Console.advanceLine();
+                    return created;
+                }
+        }
 
-            //print success or failure
-            if(created){
-                _StdOut.putText("Successfully created file: "+filename);
-                _Console.advanceLine();
-                return created;
-            }else {
-                _StdOut.putText("Could not create the file: " + filename + ", Please format and try again!");
-                _Console.advanceLine();
-                return created;
-            }
+        public isFormatted(){
+            return this.formatted;
         }
 
         /**
@@ -496,16 +520,24 @@ module TSOS{
                 nextProcess.setLocation("Disk");
                 nextProcess.setPrintLocation("Memory -> Disk");
                 nextProcess.setState(2);//waiting
+                nextProcess.setBase(-1);
+                nextProcess.setLimit(-1);
+                nextProcess.setBlock(-1);
                 this.createFile(filename);
                 this.writeToFile(filename,oldContents);
                 Shell.updateReadyQueue();
             }else{
-                nextProcess.setLocation("Memory");
+                //even though it won't be in the disk
+                //we need to set the location to disk here
+                //because when we kill or swap...we can still swap
+                //in order
+                nextProcess.setLocation("Disk");
                 nextProcess.setPrintLocation("Memory -> Trash");
                 Shell.updateReadyQueue();
             }
             //load back in to memory and continue...
             _MemoryManager.load(currentProcess.getBase(),data.toString());
+            _MemoryManager.update();
             this.update();
         }
 
@@ -584,7 +616,6 @@ module TSOS{
                             this.update();
                             keys += key +", ";
                         }
-                        key = nextKey;
                         index = nextKey;
                     }
                     if(stepOut){
@@ -630,7 +661,6 @@ module TSOS{
                             oldData += data.slice(4, data.length);
                             sessionStorage.setItem(key, zeroData);//replace with zeros
                         }
-                        key = nextMeta;
                         index = nextMeta;
                     }
                 }
@@ -662,7 +692,6 @@ module TSOS{
                             len +=oldData;
                             _StdOut.putText(this.fsu.hexToString(oldData.toString()));
                         }
-                        key = nextKey;
                         index = nextKey;
                     }
                 }
