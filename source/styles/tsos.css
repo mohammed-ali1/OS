@@ -58,6 +58,7 @@ h3 {
     border: 1px solid;
     margin:4px;
     width: auto;
+    border-color: wheat;
 }
 
 #btnStartOS{
@@ -68,17 +69,19 @@ h3 {
 }
 
 #btnHaltOS{
-    background-color: palegoldenrod;
+    background-color: orange;
     font-size: 20px;
     border-radius: 10px;
     width: 150px;
+    color:#ffffff;
 }
 
 #btnReset{
-    background-color: gold;
+    background-color: orangered;
     font-size: 20px;
     border-radius: 10px;
     width: 150px;
+    color:#ffffff;
 }
 
 #stepButton, #stopButton, #nextButton{
@@ -169,16 +172,16 @@ h3 {
 
 #memoryContents{
     border: 2px solid #000000;
-    color: firebrick;
+    color: #fa9353;
     font-weight: bold;
 }
 
 #tableID tr:nth-child(odd) {
-    background-color: #E3E4FA;
+    background-color: #e0af35;
     /*FFD801*/
 }
 #tableID tr:nth-child(even) {
-    background-color:#40E0D0;
+    background-color: rgba(250, 73, 56, 0.88);
     /*E66C2C*/
 }
 

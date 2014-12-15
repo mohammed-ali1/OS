@@ -66,7 +66,7 @@ var TSOS;
         */
         FileSystem.prototype.deleteFile = function (str) {
             //can't delete program files!
-            var swapFile = str.slice(0, 4);
+            var swapFile = str[0].slice(0, 4);
             if ((_ProgramFile == swapFile)) {
                 _StdOut.putText("No!");
                 return;
@@ -385,10 +385,10 @@ var TSOS;
                         }
                         if (meta == "0") {
                             array.push(key);
-                            if (array.length == (limit)) {
-                                stepOut = true;
-                                break;
-                            }
+                        }
+                        if (array.length == (limit)) {
+                            stepOut = true;
+                            break;
                         }
                     }
                     if (stepOut) {
@@ -436,15 +436,17 @@ var TSOS;
                 if (a + 1 < array.length) {
                     var nextKey = this.makeFreshKey(array[a + 1]);
                     sessionStorage.setItem(key, "1" + nextKey + chunk);
+                    this.update();
                 } else {
                     var pad = this.fsu.padding(chunk, size);
                     sessionStorage.setItem(key, "1###" + pad);
-                }
-
-                if (end == fileContents.length) {
+                    this.update();
                     break;
                 }
 
+                //                if(end == fileContents.length){
+                //                    break;
+                //                }
                 if ((end + size) > (fileContents.length)) {
                     start = end;
                     end = (fileContents.length);
@@ -659,7 +661,6 @@ var TSOS;
                             len += oldData;
                             _StdOut.putText(this.fsu.hexToString(oldData.toString()));
                             _Console.advanceLine();
-                            _StdOut.putText("len: " + len.length);
                             return;
                         } else {
                             oldData = data.slice(4, data.length);

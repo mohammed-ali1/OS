@@ -13,34 +13,27 @@ var TSOS;
         */
         Scheduler.prototype.rr = function () {
             if (_ReadyQueue.getSize() > 0) {
-                _CurrentProcess = _ReadyQueue.dequeue();
+                _CurrentProcess = _ReadyQueue.dequeue(); // grab the next process
 
-                if ((_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed") && (_CurrentProcess.getLocation() == "Memory")) {
+                alert("next pid in queue: " + _CurrentProcess.getPid() + ", state: " + _CurrentProcess.getState() + ", loc: " + _CurrentProcess.getLocation());
+
+                if ((_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed")) {
                     this.rr();
                 }
-
-                if ((_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed") && _CurrentProcess.getLocation() == "Disk") {
-                    var filename = "swap" + _CurrentProcess.getPid();
-                    _FileSystem.deleteFile(filename);
-                    this.rr();
-                }
-
                 if (_CurrentProcess.getState() == "Ready") {
                     _CurrentProcess.setTimeArrived(_OSclock);
                 }
-
-                if (_CurrentProcess.getLocation() == "Disk" && (_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() != "Killed")) {
-                    _Kernel.contextSwitchDisk(true, false, false);
-                    return;
+                if ((_CurrentProcess.getLocation() == "Memory")) {
+                    _CurrentProcess.setState(1);
+                    _CPU.startProcessing(_CurrentProcess);
+                    _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
+                    TSOS.Shell.updateReadyQueue();
                 }
-
-                _CurrentProcess.setState(1);
-                _CPU.startProcessing(_CurrentProcess);
-                _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
-                TSOS.Shell.updateReadyQueue();
-            } else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() != "Killed") && _ReadyQueue.isEmpty()) {
-                //               _ResidentQueue.splice(0, _ResidentQueue.length); // clear resident Queue as well!
-                TSOS.Shell.updateReadyQueue();
+                if ((_CurrentProcess.getLocation() == "Disk")) {
+                    _Kernel.contextSwitchDisk(true, false, false);
+                }
+            } else if ((_CurrentProcess.getState() != "Terminated" && _CurrentProcess.getState() != "Killed") && _ReadyQueue.isEmpty()) {
+                return;
             }
         };
 

@@ -42,9 +42,6 @@ module TSOS {
             //Initialize the Memory Manager
             _MemoryManager = new MemoryManager();
 
-            //Processes Activity
-            _ProcessActivity = new Activity();
-
             //Initialize and load file system Device Driver
             _FileSystem = new FileSystem();
             _FileSystem.launch();
@@ -184,12 +181,18 @@ module TSOS {
                 case _Break: //-1 Denotes END of a process!
                     _CPU.reset();//Re-Start the CPU!
                     _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
+                    alert("Terminating pid; "+_CurrentProcess.getPid());
                     _CurrentProcess.setState(4);
                     _CurrentProcess.setTimeFinished(_OSclock);
                     Pcb.displayTimeMonitor();
+//                    _ResidentQueue.splice(_ResidentQueue.indexOf(_CurrentProcess),1);//delete off of resident queue
                     _ClockCycle = 0;
                     _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
                     Shell.updateReadyQueue();
+                    if(_ReadyQueue.isEmpty()){
+                        _ResidentQueue.splice(0,_ResidentQueue.length);
+                        _Memory.clearMemory();
+                    }
                     this.startScheduler();
                     break;
                 case _InvalidOpCode:
@@ -227,14 +230,14 @@ module TSOS {
                     params.setState(5);
                     _StdOut.putText("Killed PID: " +params.getPid());
                     Shell.updateReadyQueue();
-                    this.krnInterruptHandler(_RUNALL,0);
                     _CPU.reset();
                     break;
                 case _KilledRunAll:
+                    _ClockCycle = 0;
                     params.setState(5);
                     _StdOut.putText("Killed PID: " +params.getPid());
                     Shell.updateReadyQueue();
-                    this.krnInterruptHandler(_RUNALL, 0);
+                    this.startScheduler();
                     break;
                 case _BSOD:
                     this.bsod(params);
@@ -316,12 +319,13 @@ module TSOS {
                 //grab the next process
                 _CurrentProcess = _ReadyQueue.dequeue();
 
+                alert("cs... next pid: "+_CurrentProcess.getPid()+", state: "+_CurrentProcess.getState()+", loc: "+_CurrentProcess.getLocation());
+
                 if((_CurrentProcess.getState() == "Terminated" ||
-                    _CurrentProcess.getState() == "Killed") &&
-                    _CurrentProcess.getLocation() == "Disk"){
-                    var filename = "swap"+_CurrentProcess.getPid();
-                    _FileSystem.deleteFile(filename);
-                    _CurrentScheduler.rr();
+                    _CurrentProcess.getState() == "Killed")){
+                    alert("State: "+_CurrentProcess.getState()+" grabbig next...");
+                    this.startScheduler();
+                    return;
                 }
 
                 //record arrival time
@@ -331,9 +335,13 @@ module TSOS {
                 }
 
                 if(_CurrentProcess.getLocation() == "Disk"){
+                    alert("loc: "+_CurrentProcess.getLocation()+" need to swap..");
                     this.contextSwitchDisk(true,false,false);
-                }else{
+                    return;
+                }
+                if(_CurrentProcess.getLocation() == "Memory"){
                     //keep executing....Location = Memory
+                    alert("loc: "+_CurrentProcess.getLocation());
                     _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
                     _CurrentProcess.setState(1); //set state to running
                     Shell.updateReadyQueue();
@@ -351,26 +359,16 @@ module TSOS {
          */
         public getNextAvailableBlock(){
             var index:number = _ResidentQueue.indexOf(_CurrentProcess);
-            var process:TSOS.Pcb = _ResidentQueue[index];
-//            if(index == 0){
-//                while(process.getState() != "Memory"){
-//                    index++;
-//                    process = _ReadyQueue.q[index];
-//                }
-//            }
-//            if(index == _ReadyQueue.q.length-1){
-//                while(process.getState() != "Memory"){
-//                    index--;
-//                    process = _ReadyQueue.q[index];
-//                }
-//            }
-//            return process;
-            index =  (index - 3);
-            if(index < 0){
-                var i = _ResidentQueue.indexOf(_CurrentProcess);
-                    index = ((_ResidentQueue.length - 3) + Math.abs(i));
+            var nextProcess:TSOS.Pcb = _ResidentQueue[index];
+            while(nextProcess.getLocation() != "Memory") {
+                index++;
+                if(index >= _ResidentQueue.length) {
+                    index = 0;
+                }
+                nextProcess = _ResidentQueue[index];
             }
-            return _ResidentQueue[index];
+            alert("swapping with pid: "+nextProcess.getPid()+", loc: "+nextProcess.getLocation());
+            return nextProcess;
         }
 
 
@@ -386,18 +384,11 @@ module TSOS {
 
             if (rr) {
                 var nextProcess:TSOS.Pcb = this.getNextAvailableBlock();
-                if(_CurrentProcess != nextProcess){
-                    _FileSystem.rollIn(_CurrentProcess, nextProcess);//swap processes and delete if "terminated"
-                    _Kernel.krnTrace("\nCONTEXT SWITCH FROM TO PID: " + _CurrentProcess.getPid() + "\n");
-                    Shell.updateReadyQueue();
-                    _CPU.startProcessing(_CurrentProcess);
-                    _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
-                }else{
-                    _Kernel.krnTrace("\nCONTEXT SWITCH FROM TO PID: " + _CurrentProcess.getPid() + "\n");
-                    Shell.updateReadyQueue();
-                    _CPU.startProcessing(_CurrentProcess);
-                    _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
-                }
+                _FileSystem.rollIn(_CurrentProcess, nextProcess);//swap processes and delete if "terminated"
+                _Kernel.krnTrace("\nCONTEXT SWITCH FROM TO PID: " + _CurrentProcess.getPid() + "\n");
+                Shell.updateReadyQueue();
+                _CPU.startProcessing(_CurrentProcess);
+                _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
             }
             if (fcfs) {
                 _CurrentProcess.setLocation("Memory");

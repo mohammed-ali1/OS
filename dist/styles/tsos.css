@@ -9,14 +9,14 @@
 }
 #top p{
     font-size:25px;
-    color: #000000;
+    color:firebrick;
     margin-left: 1%;
     float: left;
 }
 
 /* Body */
 body {
-    background-color: rgba(208, 247, 255, 0.40);
+    background-color: rgba(122, 122, 122, 0.40);
     font-family: Helvetica, Verdana, Arial, sans-serif;
     font-size: 12pt;
     font-weight: normal;
@@ -41,7 +41,7 @@ h2 {
     font-size: 20pt;
     font-weight: normal;
     font-style: normal;
-    color: #000000;
+    color: firebrick;
 }
 
 h3 {
@@ -49,7 +49,7 @@ h3 {
     font-size: 16pt;
     font-weight: normal;
     font-style: normal;
-    color: #000000;
+    color: firebrick;
     text-align: center;
 }
 /* Buttons */
@@ -58,27 +58,30 @@ h3 {
     border: 1px solid;
     margin:4px;
     width: auto;
+    border-color: wheat;
 }
 
 #btnStartOS{
-    background-color: #ffa199;
+    background-color: lawngreen;
     font-size: 20px;
     border-radius: 10px;
     width: 150px;
 }
 
 #btnHaltOS{
-    background-color: #eeeec6;
+    background-color: orange;
     font-size: 20px;
     border-radius: 10px;
     width: 150px;
+    color:#ffffff;
 }
 
 #btnReset{
-    background-color: #40e0d0;
+    background-color: orangered;
     font-size: 20px;
     border-radius: 10px;
     width: 150px;
+    color:#ffffff;
 }
 
 #stepButton, #stopButton, #nextButton{
@@ -91,7 +94,7 @@ h3 {
 }
 
 #nextButton{
-    background-color: #eeeec6;
+    background-color: lawngreen;
     color: #000000;
 }
 
@@ -101,8 +104,8 @@ h3 {
 }
 
 #display {
-    background-color: #E3E4FA;
-    border: 2px solid #028064;
+    background-color: #E78A61;
+    border: 2px solid red;
     cursor: default;
     border-radius: 5px;
 }
@@ -129,13 +132,13 @@ h3 {
     border-radius: 10px;
     width: 350px;
     height: 70px;
-    color: #000000;
+    color: firebrick;
     border: 2px solid;
     font-size: 14px;
 }
 
 #taHostLog{
-    color: #000000;
+    color:#E66C2C;
     resize:none;
     width:350px;
     height:200px;
@@ -169,16 +172,16 @@ h3 {
 
 #memoryContents{
     border: 2px solid #000000;
-    color: firebrick;
+    color: #fa9353;
     font-weight: bold;
 }
 
 #tableID tr:nth-child(odd) {
-    background-color: #E3E4FA;
+    background-color: #e0af35;
     /*FFD801*/
 }
 #tableID tr:nth-child(even) {
-    background-color:#40E0D0;
+    background-color: rgba(250, 73, 56, 0.88);
     /*E66C2C*/
 }
 
@@ -214,8 +217,8 @@ h3 {
 
 #cpu th, #readyQueue th, #displayReady th, #monitor th{
     text-align: center;
-    color: #ffffff;
-    background-color: #028064;
+    color: firebrick;
+    background-color: #FFD801;
     width: auto;
 }
 
@@ -224,7 +227,7 @@ h3 {
     text-align: center;
     border-radius: 5px;
     color: #ffffff;
-    background-color: #40e0d0;
+    background-color: #E66C2C;
 }
 
 #displayReady td{

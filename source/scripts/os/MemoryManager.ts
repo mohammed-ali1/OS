@@ -47,13 +47,8 @@ module TSOS{
          * Clears Memory
          */
         public clearMemory(){
-
-            if(_CurrentProcess.getState() == "Running" || _CurrentProcess.getState() == "Waiting"){
-                _StdOut.putText("Let me Terminate First.....DAmmmmm!");
-            }else{
-                _StdOut.putText("Memory Wiped!");
-                _Memory.clearMemory();
-            }
+            _StdOut.putText("Memory Wiped!");
+            _Memory.clearMemory();
         }
 
         /**

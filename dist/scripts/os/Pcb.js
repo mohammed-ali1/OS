@@ -28,9 +28,9 @@ var TSOS;
             this.block = 0;
             this.priority = 0;
             this.location = "";
+            this.printLocation = "";
             this.timeArrived = 0;
             this.timeFinished = 0;
-            this.printLocation = "";
             Pcb.PID++;
             this.pid = Pcb.PID; //Increment PID all the time!
             this.base = b;

@@ -43,12 +43,8 @@ var TSOS;
         * Clears Memory
         */
         MemoryManager.prototype.clearMemory = function () {
-            if (_CurrentProcess.getState() == "Running" || _CurrentProcess.getState() == "Waiting") {
-                _StdOut.putText("Let me Terminate First.....DAmmmmm!");
-            } else {
-                _StdOut.putText("Memory Wiped!");
-                _Memory.clearMemory();
-            }
+            _StdOut.putText("Memory Wiped!");
+            _Memory.clearMemory();
         };
 
         /**

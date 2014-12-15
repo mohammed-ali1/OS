@@ -23,9 +23,9 @@ module TSOS{
         private block : number = 0;
         private priority:number = 0;
         private location:string = "";
+        private printLocation:string = "";
         private timeArrived : number = 0;
         private timeFinished: number = 0;
-        private printLocation:string = "";
 
         constructor(b:number, l:number, p:number){
 

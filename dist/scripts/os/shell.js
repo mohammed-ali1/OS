@@ -669,87 +669,47 @@ var TSOS;
         * @param args
         */
         Shell.prototype.shellKill = function (args) {
-            if (_CurrentProcess.getPid() == args) {
+            var killMe = args[0];
+
+            if ((_CurrentProcess.getPid() == killMe) && (_ReadyQueue.getSize() > 0)) {
                 _CurrentProcess.setState(5);
+                _CurrentProcess.setPrintLocation("Memory -> Trash");
                 Shell.updateReadyQueue();
-                _Kernel.startScheduler();
+                _Kernel.krnInterruptHandler(_KilledRunAll, _CurrentProcess);
+                return;
             }
 
-            for (var i = 0; i < _ReadyQueue.getSize(); i++) {
-                var process = _ReadyQueue.q[i];
+            if ((_CurrentProcess.getPid() == killMe) && (_ReadyQueue.isEmpty())) {
+                _CurrentProcess.setState(5);
+                _CurrentProcess.setPrintLocation("Memory -> Trash");
+                Shell.updateReadyQueue();
+                _Kernel.krnInterruptHandler(_KilledReset, _CurrentProcess);
+                return;
+            }
 
-                if (process.getPid() == args) {
+            for (var i = 0; i < _ResidentQueue.length; i++) {
+                var process = _ResidentQueue[i];
+
+                if (process.getPid() == killMe) {
                     if (process.getLocation() == "Disk") {
                         _FileSystem.deleteFile(_ProgramFile + process.getPid());
+                        process.setPrintLocation("Disk -> Trash");
                         process.setState(5);
-                        _ReadyQueue.q.splice(i, 1);
-
-                        //                        var index = _ResidentQueue.indexOf(process);
-                        //                        _ResidentQueue.splice(index,1);
-                        _Kernel.startScheduler();
+                        Shell.updateReadyQueue();
+                        alert("Killed: " + process.getPid());
+                        _StdOut.putText("Killed PID: " + process.getPid());
                         break;
                     }
                     if (process.getLocation() == "Memory") {
                         process.setState(5);
-                        _ReadyQueue.q.splice(i, 1);
-
+                        process.setPrintLocation("Memory -> Trash");
+                        Shell.updateReadyQueue();
+                        alert("Killed: " + process.getPid());
+                        _StdOut.putText("Killed PID: " + process.getPid());
                         break;
                     }
                 }
             }
-            //            if(args[0] < 0){
-            //                _StdOut.putText("You said kill what...?");
-            //                return;
-            //            }
-            //
-            //            //what if only thing running...we want to reset the CPU
-            //            if((_CurrentProcess.getPid() == args) &&  (_ReadyQueue.isEmpty())){
-            //                Shell.updateReadyQueue();
-            //                _Kernel.krnInterruptHandler(_KilledReset,_CurrentProcess);
-            //                return;
-            //            }
-            //
-            //            //kill the current process...so move on to the next process
-            //            if((_CurrentProcess.getPid() == args) && _ReadyQueue.getSize() > 0){
-            //                _CurrentProcess.setState(5);
-            //                Shell.updateReadyQueue();
-            //                _Kernel.startScheduler();
-            //                return;
-            //            }
-            //
-            //            //set the current process to killed...and go to next process
-            //            if((_CurrentProcess.getPid() == args) && (_CurrentProcess.getState() == "Running")){
-            //                _Kernel.krnInterruptHandler(_KilledRunAll,_CurrentProcess);
-            //                return;
-            //            }
-            //
-            //            for(var i=0; i<_ResidentQueue.length;i++){
-            //
-            //                var process:TSOS.Pcb = _ResidentQueue[i];
-            //
-            //                if(process.getPid() == args && (process.getState() == "Terminated" || process.getState() == "Killed")){
-            //                    _StdOut.putText("I'm already dead......Why are you so mean....?");
-            //                    return;
-            //                }
-            //
-            //                if (process.getPid() == args && process.getLocation() == "Memory") {
-            //                    process.setState(5);
-            //                    process.setPrintLocation("Memory -> Trash");
-            //                    _StdOut.putText("Killed PID: " + process.getPid());
-            //                    _Kernel.krnInterruptHandler(_Killed, process);
-            //                    _ResidentQueue.splice(i,1);
-            //                    Shell.updateReadyQueue();
-            //                    return;
-            //                }
-            //                if (process.getPid() == args  &&
-            //                    (process.getState() != "Terminated" && process.getLocation() == "Disk")){
-            //                    process.setState(5);
-            //                    _Kernel.krnInterruptHandler(_Killed, process);
-            //                    _ResidentQueue.splice(i,1);
-            //                    return;
-            //                }
-            //            }
-            //            _StdOut.putText("Why do you wanna KILL me....?");
         };
 
         /**
@@ -778,6 +738,8 @@ var TSOS;
                 var temp = _ResidentQueue[i];
                 if (temp.getLocation() == "Memory") {
                     temp.setState(3); //set state to "Ready"
+                } else {
+                    temp.setState(3);
                 }
                 _ReadyQueue.enqueue(temp);
             }

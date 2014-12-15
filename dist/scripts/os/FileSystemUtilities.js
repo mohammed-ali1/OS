@@ -83,7 +83,7 @@ var TSOS;
         * @param size
         */
         FSU.prototype.createMBR = function (sessionStorage, size) {
-            var data = this.stringToHex((APP_NAME + " " + APP_VERSION));
+            var data = this.stringToHex(("MBR"));
             var pad = this.padding("1###" + data, size);
             var key = this.makeKey(0, 0, 0);
             sessionStorage.setItem(key, pad);

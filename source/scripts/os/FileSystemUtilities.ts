@@ -92,7 +92,7 @@ module TSOS{
          * @param size
          */
         public createMBR(sessionStorage,size){
-            var data:string = this.stringToHex((APP_NAME+" "+APP_VERSION));
+            var data:string = this.stringToHex(("MBR"));
             var pad:string = this.padding("1###"+data,size);
             var key = this.makeKey(0,0,0);
             sessionStorage.setItem(key,pad);
