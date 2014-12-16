@@ -19,16 +19,11 @@ var TIMER_IRQ = 0;
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 100;
 
-//Color for the Logger!
-var _FancyColor = 0;
-
-//
 // Global Variables
 //
 var _CPU;
 
 var _OSclock = 0;
-
 var _Mode = 0;
 
 var _Canvas = null;
@@ -66,21 +61,20 @@ var _hardwareClockID = null;
 var _GLaDOS = null;
 var Glados = null;
 
+/*INTERRUPT CASES */
+var _ROLLIN = 990;
+var _READ = 991;
+var _DELETE = 992;
+var _CREATE = 993;
+var _LS = 994;
+
 // MEMORY INFO
 var _MainMemory = null;
 var _MainMemorySize = 768;
 var _MainMemoryBase = null;
 var _Memory;
 var _BlockSize = 256;
-
-//Schedules the  Algorithms
-var _SCHEDULE = 444;
-
-//Memory Manager
 var _MemoryManager;
-
-//PCB
-var _Pcb;
 
 //Ready and Resident Queues
 var _ResidentQueue = null;
@@ -119,8 +113,11 @@ var _Quantum = 6;
 var _CurrentScheduler;
 var _CurrentSchedule = null;
 
+//Program File Name
 var _ProgramFile = "swap";
-var _ProcessActivity;
+
+//Color for the Logger!
+var _FancyColor = 0;
 
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();

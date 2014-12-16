@@ -4,6 +4,11 @@
 module TSOS{
     export class FileSystem extends DeviceDriver{
 
+        /**
+         * File System Class
+         * Loads the File System Driver
+         */
+
         private trackSize: number;
         private sectorSize:number;
         private blockSize:number;
@@ -69,13 +74,6 @@ module TSOS{
          */
         public deleteFile(str:string){
 
-            //can't delete program files!
-            var swapFile:string = str[0].slice(0,4);
-            if((_ProgramFile == swapFile)){
-                _StdOut.putText("No!");
-                return;
-            }
-
             var hexData = this.fsu.stringToHex(str.toString());
             var fileData = this.fsu.padding(hexData,(this.dataSize));
             var dataIndex = this.getFileContents(fileData);
@@ -84,12 +82,8 @@ module TSOS{
             if(dataIndex == "-1"){
                 _StdOut.putText("Cannot find the file: "+str);
             }else{
-                var data = sessionStorage.getItem(dataIndex);
-                var key = data.slice(1,4);
-                if(key == "###"){
-                    sessionStorage.setItem(dataIndex,zero);
-                }else{
-                    this.startDeleting(key,zero);
+                if(dataIndex != "###"){
+                    this.startDeleting(dataIndex,zero);
                 }
             }
             this.update();
@@ -104,11 +98,15 @@ module TSOS{
                         var key = this.fsu.makeKey(t, s, b);
                         var data = sessionStorage.getItem(key);
                         var nextKey = data.slice(1, 4);
-                        if (nextKey == "###") {
-                            sessionStorage.setItem(key,zero);
-                            return;
-                        } else {
-                            sessionStorage.setItem(key,zero);
+                        if(key != "000"){
+                            if (nextKey == "###") {
+                                sessionStorage.setItem(key,zero);
+                                this.update();
+                                return;
+                            } else {
+                                sessionStorage.setItem(key,zero);
+                                this.update();
+                            }
                         }
                         index = nextKey;
                     }
@@ -178,6 +176,7 @@ module TSOS{
             else{
                 var padHex = this.fsu.padding(contentsHex,this.dataSize);
                 sessionStorage.setItem(dataIndex,"1###"+padHex);
+                this.update();
                 success = true;
             }
             this.update();
@@ -250,10 +249,12 @@ module TSOS{
 
                     //store in dir-Index
                     sessionStorage.setItem(dirIndex, ("1" + dataIndex + hexData));//need to add actualData
+                    this.update();
 
                     //store "0" in data address
                     var formatData = this.fsu.formatData((this.dataSize));
                     sessionStorage.setItem(dataIndex, "1###" + formatData);
+                    this.update();
 
                     //mark success
                     created = true;
@@ -306,8 +307,7 @@ module TSOS{
                     var dataData = data.slice(4,data.length);
                     if(meta == "1" && (dataData == filename)){
                         return "-1";
-                    }
-                    else if(meta == "0"){
+                    }else if(meta == "0"){
                         return key;
                     }
                 }
@@ -332,7 +332,6 @@ module TSOS{
                     var meta = data.slice(0,1);
                     var hexData:string = data.slice(4,this.metaDataSize);
                     if((filename == hexData) && (meta == "1")){
-                        //found duplicate and in use...
                         return key;
                     }
                 }
@@ -358,8 +357,8 @@ module TSOS{
                     var meta = data.slice(1,4);
                     var hexData:string = data.slice(4,data.length);
                     if((filename == hexData) && (inUse == "1")){
-                        //found what we are looking for...
                         sessionStorage.setItem(key,zero);//delete the contents
+                        this.update();
                         return meta;
                     }
                 }
@@ -368,7 +367,7 @@ module TSOS{
         }
 
         public hasStorage(){
-            if('sessionStorage' in window && window['sessionStorage'] !== null){
+            if('localStorage' in window && window['localStorage'] !== null){
                 this.support = 1;
             }else{
                 this.support = 0;
@@ -389,11 +388,8 @@ module TSOS{
                         var meta = data.slice(0, 1);
 
                         if((key == "377") && (array.length < (limit))){
-//                            _StdOut.putText("Not enough space sorry!");
-//                            _Console.advanceLine();
-//                            _OsShell.putPrompt();
-                            stepOut = true;
-                            break;
+                            _Kernel.krnInterruptHandler(_BSOD,"Not enough space for you!");
+                            return;
                         }
                         if (meta == "0") {
                             array.push(key);
@@ -457,9 +453,9 @@ module TSOS{
                     this.update();
                     break;
                 }
-//                if(end == fileContents.length){
-//                    break;
-//                }
+                if(end == fileContents.length){
+                    break;
+                }
                 if ((end + size) > (fileContents.length)) {
                     start = end;
                     end = (fileContents.length);
@@ -501,7 +497,7 @@ module TSOS{
             var oldContents : string;
 
             //search for a filename
-            var filename = "swap"+currentProcess.getPid();
+            var filename = _ProgramFile+currentProcess.getPid();
             var fileHex = this.fsu.stringToHex(filename.toString());
             var padFile = this.fsu.padding(fileHex,this.dataSize);
             var dataIndex = this.getFileContents(padFile);
@@ -516,8 +512,11 @@ module TSOS{
             Shell.updateReadyQueue();
 
             if(nextProcess.getState() != "Terminated" && nextProcess.getState() != "Killed"){
-                filename = "swap"+nextProcess.getPid();
+                filename = _ProgramFile+nextProcess.getPid();
                 oldContents = _MemoryManager.copyBlock(nextProcess.getBase());
+                if(data.length < this.dataSize){
+                    _MemoryManager.clearBlock(nextProcess.getBase());//clear the block
+                }
                 nextProcess.setLocation("Disk");
                 nextProcess.setPrintLocation("Memory -> Disk");
                 nextProcess.setState(2);//waiting
@@ -532,7 +531,7 @@ module TSOS{
                 //we need to set the location to disk here
                 //because when we kill or swap...we can still swap
                 //in order
-                nextProcess.setLocation("Disk");
+                nextProcess.setLocation("Memory");
                 nextProcess.setPrintLocation("Memory -> Trash");
                 Shell.updateReadyQueue();
             }
@@ -564,6 +563,7 @@ module TSOS{
             //grab everything in hex!!!!
             data = this.grabAllHex(dataIndex);
             sessionStorage.setItem(dataIndex,zeroData);
+            this.update();
 
             processOnDisk.setBase(base);
             processOnDisk.setLimit((base+_BlockSize));
@@ -592,7 +592,6 @@ module TSOS{
             var stepOut:boolean = false;
             var dataData;
             var changeHex;
-            var keys = "";
 
             for (var t:number = index.charAt(0); t < this.trackSize; t++) {
                 for (var s:number = index.charAt(1); s < this.sectorSize; s++) {
@@ -607,7 +606,6 @@ module TSOS{
                             value += changeHex;
                             sessionStorage.setItem(key, zeroData);//replace with zeros
                             this.update();
-                            keys += key;
                             stepOut = true;
                             break;
                         } else {
@@ -615,7 +613,6 @@ module TSOS{
                             value += changeHex;
                             sessionStorage.setItem(key, zeroData);//replace with zeros
                             this.update();
-                            keys += key +", ";
                         }
                         index = nextKey;
                     }
@@ -657,10 +654,12 @@ module TSOS{
                         if (nextMeta == "###") {
                             oldData += data.slice(4, data.length);
                             sessionStorage.setItem(key, zeroData);//replace with zeros
+                            this.update();
                             return oldData;
                         } else {
                             oldData += data.slice(4, data.length);
                             sessionStorage.setItem(key, zeroData);//replace with zeros
+                            this.update();
                         }
                         index = nextMeta;
                     }

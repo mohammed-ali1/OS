@@ -24,13 +24,13 @@ module TSOS {
             for(var i=0; i<_MainMemorySize;i+=8){
 
                 _MainMemoryBase[i] = i.toString(16).toUpperCase();
-                if(i % 256 == 0){
+                if(i % _BlockSize == 0){
                     Memory.segment++;
-                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 10px;'>" + "["+
+                    table += "<tr><td style='font-size: 10px; font-weight: bold;'>" + "["+
                         Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 else{
-                    table += "<tr><td style='font-size: 10px;'>" + "["+
+                    table += "<tr><td style='font-size: 10px; font-weight: bold;'>" + "["+
                         Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
 
@@ -71,16 +71,22 @@ module TSOS {
             var x = str.replace(/^\s+|\s+$/g, '');
             x = str.trim();
             var a = 0, b = 2;
+            var s;
             //Need to load carefully Here!
             //base + (x.length / 2);
             for (var i = base; i < base + (x.length / 2); i++) {
 
-                var s = x.substring(a, b);
+                s = x.substring(a, b);
                 _MainMemory[i] = s;
                 a = b;
                 b += 2;
             }
-//            Update the Memory
+            for(var j = base; j<(base+_BlockSize); j++){
+               s =  _MainMemory[j];
+                if(s.length <= 1){
+                    _MainMemory[j] = "00";
+                }
+            }
             this.updateMemory();
         }
 
@@ -95,13 +101,13 @@ module TSOS {
 
             for(var i=0; i<_MainMemorySize;i+=8){
 
-                if(i % 256 == 0){
+                if(i % _BlockSize == 0){
                     Memory.segment++;
-                    table += "<tr style='background-color: #ffffff;'><td style='font-size: 11px;'>" + "["+
+                    table += "<tr ><td style='font-size: 10px; font-weight: bold;'>" + "["+
                         Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 else{
-                    table += "<tr><td style='font-size: 11px;'>" + "["+
+                    table += "<tr><td style='font-size: 10px; font-weight: bold;'>" + "["+
                         Memory.segment + "x" + _MainMemoryBase[i] + "]" + "</td>";
                 }
                 for(var j=i; j<=i+7;j++){
@@ -129,7 +135,7 @@ module TSOS {
 
         public clearBlock(base){
 
-            for(var i=base; i<(base+256);i++){
+            for(var i=base; i<(base+_BlockSize);i++){
                 _MainMemory[i] = "00";
             }
             this.updateMemory();
@@ -146,7 +152,7 @@ module TSOS {
         public copyBlock(base){
             var data: string = "";
             var current:string;
-            for(var i = base ; i<(base+256);i++){
+            for(var i = base; i<(base+_BlockSize);i++){
                 current = _MainMemory[i];
                 if(current.length ==1){
                     data += "0"+current;
@@ -154,13 +160,8 @@ module TSOS {
                     data += current;
                 }
             }
+            this.updateMemory();
             return data;
         }
     }
 }
-
-
-
-
-
-

@@ -117,9 +117,9 @@ var TSOS;
         */
         FSU.prototype.update = function (trackSize, sectorSize, blockSize, sessionStorage) {
             var table = "<table>";
-            table += "<th style='text-align: left; background-color: transparent;'>TSB</th>";
-            table += "<th style='text-align: left; background-color: transparent;'>META</th>";
-            table += "<th style='text-align: left; background-color: transparent;'>DATA</th>";
+            table += "<th style=' background-color:lightgoldenrodyellow'>TSB</th>";
+            table += "<th style=' background-color:lightgoldenrodyellow'>META</th>";
+            table += "<th style=' background-color:lightgoldenrodyellow'>DATA</th>";
 
             for (var t = 0; t < trackSize; t++) {
                 for (var s = 0; s < sectorSize; s++) {
@@ -132,21 +132,21 @@ var TSOS;
                         //add some colors for readability.
                         if (key.charAt(0) == "0") {
                             if (meta.charAt(0) == "1") {
-                                table += "<tr style='background-color: #40e0d0'><td>" + t + s + b + " </td>";
+                                table += "<tr style='background-color:transparent'><td>" + t + s + b + " </td>";
                                 table += "<td style='color: red; background-color: #ffffff;'>" + meta + " " + "</td>";
                                 table += "<td>" + data + "</td></tr>";
                             } else {
-                                table += "<tr style='background-color: #40e0d0'><td>" + t + s + b + " </td>";
+                                table += "<tr style='background-color: transparent;'><td>" + t + s + b + " </td>";
                                 table += "<td style='color: #028064; background-color: #ffffff;'>" + meta + " " + "</td>";
                                 table += "<td>" + data + "</td></tr>";
                             }
                         } else {
                             if (meta.charAt(0) == "1") {
-                                table += "<tr style='background-color: orange'><td>" + t + s + b + " </td>";
+                                table += "<tr style='background-color: transparent'><td>" + t + s + b + " </td>";
                                 table += "<td style='color: red; background-color: #ffffff;'>" + meta + " " + "</td>";
                                 table += "<td>" + data + "</td></tr>";
                             } else {
-                                table += "<tr style='background-color: orange'><td>" + t + s + b + " </td>";
+                                table += "<tr style='background-color: transparent'><td>" + t + s + b + " </td>";
                                 table += "<td style='color: #028064; background-color: #ffffff;'>" + meta + " " + "</td>";
                                 table += "<td>" + data + "</td></tr>";
                             }

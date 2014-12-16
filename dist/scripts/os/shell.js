@@ -333,15 +333,13 @@ var TSOS;
 
             if (pro == undefined || pro < 0) {
                 priority = 10;
-            } else if (priority < 0) {
-                priority = 0;
             }
 
             if (base != -1) {
                 //Create New PCB and don't forget the priority
                 process = new TSOS.Pcb(base, (base + 255), priority);
                 process.setLength((x.length / 2)); //set the length of the program.
-                process.setState(007); //set state "NEW"
+                process.setState(7); //set state "NEW"
                 process.setLocation("Memory");
                 process.setPrintLocation("Memory");
 
@@ -367,7 +365,7 @@ var TSOS;
                     process = new TSOS.Pcb(-1, -1, priority);
                     process.setLocation("Disk");
                     process.setPrintLocation("Disk");
-                    process.setState(007); //set state "NEW"
+                    process.setState(7); //set state "NEW"
                     process.setLength((x.length / 2));
                     process.setLocation("Disk");
                     var filename = ("swap" + process.getPid());
@@ -691,12 +689,18 @@ var TSOS;
                 var process = _ResidentQueue[i];
 
                 if (process.getPid() == killMe) {
+                    if (process.getState() == "Killed") {
+                        _StdOut.putText("I'm already dead...!");
+                        return;
+                    }
+
                     if (process.getLocation() == "Disk") {
                         _FileSystem.deleteFile(_ProgramFile + process.getPid());
                         process.setPrintLocation("Disk -> Trash");
                         process.setState(5);
+
+                        //                        _ResidentQueue.splice(i,1);
                         Shell.updateReadyQueue();
-                        alert("Killed: " + process.getPid());
                         _StdOut.putText("Killed PID: " + process.getPid());
                         break;
                     }
@@ -704,7 +708,6 @@ var TSOS;
                         process.setState(5);
                         process.setPrintLocation("Memory -> Trash");
                         Shell.updateReadyQueue();
-                        alert("Killed: " + process.getPid());
                         _StdOut.putText("Killed PID: " + process.getPid());
                         break;
                     }
@@ -733,13 +736,19 @@ var TSOS;
         Shell.prototype.shellRunAll = function () {
             if (_CurrentSchedule == "priority") {
                 _CurrentScheduler.sort();
+                for (var i = 0; i < _ResidentQueue.length; i++) {
+                    var temp = _ResidentQueue[i];
+                    _ReadyQueue.enqueue(temp);
+                }
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(_RUNALL, 0));
+                return;
             }
             for (var i = 0; i < _ResidentQueue.length; i++) {
                 var temp = _ResidentQueue[i];
                 if (temp.getLocation() == "Memory") {
                     temp.setState(3); //set state to "Ready"
                 } else {
-                    temp.setState(3);
+                    temp.setState(-1);
                 }
                 _ReadyQueue.enqueue(temp);
             }
@@ -767,7 +776,7 @@ var TSOS;
                     _Console.advanceLine();
                     return;
                 }
-                _FileSystem.createFile(args.toString());
+                _Kernel.krnInterruptHandler(_CREATE, filename);
             } else {
                 _StdOut.putText("File System not Formatted!");
             }
@@ -835,7 +844,7 @@ var TSOS;
         */
         Shell.prototype.ShellRead = function (filename) {
             if (_FileSystem.isFormatted()) {
-                _FileSystem.read(filename);
+                _Kernel.krnInterruptHandler(_READ, filename);
             } else {
                 _StdOut.putText("File System not Formatted!");
             }
@@ -847,7 +856,7 @@ var TSOS;
         */
         Shell.prototype.ShellLs = function () {
             if (_FileSystem.isFormatted()) {
-                _FileSystem.fileDirectory();
+                _Kernel.krnInterruptHandler(_LS, 0);
             } else {
                 _StdOut.putText("File System not Formatted!");
             }
@@ -855,7 +864,7 @@ var TSOS;
 
         Shell.prototype.ShellDelete = function (filename) {
             if (_FileSystem.isFormatted()) {
-                _FileSystem.deleteFile(filename);
+                _Kernel.krnInterruptHandler(_DELETE, filename);
             } else {
                 _StdOut.putText("File System not Formatted!");
             }

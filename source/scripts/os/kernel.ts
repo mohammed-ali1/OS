@@ -41,6 +41,7 @@ module TSOS {
 
             //Initialize the Memory Manager
             _MemoryManager = new MemoryManager();
+            document.getElementById("tableID").style.visibility = "visible";
 
             //Initialize and load file system Device Driver
             _FileSystem = new FileSystem();
@@ -53,10 +54,6 @@ module TSOS {
             _krnKeyboardDriver = new DeviceDriverKeyboard();     // Construct it.
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
-
-            //
-            // ... more?
-            //
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
@@ -150,56 +147,20 @@ module TSOS {
                     _StdIn.handleInput();
                     break;
                 case _NextButton:
-                    _CurrentProcess.setState(1);
-                    _CPU.cycle();
-                    if(_CPU.PC > _CurrentProcess.getLength()){ //Use the program length to break
-                        Control.hostStopButton_click(this); //helps us exit next button!
-                        _CurrentProcess.setState(4);
-                        _CPU.reset();
-                        _CPU.displayCPU();
-                    }
+                    this.handleNextButton();
                     break;
                 case _SystemCall:
-                    if(params == 1){
-                        _StdOut.putText(_CPU.Yreg.toString());
-                    }
-                    if (params == 2){
-                        var address  = _CPU.Yreg;
-                        var print = "";
-                        var temp = parseInt(_MemoryManager.read(address),16);
-                        var index = 0;
-                        while (temp != "00"){
-                            print += String.fromCharCode(temp).toString();
-                            index++;
-                            temp = parseInt(_MemoryManager.read(parseInt(index+address)),16);
-                        }
-                        _StdOut.putText(print);
-                    }
-                    _Console.advanceLine();
-                    _OsShell.putPrompt();
+                    this.systemCall(params);
                     break;
                 case _Break: //-1 Denotes END of a process!
-                    _CPU.reset();//Re-Start the CPU!
-                    _CPU.displayCPU(); // commented because, we can test if it syncs with PCB!
-                    alert("Terminating pid; "+_CurrentProcess.getPid());
-                    _CurrentProcess.setState(4);
-                    _CurrentProcess.setTimeFinished(_OSclock);
-                    Pcb.displayTimeMonitor();
-//                    _ResidentQueue.splice(_ResidentQueue.indexOf(_CurrentProcess),1);//delete off of resident queue
-                    _ClockCycle = 0;
-                    _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
-                    Shell.updateReadyQueue();
-                    if(_ReadyQueue.isEmpty()){
-                        _ResidentQueue.splice(0,_ResidentQueue.length);
-                        _Memory.clearMemory();
-                    }
-                    this.startScheduler();
+                    this.breakCall();
                     break;
                 case _InvalidOpCode:
                     _StdOut.putText("WTF is this Instruction?");
+                    _CPU.reset();
                     break;
                 case _RUN:
-                    //need to look at current scheduler first
+                    //what if something is already running...?
                     if(_CPU.isExecuting){
                         _ReadyQueue.enqueue(params);
                     }else{
@@ -208,6 +169,7 @@ module TSOS {
                     }
                     break;
                 case _RUNALL:
+                    document.getElementById("processesDiv").style.visibility = "visible";
                     this.startScheduler();
                     break;
                 case _ContextSwitch:
@@ -231,6 +193,7 @@ module TSOS {
                     _StdOut.putText("Killed PID: " +params.getPid());
                     Shell.updateReadyQueue();
                     _CPU.reset();
+                    _ClockCycle = 0;
                     break;
                 case _KilledRunAll:
                     _ClockCycle = 0;
@@ -242,6 +205,21 @@ module TSOS {
                 case _BSOD:
                     this.bsod(params);
                     break;
+                case _ROLLIN:
+                    this.rollIn(params);
+                    break;
+                case _READ:
+                    _FileSystem.read(params);
+                    break;
+                case _CREATE:
+                    _FileSystem.createFile(params.toString());
+                    break;
+                case _DELETE:
+                    _FileSystem.deleteFile(filename);
+                    break;
+                case _LS:
+                    _FileSystem.fileDirectory();
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -252,21 +230,34 @@ module TSOS {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
         }
 
+        public rollIn(process:TSOS.Pcb){
+            _FileSystem.rollIn(_CurrentProcess, process);//swap processes and delete if "terminated"
+        }
 
-        // System Calls... that generate software interrupts via tha Application Programming Interface library routines.
-        //
-        // Some ideas:
-        // - ReadConsole
-        // - WriteConsole
-        // - CreateProcess
-        // - ExitProcess
-        // - WaitForProcessToExit
-        // - CreateFile
-        // - OpenFile
-        // - ReadFile
-        // - WriteFile
-        // - CloseFile
+        /**
+         * Handles System Call
+         * @param params
+         */
+        public systemCall(params){
 
+            if(params == 1){
+                _StdOut.putText(_CPU.Yreg.toString());
+            }
+            if (params == 2){
+                var address  = _CPU.Yreg;
+                var print = "";
+                var temp = parseInt(_MemoryManager.read(address),16);
+                var index = 0;
+                while (temp != "00"){
+                    print += String.fromCharCode(temp).toString();
+                    index++;
+                    temp = parseInt(_MemoryManager.read(parseInt(index+address)),16);
+                }
+                _StdOut.putText(print);
+            }
+            _Console.advanceLine();
+            _OsShell.putPrompt();
+        }
 
         //
         // OS Utility Routines
@@ -303,7 +294,6 @@ module TSOS {
             if(_ReadyQueue.isEmpty() && (_CurrentProcess.getState() == "Terminated" ||
                                         _CurrentProcess.getState() == "Killed")){
                 _CPU.reset();
-
             }else {
                 _CurrentProcess.setPc(_CPU.PC);
                 _CurrentProcess.setAcc(_CPU.Acc);
@@ -315,39 +305,7 @@ module TSOS {
 
                 //push back onto the queue
                 _ReadyQueue.enqueue(_CurrentProcess);
-
-                //grab the next process
-                _CurrentProcess = _ReadyQueue.dequeue();
-
-                alert("cs... next pid: "+_CurrentProcess.getPid()+", state: "+_CurrentProcess.getState()+", loc: "+_CurrentProcess.getLocation());
-
-                if((_CurrentProcess.getState() == "Terminated" ||
-                    _CurrentProcess.getState() == "Killed")){
-                    alert("State: "+_CurrentProcess.getState()+" grabbig next...");
-                    this.startScheduler();
-                    return;
-                }
-
-                //record arrival time
-                if(_CurrentProcess.getState() == "Ready"){
-                    _CurrentProcess.setTimeArrived(_OSclock);
-                    Pcb.displayTimeMonitor();
-                }
-
-                if(_CurrentProcess.getLocation() == "Disk"){
-                    alert("loc: "+_CurrentProcess.getLocation()+" need to swap..");
-                    this.contextSwitchDisk(true,false,false);
-                    return;
-                }
-                if(_CurrentProcess.getLocation() == "Memory"){
-                    //keep executing....Location = Memory
-                    alert("loc: "+_CurrentProcess.getLocation());
-                    _Kernel.krnTrace("\nCONTEXT SWITCH TO PID: " + _CurrentProcess.getPid() + "\n");
-                    _CurrentProcess.setState(1); //set state to running
-                    Shell.updateReadyQueue();
-                    _CPU.startProcessing(_CurrentProcess);
-                    _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
-                }
+                this.startScheduler();//go back and get next process, if any!
             }
         }
 
@@ -367,7 +325,9 @@ module TSOS {
                 }
                 nextProcess = _ResidentQueue[index];
             }
-            alert("swapping with pid: "+nextProcess.getPid()+", loc: "+nextProcess.getLocation());
+            if(nextProcess.getState() == "Killed" || nextProcess.getState() == "Terminated"){
+                _ResidentQueue.splice(_ResidentQueue.indexOf(nextProcess),1);
+            }
             return nextProcess;
         }
 
@@ -383,9 +343,10 @@ module TSOS {
         public contextSwitchDisk(rr,fcfs,priority) {
 
             if (rr) {
+                _ClockCycle = 0;
                 var nextProcess:TSOS.Pcb = this.getNextAvailableBlock();
-                _FileSystem.rollIn(_CurrentProcess, nextProcess);//swap processes and delete if "terminated"
-                _Kernel.krnTrace("\nCONTEXT SWITCH FROM TO PID: " + _CurrentProcess.getPid() + "\n");
+                this.krnInterruptHandler(_ROLLIN,nextProcess);//handled as an interrupt.
+                _Kernel.krnTrace("\nRolling In "+_CurrentProcess.getPid()+" from Disk"+ "\n");
                 Shell.updateReadyQueue();
                 _CPU.startProcessing(_CurrentProcess);
                 _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
@@ -427,6 +388,31 @@ module TSOS {
                     break;
                 }
             }
+        }
+
+        public breakCall(){
+            _CPU.reset();//Re-Start the CPU!
+            _CurrentProcess.setState(4);
+            _CurrentProcess.setTimeFinished(_OSclock);
+            Pcb.displayTimeMonitor();
+            _ClockCycle = 0;
+            _Kernel.krnTrace("\n\nTERMINATING PID: "+_CurrentProcess.getPid()+"\n");
+            Shell.updateReadyQueue();
+            if(_ReadyQueue.isEmpty()){
+                _ResidentQueue.splice(0,_ResidentQueue.length);
+                _Memory.clearMemory();
+            }
+            this.startScheduler();//start over
+        }
+
+        /**
+         * Handles Single Step
+         */
+        public handleNextButton(){
+            _CurrentProcess.setState(1);
+            _CPU.cycle();
+            _StepButton = false;
+            Shell.updateReadyQueue();
         }
 
         /**

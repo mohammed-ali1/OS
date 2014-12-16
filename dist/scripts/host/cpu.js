@@ -59,7 +59,7 @@ var TSOS;
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set _CPU.isExecuting appropriately.
             //Read Stuff from Memory @ Program Counter
-            _CPU.manageOpCodes(_MemoryManager.read(_CPU.PC));
+            this.manageOpCodes(_MemoryManager.read(_CPU.PC));
 
             //Update the Memory if Any Changes!
             _MemoryManager.update();
@@ -69,6 +69,8 @@ var TSOS;
 
             //Update PCB
             _CPU.updatePcb(_CurrentProcess);
+
+            TSOS.Shell.updateReadyQueue();
         };
 
         Cpu.prototype.displayCPU = function () {
@@ -268,16 +270,9 @@ var TSOS;
                 var address = parseInt(_MemoryManager.read(++_CPU.PC), 16);
                 _CPU.PC += address;
 
-                //                alert("PC Before: "+parseInt(_CPU.PC+_CurrentProcess.getBase())+", Limit: "+_CurrentProcess.getLimit());
                 if (_CPU.PC > _BlockSize) {
                     _CPU.PC -= _BlockSize;
                 }
-
-                //                alert("PC After: "+parseInt(_CPU.PC+_CurrentProcess.getBase()));
-                //                if(_CPU.PC > _BlockSize){
-                //                    alert("GETTING OUT OF BOUNDS!!!");
-                //                    _KernelInterruptQueue.enqueue(new Interrupt(_MemoryErrr,0)); //Out of Memory Bounds!!!
-                //                }
                 _CPU.INS = "CPU [D0 $EF]" + "   [" + _CPU.IR + ", " + address + "]";
             } else {
                 _CPU.PC++;
@@ -314,6 +309,10 @@ var TSOS;
             return parseInt((first + second));
         };
 
+        /**
+        * Updates the process state
+        * @param p
+        */
         Cpu.prototype.updatePcb = function (p) {
             p.setPc(_CPU.PC);
             p.setAcc(_CPU.Acc);

@@ -388,15 +388,13 @@ module TSOS {
 
             if(pro == undefined || pro < 0){
                 priority = 10;
-            }else if(priority <0){
-                priority = 0;
             }
 
             if(base != -1) {
                 //Create New PCB and don't forget the priority
                 process = new Pcb(base, (base + 255), priority);
                 process.setLength((x.length / 2)); //set the length of the program.
-                process.setState(007);//set state "NEW"
+                process.setState(7);//set state "NEW"
                 process.setLocation("Memory");
                 process.setPrintLocation("Memory");
 
@@ -420,7 +418,7 @@ module TSOS {
                     process = new Pcb(-1,-1,priority);
                     process.setLocation("Disk");
                     process.setPrintLocation("Disk");
-                    process.setState(007);//set state "NEW"
+                    process.setState(7);//set state "NEW"
                     process.setLength((x.length / 2));
                     process.setLocation("Disk");
                     var filename:string = ("swap"+process.getPid());
@@ -752,23 +750,28 @@ module TSOS {
                 var process:TSOS.Pcb = _ResidentQueue[i];
 
                 if(process.getPid() == killMe){
-                    if(process.getLocation() == "Disk"){
+
+                   if(process.getState() == "Killed"){
+                       _StdOut.putText("I'm already dead...!");
+                       return;
+                   }
+
+                   if(process.getLocation() == "Disk"){
                         _FileSystem.deleteFile(_ProgramFile+process.getPid());
                         process.setPrintLocation("Disk -> Trash");
                         process.setState(5);
+//                        _ResidentQueue.splice(i,1);
                         Shell.updateReadyQueue();
-                        alert("Killed: "+process.getPid());
                         _StdOut.putText("Killed PID: "+process.getPid());
                         break;
-                    }
-                    if(process.getLocation() == "Memory"){
+                   }
+                   if(process.getLocation() == "Memory"){
                         process.setState(5);
                         process.setPrintLocation("Memory -> Trash");
                         Shell.updateReadyQueue();
-                        alert("Killed: "+process.getPid());
                         _StdOut.putText("Killed PID: "+process.getPid());
                         break;
-                    }
+                   }
                 }
             }
         }
@@ -798,13 +801,19 @@ module TSOS {
 
             if(_CurrentSchedule == "priority"){
                 _CurrentScheduler.sort();
+                for(var i=0; i<_ResidentQueue.length;i++){
+                    var temp: TSOS.Pcb = _ResidentQueue[i];
+                    _ReadyQueue.enqueue(temp);
+                }
+                _KernelInterruptQueue.enqueue(new Interrupt(_RUNALL,0));
+                return;
             }
             for(var i=0; i<_ResidentQueue.length;i++){
                 var temp: TSOS.Pcb = _ResidentQueue[i];
                 if(temp.getLocation() == "Memory"){
                     temp.setState(3);//set state to "Ready"
                 }else{
-                    temp.setState(3);
+                    temp.setState(-1);
                 }
                 _ReadyQueue.enqueue(temp);
             }
@@ -832,7 +841,7 @@ module TSOS {
                     _Console.advanceLine();
                     return;
                 }
-                _FileSystem.createFile(args.toString());
+                _Kernel.krnInterruptHandler(_CREATE, filename);
             }else{
                 _StdOut.putText("File System not Formatted!");
             }
@@ -903,7 +912,7 @@ module TSOS {
          */
         public ShellRead(filename){
             if(_FileSystem.isFormatted()){
-                _FileSystem.read(filename);
+                _Kernel.krnInterruptHandler(_READ, filename);
             }else{
                 _StdOut.putText("File System not Formatted!");
             }
@@ -915,7 +924,7 @@ module TSOS {
          */
         public ShellLs(){
             if(_FileSystem.isFormatted()){
-                _FileSystem.fileDirectory();
+                _Kernel.krnInterruptHandler(_LS, 0);
             }else{
                 _StdOut.putText("File System not Formatted!");
             }
@@ -923,7 +932,7 @@ module TSOS {
 
         public ShellDelete(filename:string){
             if(_FileSystem.isFormatted()){
-                _FileSystem.deleteFile(filename);
+                _Kernel.krnInterruptHandler(_DELETE, filename);
             }else{
                 _StdOut.putText("File System not Formatted!");
             }

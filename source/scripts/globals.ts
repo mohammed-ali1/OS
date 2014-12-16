@@ -21,16 +21,11 @@ var TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interr
                             // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ: number = 100;
 
-//Color for the Logger!
-var _FancyColor:number = 0;
-
-//
 // Global Variables
 //
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 
 var _OSclock: number = 0;  // Page 23.
-
 var _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 
 var _Canvas: HTMLCanvasElement = null;  // Initialized in hostInit().
@@ -68,21 +63,20 @@ var _hardwareClockID: number = null;
 var _GLaDOS: any = null;
 var Glados: any = null;
 
+/*INTERRUPT CASES */
+var _ROLLIN:number = 990;
+var _READ:number = 991;
+var _DELETE:number = 992;
+var _CREATE:number = 993;
+var _LS:number = 994;
+
 // MEMORY INFO
 var _MainMemory: string[] = null;
 var _MainMemorySize: number = 768;
 var _MainMemoryBase : string[] = null;
 var _Memory : TSOS.Memory;
 var _BlockSize :number = 256;
-
-//Schedules the  Algorithms
-var _SCHEDULE :number = 444;
-
-//Memory Manager
 var _MemoryManager : TSOS.MemoryManager;
-
-//PCB
-var _Pcb:TSOS.Pcb;
 
 //Ready and Resident Queues
 var _ResidentQueue: any[] =  null;
@@ -121,8 +115,11 @@ var _Quantum:number = 6;
 var _CurrentScheduler: TSOS.Scheduler;
 var _CurrentSchedule :string = null;
 
+//Program File Name
 var _ProgramFile:string = "swap";
-var _ProcessActivity:TSOS.Activity;
+
+//Color for the Logger!
+var _FancyColor:number = 0;
 
 
 var onDocumentLoad = function() {

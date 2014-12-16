@@ -57,7 +57,7 @@ module TSOS {
             // Do the real work here. Be sure to set _CPU.isExecuting appropriately.
 
             //Read Stuff from Memory @ Program Counter
-            _CPU.manageOpCodes(_MemoryManager.read(_CPU.PC));
+            this.manageOpCodes(_MemoryManager.read(_CPU.PC));
 
             //Update the Memory if Any Changes!
             _MemoryManager.update();
@@ -67,6 +67,8 @@ module TSOS {
 
             //Update PCB
             _CPU.updatePcb(_CurrentProcess);
+
+            Shell.updateReadyQueue();
         }
 
         public displayCPU(){
@@ -301,17 +303,10 @@ module TSOS {
 
                 var address:number = parseInt(_MemoryManager.read(++_CPU.PC),16);
                 _CPU.PC += address;
-//                alert("PC Before: "+parseInt(_CPU.PC+_CurrentProcess.getBase())+", Limit: "+_CurrentProcess.getLimit());
+
                 if(_CPU.PC > _BlockSize){
                     _CPU.PC -= _BlockSize;
                 }
-//                alert("PC After: "+parseInt(_CPU.PC+_CurrentProcess.getBase()));
-
-//                if(_CPU.PC > _BlockSize){
-//                    alert("GETTING OUT OF BOUNDS!!!");
-//                    _KernelInterruptQueue.enqueue(new Interrupt(_MemoryErrr,0)); //Out of Memory Bounds!!!
-//                }
-
                 _CPU.INS = "CPU [D0 $EF]" +
                     "   ["+_CPU.IR+", "+address+"]";
             }
@@ -353,6 +348,10 @@ module TSOS {
             return parseInt((first+second));
         }
 
+        /**
+         * Updates the process state
+         * @param p
+         */
         public updatePcb(p:Pcb){
 
             p.setPc(_CPU.PC);

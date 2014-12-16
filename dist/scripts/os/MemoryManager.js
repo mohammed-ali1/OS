@@ -16,6 +16,8 @@ var TSOS;
             if (parseInt(_CurrentProcess.getBase() + index) > parseInt(_CurrentProcess.getLimit()) || parseInt(_CurrentProcess.getBase() + index) < parseInt(_CurrentProcess.getBase())) {
                 //memory bound interrupt
                 _Kernel.krnInterruptHandler(_BSOD, "Illegal Memory Access");
+                _CurrentProcess.setState(4);
+                TSOS.Shell.updateReadyQueue();
             } else {
                 return _Memory.read(parseInt(_CurrentProcess.getBase() + index));
             }
@@ -30,8 +32,10 @@ var TSOS;
             if (parseInt(_CurrentProcess.getBase() + index) > parseInt(_CurrentProcess.getLimit()) || parseInt(_CurrentProcess.getBase() + index) < parseInt(_CurrentProcess.getBase())) {
                 //memory bound interrupt
                 _Kernel.krnInterruptHandler(_BSOD, "Illegal Memory Access");
+                _CurrentProcess.setState(4);
+                TSOS.Shell.updateReadyQueue();
             } else {
-                _Memory.store(parseInt(_CurrentProcess.getBase() + index), str);
+                _Memory.store(parseInt(_CurrentProcess.getBase() + index), str.toUpperCase().toString());
             }
         };
 

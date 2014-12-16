@@ -4,8 +4,6 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <meta name="author"             content="Alan G. Labouseur" />
     <link rel="stylesheet" href="dist/styles/tsos.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="dist/styles/flipclock.css" />
-    <script type="text/javascript" src="dist/styles/flipclock.js"></script>
     <title>BAD ASS OS -- 9.1.5</title>
 
     <!-- Globals CONSTANTS and _Variables. Must included be first. -->
@@ -109,20 +107,6 @@
                 height="500"
                 tabindex="3">
         </canvas>
-        <div id="osMonitorDiv">
-            <h4 style="color: firebrick;">Processes Activity</h4>
-            <table id="odMonitorTable">
-                <tr>
-                    <th>Killed</th>
-                    <th>Terminated</th>
-                    <th>In-Memory</th>
-                    <th>In-Disk</th>
-                    <th>Waiting</th>
-                    <th>Running</th>
-                    <th>Trash</th>
-                </tr>
-            </table>
-        </div>
     </div>
 
     <div id="divLog" style="margin-left:2px; float: left; width: auto; height: auto;">
@@ -136,23 +120,21 @@
         </div>
 
         <div>
-            <h3 style="color: #000000; text-align: left;">User Program</h3>
+            <h3 style="color: firebrick; text-align: left;">User Program</h3>
             <textarea name="taProgramInput"
                       id  ="taProgramInput"
                       rows="8"
                       cols="40"
-                      placeholder="Enter Program to RUN"
-                    >A9 00 8D 7B 00 A9 00 8D 7B 00 A9 00 8D 7C 00 A9 00 8D 7C 00 A9 01 8D 7A 00 A2 00 EC 7A 00 D0 39 A0 7D A2 02 FF AC 7B 00 A2 01 FF AD 7B 00 8D 7A 00 A9 01 6D 7A 00 8D 7B 00 A9 03 AE 7B 00 8D 7A 00 A9 00 EC 7A 00 D0 02 A9 01 8D 7A 00 A2 01 EC 7A 00 D0 05 A9 01 8D 7C 00 A9 00 AE 7C 00 8D 7A 00 A9 00 EC 7A 00 D0 02 A9 01 8D 7A 00 A2 00 EC 7A 00 D0 AC A0 7F A2 02 FF 00 00 00 00 61 00 61 64 6F 6E 65 00</textarea>
+                      placeholder="Enter Program to RUN">A9 00 8D 7B 00 A9 00 8D 7B 00 A9 00 8D 7C 00 A9 00 8D 7C 00 A9 01 8D 7A 00 A2 00 EC 7A 00 D0 39 A0 7D A2 02 FF AC 7B 00 A2 01 FF AD 7B 00 8D 7A 00 A9 01 6D 7A 00 8D 7B 00 A9 03 AE 7B 00 8D 7A 00 A9 00 EC 7A 00 D0 02 A9 01 8D 7A 00 A2 01 EC 7A 00 D0 05 A9 01 8D 7C 00 A9 00 AE 7C 00 8D 7A 00 A9 00 EC 7A 00 D0 02 A9 01 8D 7A 00 A2 00 EC 7A 00 D0 AC A0 7F A2 02 FF 00 00 00 00 61 00 61 64 6F 6E 65 00</textarea>
         </div>
     </div>
 
     <div id="memoryTable" style="margin-left:5px; height: auto;float:left;">
 
-        <div style="margin:2%;">
+        <div>
             <p>
-                <br/>
                 <center>
-                     <h3 style="margin-top:5%;">Main Memory</h3>
+                     <h3 style="">Main Memory</h3>
                 </center>
             </p>
         </div>
@@ -186,7 +168,7 @@
                     </tr>
                 </table>
 
-                <div style="height: 130px; overflow: scroll; border:transparent; border-radius: 10px;">
+                <div style="height: 130px; overflow: scroll; border:transparent; border-radius: 5px;">
                     <h4 style="color: firebrick;">Processes Monitoring</h4>
                     <table id="monitor">
                         <tr>
@@ -203,11 +185,11 @@
 </div>
 
 <div>
-    <div style="overflow: scroll; border: transparent; float: left; border: 2px solid;">
+    <div id="processesDiv">
         <h4 id="currentScheduler" style="color:firebrick;" ></h4>
         <h4 style="color:firebrick; display: inline;">Active Processes</h4>
 
-        <div>
+        <div">
             <table id="displayReady">
                 <tr>
                     <th>Pid</th>
@@ -226,7 +208,7 @@
         </div>
     </div>
 
-    <div id="fileSystemDiv" style=" float:right; border: 2px solid; visibility: hidden;">
+    <div id="fileSystemDiv">
         <center><h4 style="color: firebrick;">File System</h4></center>
         <div id="dirDataDiv" style=" max-width: 550px; max-height: 500px; overflow: scroll;">
             <table id="dirDataTable">
@@ -244,6 +226,4 @@
     Reproduction is prohibited without the express written consent of
     Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
 </footer>
-
-
 </html>
