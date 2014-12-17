@@ -86,6 +86,7 @@ module TSOS{
        public priority(){
 
            if (_ReadyQueue.getSize() > 0) {
+
                _CurrentProcess = _ReadyQueue.dequeue();
 
                if((_CurrentProcess.getState() == "Terminated" ||
@@ -113,7 +114,7 @@ module TSOS{
            } else if ((_CurrentProcess.getState() != "Terminated" ||
                _CurrentProcess.getState() != "Killed")&&
                _ReadyQueue.isEmpty()) {
-               Shell.updateReadyQueue();
+               return;
            }
        }
 
@@ -135,17 +136,20 @@ module TSOS{
         *
         */
        public sort(){
+
            for(var i = 0; i<_ResidentQueue.length;i++){
-               for(var j = 1; j<_ResidentQueue.length-i;j++){
-                   var first = _ResidentQueue[j-1].getPriority();
-                   var second = _ResidentQueue[j].getPriority();
-                   if(first > second){
+               for(var j = 1; j<((_ResidentQueue.length)-i);j++){
+
+                   var first:number = _ResidentQueue[j-1].getPriority();
+                   var second:number = _ResidentQueue[j].getPriority();
+                   if(first >= second){
                        var temp:TSOS.Pcb = _ResidentQueue[j-1];
                        _ResidentQueue[j-1] = _ResidentQueue[j];
                        _ResidentQueue[j] = temp;
 
+                       var temp1:TSOS.Pcb = _TerminatedQueue[j-1];
                        _TerminatedQueue[j-1] = _TerminatedQueue[j];
-                       _TerminatedQueue[j] = temp;
+                       _TerminatedQueue[j] = temp1;
                    }
                }
            }

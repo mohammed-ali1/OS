@@ -104,7 +104,8 @@ h3 {
 }
 
 #display {
-    background-color: rgba(246, 232, 151, 0.30);
+    /*background-color: rgba(246, 232, 151, 0.30);*/
+    background-color: lightgrey;
     border: 2px solid red;
     cursor: default;
     border-radius: 5px;
@@ -176,19 +177,16 @@ h3 {
 }
 
 #tableID tr:nth-child(odd) {
-    background-color: oldlace;
+    background-color: rgb(255, 196, 45);
     /*FFD801*/
 }
 #tableID tr:nth-child(even) {
-    background-color:lightgoldenrodyellow;
+    background-color:#E66C2C;
     /*E66C2C*/
 }
 
 #tableID td:hover{
     background-color:red;
-}
-#tableID tr:hover{
-    background-color:greenyellow;
 }
 
 #tableID td{
@@ -317,7 +315,17 @@ h3 {
     color: firebrick;
     width: auto;
     border-radius: 5px;
+    background-color: rgb(255, 196, 45);
  }
+
+#dirDataTable tr:nth-child(odd) {
+    background-color: rgb(255, 196, 45);
+    /*FFD801*/
+}
+#dirDataTable tr:nth-child(even) {
+    background-color:#E66C2C;
+    /*E66C2C*/
+}
 
 #dirDataTable td{
     width: auto;

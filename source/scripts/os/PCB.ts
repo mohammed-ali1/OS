@@ -89,7 +89,7 @@ module TSOS{
             return this.printLocation;
         }
 
-        public getPriority(){
+        public getPriority():number{
             return this.priority;
         }
 

@@ -94,7 +94,7 @@ var TSOS;
                     return;
                 }
             } else if ((_CurrentProcess.getState() != "Terminated" || _CurrentProcess.getState() != "Killed") && _ReadyQueue.isEmpty()) {
-                TSOS.Shell.updateReadyQueue();
+                return;
             }
         };
 
@@ -117,16 +117,17 @@ var TSOS;
         */
         Scheduler.prototype.sort = function () {
             for (var i = 0; i < _ResidentQueue.length; i++) {
-                for (var j = 1; j < _ResidentQueue.length - i; j++) {
+                for (var j = 1; j < ((_ResidentQueue.length) - i); j++) {
                     var first = _ResidentQueue[j - 1].getPriority();
                     var second = _ResidentQueue[j].getPriority();
-                    if (first > second) {
+                    if (first >= second) {
                         var temp = _ResidentQueue[j - 1];
                         _ResidentQueue[j - 1] = _ResidentQueue[j];
                         _ResidentQueue[j] = temp;
 
+                        var temp1 = _TerminatedQueue[j - 1];
                         _TerminatedQueue[j - 1] = _TerminatedQueue[j];
-                        _TerminatedQueue[j] = temp;
+                        _TerminatedQueue[j] = temp1;
                     }
                 }
             }

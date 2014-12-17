@@ -511,7 +511,7 @@ var TSOS;
                 //we need to set the location to disk here
                 //because when we kill or swap...we can still swap
                 //in order
-                nextProcess.setLocation("Memory");
+                nextProcess.setLocation("Disk");
                 nextProcess.setPrintLocation("Memory -> Trash");
                 TSOS.Shell.updateReadyQueue();
             }

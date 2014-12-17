@@ -500,7 +500,7 @@ module TSOS {
                 if (s.getState() == "Waiting"){
 
                     if(s.getLocation() == "Memory"){
-                        tableView += "<tr style='background-color: #FFD801;'>";
+                        tableView += "<tr style='background-color:rgb(255, 196, 45);'>";
                         tableView += "<td style='color: #000000;'>" + s.getPid().toString() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getBlock().toString() + "</td>";
                         tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
@@ -516,7 +516,7 @@ module TSOS {
                         tableView += "<td style='color: #000000;'>" + s.getPriority()+ "</td>";
                         tableView += "</tr>";
                     }else{
-                        tableView += "<tr style='background-color: #FFD801;'>";
+                        tableView += "<tr style='background-color: rgb(255, 196, 45);'>";
                         tableView += "<td style='color: firebrick;'>" + s.getPid().toString() + "</td>";
                         tableView += "<td style='color: firebrick;'>" + s.getBlock().toString() + "</td>";
                         tableView += "<td style='color: firebrick;'>" + s.getBase().toString() + "</td>";
@@ -554,7 +554,7 @@ module TSOS {
                 }
 
                 if (s.getState() == "New"){
-                    tableView += "<tr style='background-color: darkturquoise;'>";
+                    tableView += "<tr style='background-color: #E66C2C;'>";
                     tableView += "<td style='color: #000000;'>" + s.getPid().toString() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getBlock().toString() + "</td>";
                     tableView += "<td style='color: #000000;'>" + s.getBase().toString() + "</td>";
