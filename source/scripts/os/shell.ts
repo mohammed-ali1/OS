@@ -383,8 +383,8 @@ module TSOS {
 //            Get the free block first!
             var base = _MemoryManager.getBlockAvailable();
             var process;
-            var pro:string = args[0];
-            var priority:number = args[0];
+            var pro:string = args;
+            var priority:number = args;
 
             if(pro == undefined || pro < 0){
                 priority = 10;
@@ -698,11 +698,11 @@ module TSOS {
 
             var nobueno:boolean = false;
 
-            for(var i=0; i<_ResidentQueue.length;i++){
-                var temp : TSOS.Pcb = _ResidentQueue[i];
+            for(var i=0; i<_ReadyQueue.getSize();i++){
+                var temp : TSOS.Pcb = _ReadyQueue.q[i];
                 if(temp.getState() == "Running" || temp.getState() == "Waiting") {
                     nobueno = true;
-                    if (i + 1 == _ResidentQueue.length) {
+                    if (i + 1 == _ReadyQueue.getSize()>0) {
                         _StdOut.putText("Pid: " + temp.getPid());
                     } else {
                         _StdOut.putText("PID: " + temp.getPid() + ", ");
@@ -841,14 +841,13 @@ module TSOS {
                     _Console.advanceLine();
                     return;
                 }
-                _Kernel.krnInterruptHandler(_CREATE, filename);
+                _Kernel.krnInterruptHandler(_CREATE, args);
             }else{
                 _StdOut.putText("File System not Formatted!");
             }
         }
 
-        /**
-         *
+        /**   
          * @param filename
          * @param filecontents
          * @constructor

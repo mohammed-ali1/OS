@@ -142,7 +142,7 @@ module TSOS{
 
                    var first:number = _ResidentQueue[j-1].getPriority();
                    var second:number = _ResidentQueue[j].getPriority();
-                   if(first >= second){
+                   if(first > second){
                        var temp:TSOS.Pcb = _ResidentQueue[j-1];
                        _ResidentQueue[j-1] = _ResidentQueue[j];
                        _ResidentQueue[j] = temp;

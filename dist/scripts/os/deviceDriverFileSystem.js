@@ -406,8 +406,8 @@ var TSOS;
             var newKey = this.makeFreshKey(dataIndex);
 
             //get more keys starting from newKey
-            array = this.getAvailableAddresses(newKey, (ceiling - 1));
-            if (array.length < (ceiling - 1)) {
+            array = this.getAvailableAddresses(newKey, (ceiling));
+            if (array.length < (ceiling)) {
                 return false;
             }
 

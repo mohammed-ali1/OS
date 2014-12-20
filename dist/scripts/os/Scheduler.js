@@ -120,7 +120,7 @@ var TSOS;
                 for (var j = 1; j < ((_ResidentQueue.length) - i); j++) {
                     var first = _ResidentQueue[j - 1].getPriority();
                     var second = _ResidentQueue[j].getPriority();
-                    if (first >= second) {
+                    if (first > second) {
                         var temp = _ResidentQueue[j - 1];
                         _ResidentQueue[j - 1] = _ResidentQueue[j];
                         _ResidentQueue[j] = temp;
