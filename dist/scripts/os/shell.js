@@ -328,8 +328,8 @@ var TSOS;
             //            Get the free block first!
             var base = _MemoryManager.getBlockAvailable();
             var process;
-            var pro = args;
-            var priority = args;
+            var pro = args[0];
+            var priority;
 
             if (pro == undefined || pro < 0) {
                 priority = 10;
@@ -643,7 +643,7 @@ var TSOS;
                 var temp = _ReadyQueue.q[i];
                 if (temp.getState() == "Running" || temp.getState() == "Waiting") {
                     nobueno = true;
-                    if (i + 1 == _ReadyQueue.getSize() > 0) {
+                    if ((i + 1) == _ReadyQueue.getSize() > 0) {
                         _StdOut.putText("Pid: " + temp.getPid());
                     } else {
                         _StdOut.putText("PID: " + temp.getPid() + ", ");

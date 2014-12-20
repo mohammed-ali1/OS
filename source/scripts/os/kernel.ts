@@ -103,6 +103,7 @@ module TSOS {
                 if(_ClockCycle >= _Quantum){
                     _Mode = 0;
                     _ClockCycle = 0;
+                    Shell.updateReadyQueue();
                     this.krnInterruptHandler(_ContextSwitch,0);
                 }else{
                     _CPU.cycle();
@@ -205,8 +206,6 @@ module TSOS {
                 case _BSOD:
                     this.bsod(params);
                     break;
-                case _ROLLIN:
-                    this.rollIn(params);
                     break;
                 case _READ:
                     _FileSystem.read(params);
@@ -215,7 +214,7 @@ module TSOS {
                     _FileSystem.createFile(params.toString());
                     break;
                 case _DELETE:
-                    _FileSystem.deleteFile(filename);
+                    _FileSystem.deleteFile(params);
                     break;
                 case _LS:
                     _FileSystem.fileDirectory();
@@ -305,7 +304,21 @@ module TSOS {
 
                 //push back onto the queue
                 _ReadyQueue.enqueue(_CurrentProcess);
-                this.startScheduler();//go back and get next process, if any!
+                _CurrentProcess = _ReadyQueue.dequeue();
+
+                if(_CurrentProcess.getState() == "Terminated" || _CurrentProcess.getState() == "Killed"){
+                   this.startScheduler();
+                    return;
+                }
+
+                if(_CurrentProcess.getLocation() == "Disk"){
+                    this.contextSwitchDisk(true,false,false);
+                    return;
+                }
+                _CurrentProcess.setState(1);
+                _CPU.startProcessing(_CurrentProcess);
+                _Kernel.krnTrace("\nPROCESSING PID: " + _CurrentProcess.getPid() + "\n");
+                Shell.updateReadyQueue();
             }
         }
 
@@ -345,7 +358,7 @@ module TSOS {
             if (rr) {
                 _ClockCycle = 0;
                 var nextProcess:TSOS.Pcb = this.getNextAvailableBlock();
-                this.krnInterruptHandler(_ROLLIN,nextProcess);//handled as an interrupt.
+                _FileSystem.rollIn(_CurrentProcess, nextProcess);//swap processes and delete if "terminated"
                 _Kernel.krnTrace("\nRolling In "+_CurrentProcess.getPid()+" from Disk"+ "\n");
                 Shell.updateReadyQueue();
                 _CPU.startProcessing(_CurrentProcess);

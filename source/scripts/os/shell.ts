@@ -383,8 +383,8 @@ module TSOS {
 //            Get the free block first!
             var base = _MemoryManager.getBlockAvailable();
             var process;
-            var pro:string = args;
-            var priority:number = args;
+            var pro:string = args[0];
+            var priority:number;
 
             if(pro == undefined || pro < 0){
                 priority = 10;
@@ -702,7 +702,7 @@ module TSOS {
                 var temp : TSOS.Pcb = _ReadyQueue.q[i];
                 if(temp.getState() == "Running" || temp.getState() == "Waiting") {
                     nobueno = true;
-                    if (i + 1 == _ReadyQueue.getSize()>0) {
+                    if ((i + 1) == _ReadyQueue.getSize()>0) {
                         _StdOut.putText("Pid: " + temp.getPid());
                     } else {
                         _StdOut.putText("PID: " + temp.getPid() + ", ");
@@ -847,7 +847,7 @@ module TSOS {
             }
         }
 
-        /**   
+        /**
          * @param filename
          * @param filecontents
          * @constructor

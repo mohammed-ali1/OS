@@ -69,12 +69,13 @@ var TSOS;
                 a = b;
                 b += 2;
             }
-            for (var j = base; j < (base + _BlockSize); j++) {
-                s = _MainMemory[j];
-                if (s.length <= 1) {
-                    _MainMemory[j] = "00";
-                }
-            }
+
+            //            for(var j = base; j<(base+_BlockSize); j++){
+            //               s =  _MainMemory[j];
+            //                if(s.length <= 1){
+            //                    _MainMemory[j] = "00";
+            //                }
+            //            }
             this.updateMemory();
         };
 

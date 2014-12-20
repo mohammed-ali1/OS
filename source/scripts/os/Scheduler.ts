@@ -16,7 +16,6 @@ module TSOS{
        public rr(){
 
            if (_ReadyQueue.getSize() > 0) {
-                _ClockCycle = 0;
                _CurrentProcess = _ReadyQueue.dequeue(); // grab the next process
 
                if((_CurrentProcess.getState() == "Terminated" ||
