@@ -70,6 +70,7 @@ var TSOS;
             //Update PCB
             _CPU.updatePcb(_CurrentProcess);
 
+            TSOS.Pcb.displayTimeMonitor();
             TSOS.Shell.updateReadyQueue();
         };
 

@@ -66,24 +66,13 @@ module TSOS {
 
                 if(keyCode == 38) { //UP Arrow Key
 
+                    _Console.historyIndex--;
+
                     if (_Console.historyIndex < 0) {
                         _Console.historyIndex = _ConsoleHistory.length - 1;
                     }
-<<<<<<< HEAD
-=======
-
-<<<<<<< HEAD
-                    if (_Console.consoleHistory[_Console.historyIndex]) {
-                        this.pullHistory(_Console.consoleHistory[_Console.historyIndex]);
-                    }
-                    _Console.historyIndex--;
-                }else{
-=======
->>>>>>> master
                     this.pullHistory(_ConsoleHistory[_Console.historyIndex]);
-
                 }else{  //Down Arrow Key
->>>>>>> gh-pages
 
                     _Console.historyIndex++;
 

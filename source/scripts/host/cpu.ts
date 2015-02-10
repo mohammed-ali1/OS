@@ -68,6 +68,7 @@ module TSOS {
             //Update PCB
             _CPU.updatePcb(_CurrentProcess);
 
+            Pcb.displayTimeMonitor();
             Shell.updateReadyQueue();
         }
 

@@ -801,12 +801,12 @@ module TSOS {
 
             if(_CurrentSchedule == "priority"){
                 _CurrentScheduler.sort();
-                for(var i=0; i<_ResidentQueue.length;i++){
-                    var temp: TSOS.Pcb = _ResidentQueue[i];
-                    _ReadyQueue.enqueue(temp);
-                }
-                _KernelInterruptQueue.enqueue(new Interrupt(_RUNALL,0));
-                return;
+//                for(var i=0; i<_ResidentQueue.length;i++){
+//                    var temp: TSOS.Pcb = _ResidentQueue[i];
+//                    _ReadyQueue.enqueue(temp);
+//                }
+//                _KernelInterruptQueue.enqueue(new Interrupt(_RUNALL,0));
+//                return;
             }
             for(var i=0; i<_ResidentQueue.length;i++){
                 var temp: TSOS.Pcb = _ResidentQueue[i];

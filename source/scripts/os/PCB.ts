@@ -211,7 +211,6 @@ module TSOS{
                 table += "<td>" + parseInt(p.getTimeFinished() - p.getTimeArrived()) + "</td>";
                 table += "</tr>";
             }
-
             table += "</table>";
             document.getElementById("monitor").innerHTML = table;
 
